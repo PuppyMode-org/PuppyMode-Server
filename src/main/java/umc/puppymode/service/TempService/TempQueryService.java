@@ -1,6 +1,6 @@
 package umc.puppymode.service.TempService;
 
-public interface TempCommandService {
+public interface TempQueryService {
 
     void CheckFlag(Integer flag);
 }
