@@ -4,8 +4,8 @@ package umc.puppymode.domain.mapping;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import umc.puppymode.domain.NotificationCategory;
 import umc.puppymode.domain.User;
-import umc.puppymode.domain.NotificationType;
 import umc.puppymode.domain.common.BaseEntity;
 
 @Entity
@@ -22,8 +22,6 @@ public class UserNotification extends BaseEntity {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "notification_type_id")
-    private NotificationType notificationType;
-
-    private Boolean isEnabled;
+    @JoinColumn(name = "notification_category_id")
+    private NotificationCategory notificationCategory;
 }
