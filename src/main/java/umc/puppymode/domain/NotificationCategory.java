@@ -9,12 +9,12 @@ import umc.puppymode.domain.common.BaseEntity;
 @Entity
 @Getter
 @Setter
-public class UserAlarmType extends BaseEntity {
+public class NotificationCategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long alarmTypeId;
+    private Long notificationCategoryId;
 
-    private String typeName;
+    private String categoryName;
     private String description;
 }

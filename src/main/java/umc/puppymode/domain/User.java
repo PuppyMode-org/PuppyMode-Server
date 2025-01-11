@@ -19,5 +19,6 @@ public class User extends BaseEntity {
     private String email;
     private String password;
     private Integer points;
+    private Boolean receiveNotifications;
 }
 
