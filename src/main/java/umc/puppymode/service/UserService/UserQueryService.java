@@ -1,8 +1,8 @@
 package umc.puppymode.service.UserService;
 
-import umc.puppymode.web.dto.UserNotificationResponseDTO;
+import umc.puppymode.web.dto.UserResponseDTO;
 
 public interface UserQueryService {
 
-    UserNotificationResponseDTO getUserNotificationStatus(Long userId);
+    UserResponseDTO getUserNotificationStatus(Long userId);
 }

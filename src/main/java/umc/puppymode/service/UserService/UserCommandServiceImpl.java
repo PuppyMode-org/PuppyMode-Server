@@ -7,20 +7,24 @@ import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.domain.User;
 import umc.puppymode.repository.UserRepository;
-import umc.puppymode.web.dto.UserResponseDTO;
+import umc.puppymode.web.dto.UserRequestDTO;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class UserQueryServiceImpl implements UserQueryService {
+@Transactional
+public class UserCommandServiceImpl implements UserCommandService {
 
     private final UserRepository userRepository;
 
     @Override
-    public UserResponseDTO getUserNotificationStatus(Long userId) {
-
+    public void updateUserNotificationStatus(Long userId, UserRequestDTO userRequestDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-        return new UserResponseDTO(user.getReceiveNotifications());
+
+        if (user.getReceiveNotifications() == userRequestDTO.isReceiveNotifications()) {
+            throw new GeneralException(ErrorStatus._BAD_REQUEST_SAME_STATE);
+        }
+
+        user.setReceiveNotifications(userRequestDTO.isReceiveNotifications());
     }
 }
