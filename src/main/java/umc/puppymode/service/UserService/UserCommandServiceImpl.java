@@ -18,13 +18,17 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     public void updateUserNotificationStatus(Long userId, UserRequestDTO userRequestDTO) {
+
+        // 사용자 정보 조회, 존재하지 않으면 예외 발생
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
+        // 알림 수신 여부가 기존 값과 동일하면 예외 발생
         if (user.getReceiveNotifications() == userRequestDTO.isReceiveNotifications()) {
             throw new GeneralException(ErrorStatus._BAD_REQUEST_SAME_STATE);
         }
 
+        // 알림 수신 여부 업데이트
         user.setReceiveNotifications(userRequestDTO.isReceiveNotifications());
     }
 }

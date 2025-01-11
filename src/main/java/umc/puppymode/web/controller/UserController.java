@@ -22,19 +22,27 @@ public class UserController {
     @GetMapping("/notifications")
     @Operation(summary = "알림 수신 여부 조회 API", description = "사용자의 알림 수신 여부를 조회하는 API입니다.")
     public ResponseEntity<ApiResponse<UserResponseDTO>> getNotificationPreference() {
+
+        // 추후 JWT 인증 적용 후 변경 예정
         Long userId = 1L;
-        UserResponseDTO responseDto = userQueryService.getUserNotificationStatus(userId);
-        return ResponseEntity.ok(ApiResponse.onSuccess(responseDto));
+
+        UserResponseDTO responseDTO = userQueryService.getUserNotificationStatus(userId);
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(responseDTO));
     }
 
     @PatchMapping("/notifications")
     @Operation(summary = "알림 수신 여부 수정 API", description = "사용자의 알림 수신 여부를 수정하는 API입니다.")
     public ResponseEntity<ApiResponse<UserResponseDTO>> updateNotificationPreference(
-            @RequestBody UserRequestDTO requestDto) {
+            @RequestBody UserRequestDTO requestDTO) {
 
+        // 추후 JWT 인증 적용 후 변경 예정
         Long userId = 1L;
-        userCommandService.updateUserNotificationStatus(userId, requestDto);
-        UserResponseDTO responseDto = new UserResponseDTO(requestDto.isReceiveNotifications());
+
+        userCommandService.updateUserNotificationStatus(userId, requestDTO);
+
+        UserResponseDTO responseDto = new UserResponseDTO(requestDTO.isReceiveNotifications());
+
         return ResponseEntity.ok(ApiResponse.onSuccess(responseDto));
     }
 

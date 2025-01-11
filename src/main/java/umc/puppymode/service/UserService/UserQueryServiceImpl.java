@@ -19,8 +19,11 @@ public class UserQueryServiceImpl implements UserQueryService {
     @Override
     public UserResponseDTO getUserNotificationStatus(Long userId) {
 
+        // 사용자 정보 조회, 존재하지 않으면 예외 발생
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        // 사용자의 알림 수신 여부 반환
         return new UserResponseDTO(user.getReceiveNotifications());
     }
 }
