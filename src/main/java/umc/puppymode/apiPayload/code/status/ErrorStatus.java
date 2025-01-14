@@ -19,6 +19,10 @@ public enum ErrorStatus implements BaseErrorCode {
     // 사용자 관련 예외 처리
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "USER404", "해당 ID를 가진 사용자를 찾을 수 없습니다."),
 
+    // Firebase 관련 예외 처리
+    FIREBASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FIREBASE500", "Firebase 서버 오류"),
+    FIREBASE_MESSAGE_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FIREBASE501", "FCM 메시지 전송 실패"),
+
     // For test
     TEMP_EXCEPTION(HttpStatus.BAD_REQUEST, "TEMP4001", "이거는 테스트");
 
