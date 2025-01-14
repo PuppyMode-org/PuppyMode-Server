@@ -20,5 +20,6 @@ public class User extends BaseEntity {
     private String password;
     private Integer points;
     private Boolean receiveNotifications;
+    private String fcmToken;
 }
 
