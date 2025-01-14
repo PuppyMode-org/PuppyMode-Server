@@ -25,9 +25,11 @@ public class FcmScheduledServiceImpl implements FcmScheduledService {
 
     @Scheduled(cron = "0 8 2 * * ?", zone = "Asia/Seoul") // 매일 오전 10시 실행
     public void scheduleDailyPushNotification() {
+        // 모든 FCM 토큰 조회
         List<String> fcmTokens = userQueryService.getAllFcmTokens();
-        String puppyNickname = "브로콜리";
+        String puppyNickname = "브로콜리"; // puppy 관련 API 구현 후 수정 필요
 
+        // FCM 토큰마다 푸시 알림 전송
         fcmTokens.stream()
                 .map(token -> FCMRequestDTO.builder()
                         .token(token)

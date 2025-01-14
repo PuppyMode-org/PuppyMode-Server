@@ -32,6 +32,7 @@ public class UserQueryServiceImpl implements UserQueryService {
     @Override
     public List<String> getAllFcmTokens() {
 
+        // 알림 수신 설정이 활성화된 사용자의 FCM 토큰 목록 반환
         return userRepository.findAllFcmTokensWithNotification();
     }
 }
