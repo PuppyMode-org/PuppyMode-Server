@@ -32,5 +32,4 @@ public class FCMResponseDTO {
         private String body;
         private String image;
     }
-
 }

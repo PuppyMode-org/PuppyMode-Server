@@ -26,13 +26,17 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // Task scheduler
 
     @Override
-    public ApiResponse<FCMResponseDTO> scheduleDrinkingNotifications(FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
+    public ApiResponse<FCMResponseDTO> scheduleDrinkingNotifications(
+            FCMAppointmentRequestDTO fcmAppointmentRequestDTO
+    ) {
         try {
             // 약속 장소 도착 확인 (1km 이내)
+            // TODO: 사용자 현재 위치 API 구현 후 실제 위치로 수정 필요
             double userLatitude = 37.6378;
             double userLongitude = 127.0262;
 
-            if (fcmAppointmentRequestDTO.getTargetLatitude() == null || fcmAppointmentRequestDTO.getTargetLongitude() == null) {
+            if (fcmAppointmentRequestDTO.getTargetLatitude() == null
+                    || fcmAppointmentRequestDTO.getTargetLongitude() == null) {
                 throw new GeneralException(ErrorStatus.INVALID_LOCATION_DATA);
             }
 
@@ -63,17 +67,21 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
         } catch (GeneralException e) {
             throw e;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new GeneralException(ErrorStatus.FIREBASE_MESSAGE_SEND_FAILED);
         }
     }
 
-    private boolean isWithinArrivalRange(double userLatitude, double userLongitude, FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
+    private boolean isWithinArrivalRange(
+            double userLatitude, double userLongitude, FCMAppointmentRequestDTO fcmAppointmentRequestDTO
+    ) {
         try {
-            double distance = distanceCalculator.calculateDistance(userLatitude, userLongitude, fcmAppointmentRequestDTO.getTargetLatitude(), fcmAppointmentRequestDTO.getTargetLongitude());
-            return distance <= 1.0;  // 1km 이내
+            double distance = distanceCalculator.calculateDistance(
+                    userLatitude, userLongitude,
+                    fcmAppointmentRequestDTO.getTargetLatitude(),
+                    fcmAppointmentRequestDTO.getTargetLongitude()
+            );
+            return distance <= 1.0; // 1km 이내
         } catch (Exception e) {
-
             throw new GeneralException(ErrorStatus.DISTANCE_CALCULATION_FAILED);
         }
     }
@@ -88,7 +96,6 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
                             .build()
             );
         } catch (Exception e) {
-
             throw new GeneralException(ErrorStatus.FIREBASE_MESSAGE_SEND_FAILED);
         }
     }
@@ -125,7 +132,6 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
                     System.out.println("음주 알림 전송 시간: " + minutesElapsed + "분");
                 }, delay, TimeUnit.MINUTES);
             } catch (Exception e) {
-
                 throw new GeneralException(ErrorStatus.FIREBASE_MESSAGE_SCHEDULE_FAILED);
             }
         }

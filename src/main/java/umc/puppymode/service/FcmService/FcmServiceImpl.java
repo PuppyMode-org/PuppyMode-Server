@@ -81,7 +81,6 @@ public class FcmServiceImpl implements FcmService {
         }
     }
 
-
     /**
      * Firebase 인증 토큰을 발급받는 메서드
      *

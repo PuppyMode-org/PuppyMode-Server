@@ -24,6 +24,11 @@ public enum RandomMessages {
         return message;
     }
 
+    /**
+     * 랜덤 메시지 반환
+     *
+     * @return 랜덤 메시지
+     */
     public static RandomMessages getRandom() {
         return VALUES.get(RANDOM.nextInt(VALUES.size()));
     }

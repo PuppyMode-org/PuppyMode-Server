@@ -6,6 +6,7 @@ import lombok.*;
 @Setter
 @ToString(callSuper = true)
 public class FCMAppointmentRequestDTO extends FCMRequestDTO {
+
     private Double targetLatitude;
     private Double targetLongitude;
 
@@ -17,4 +18,3 @@ public class FCMAppointmentRequestDTO extends FCMRequestDTO {
         this.targetLongitude = targetLongitude;
     }
 }
-

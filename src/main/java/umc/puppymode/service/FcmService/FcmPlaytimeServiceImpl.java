@@ -19,7 +19,7 @@ public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
     private final FcmService fcmService;
     private final UserQueryService userQueryService;
 
-    @Scheduled(cron = "0 52 23 * * ?", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 10 * * ?", zone = "Asia/Seoul")
     public ApiResponse<FCMPlayResponseDTO> schedulePushAtSpecificTime() {
         try {
             // 모든 FCM 토큰 조회
@@ -28,7 +28,8 @@ public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
                 throw new GeneralException(ErrorStatus.FIREBASE_MISSING_TOKEN);
             }
 
-            String puppyNickname = "브로콜리"; // puppy 관련 API 구현 후 수정 필요
+            // TODO: puppy 관련 API 구현 후 실제 강아지 이름 및 이미지 URL 수정 필요
+            String puppyNickname = "브로콜리";
 
             // FCM 토큰마다 푸시 알림 전송
             fcmTokens.stream()
