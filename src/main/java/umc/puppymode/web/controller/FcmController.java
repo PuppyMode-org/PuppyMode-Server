@@ -26,7 +26,7 @@ public class FcmController {
     }
 
     @PostMapping("/")
-    @Operation(summary = "푸시 알림 즉시 전송 API", description = "요청 본문에 포함된 초기 푸시 알림을 즉시 전송합니다.")
+    @Operation(summary = "푸시 알림 API", description = "요청 본문에 포함된 푸시 알림을 즉시 전송합니다.")
     public ResponseEntity<ApiResponse<FCMResponseDTO>> sendPushNotification(
             @RequestBody FCMRequestDTO fcmRequestDTO) {
 
@@ -43,7 +43,7 @@ public class FcmController {
     }
 
     @PostMapping("/appointments")
-    @Operation(summary = "술 약속 푸시 알림 API", description = "약속 시간 이후 약속 장소 반경 1km 이내 도착 시 최초 알림을 전송합니다. 이후 1시간 간격으로 랜덤 알림 5개를 제공합니다.")
+    @Operation(summary = "술 약속 푸시 알림 API", description = "약속 시간에 맞춰 약속 장소 1km 이내 도달 시 최초 알림을 전송하고, 이후 1시간 간격으로 랜덤 알림을 5회 제공합니다.")
     public ResponseEntity<ApiResponse<FCMResponseDTO>> sendDrinkingScheduleNotification(
             @RequestBody FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
 

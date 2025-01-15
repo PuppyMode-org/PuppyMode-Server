@@ -11,7 +11,8 @@ import umc.puppymode.web.dto.FCMAppointmentRequestDTO;
 import umc.puppymode.web.dto.FCMResponseDTO;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -30,26 +31,33 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
             FCMAppointmentRequestDTO fcmAppointmentRequestDTO
     ) {
         try {
-            // 약속 장소 도착 확인 (1km 이내)
             // TODO: 사용자 현재 위치 API 구현 후 실제 위치로 수정 필요
             double userLatitude = 37.6378;
             double userLongitude = 127.0262;
 
+            // 약속 장소 도착 확인 (1km 이내)
             if (fcmAppointmentRequestDTO.getTargetLatitude() == null
                     || fcmAppointmentRequestDTO.getTargetLongitude() == null) {
-                throw new GeneralException(ErrorStatus.INVALID_LOCATION_DATA);
+                throw new GeneralException(ErrorStatus.INVALID_REQUEST_DATA);
             }
 
-            // 위치가 약속 장소의 1km 이내에 도달했는지 체크
-            if (!isWithinArrivalRange(userLatitude, userLongitude, fcmAppointmentRequestDTO)) {
-                throw new GeneralException(ErrorStatus.LOCATION_NOT_IN_RANGE);
+            boolean isWithinRange = isWithinArrivalRange(userLatitude, userLongitude, fcmAppointmentRequestDTO);
+
+            // TODO: 술 약속 API 구현 후 실제 약속 시간으로 수정 필요
+            ZonedDateTime appointmentTime = ZonedDateTime.of(2025, 1, 16, 1, 47, 0, 0, ZoneId.of("Asia/Seoul"));
+            boolean isAppointmentTimeNow = isAppointmentTimeNow(appointmentTime);
+
+            // 시간이랑 장소가 모두 맞을 때만 푸시 알림 전송
+            if (isWithinRange && isAppointmentTimeNow) {
+                sendInitialNotification(fcmAppointmentRequestDTO);
+                scheduleRandomNotifications(fcmAppointmentRequestDTO);
+            } else {
+                if (!isWithinRange) {
+                    throw new GeneralException(ErrorStatus.LOCATION_NOT_IN_RANGE);
+                } else {
+                    throw new GeneralException(ErrorStatus.APPOINTMENT_TIME_MISMATCH);
+                }
             }
-
-            // 최초 알림 전송
-            sendInitialNotification(fcmAppointmentRequestDTO);
-
-            // 1시간 간격으로 추가 알림 전송
-            scheduleRandomNotifications(fcmAppointmentRequestDTO);
 
             FCMResponseDTO response = FCMResponseDTO.builder()
                     .validateOnly(false)
@@ -86,6 +94,12 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
         }
     }
 
+    private boolean isAppointmentTimeNow(ZonedDateTime appointmentTime) {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        return now.getHour() == appointmentTime.getHour() &&
+                now.getMinute() == appointmentTime.getMinute();
+    }
+
     private void sendInitialNotification(FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
         try {
             fcmService.sendMessageTo(
@@ -101,14 +115,14 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
     }
 
     private void scheduleRandomNotifications(FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
-        LocalDateTime startTime = LocalDateTime.now();
+        ZonedDateTime startTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
 
         for (int i = 0; i < 5; i++) {
             long delay = i + 1;
             try {
                 scheduler.schedule(() -> {
                     // 경과 시간 계산
-                    long minutesElapsed = Duration.between(startTime, LocalDateTime.now()).toMinutes();
+                    long minutesElapsed = Duration.between(startTime, ZonedDateTime.now(ZoneId.of("Asia/Seoul"))).toMinutes();
 
                     // 랜덤 메시지
                     RandomMessages randomMessage = RandomMessages.getRandom();

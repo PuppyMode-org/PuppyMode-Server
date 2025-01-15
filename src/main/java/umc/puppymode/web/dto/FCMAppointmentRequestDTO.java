@@ -10,6 +10,9 @@ public class FCMAppointmentRequestDTO extends FCMRequestDTO {
     private Double targetLatitude;
     private Double targetLongitude;
 
+    public FCMAppointmentRequestDTO() {
+    }
+
     @Builder
     public FCMAppointmentRequestDTO(String token, String title, String body, String image,
                                     Double targetLatitude, Double targetLongitude) {

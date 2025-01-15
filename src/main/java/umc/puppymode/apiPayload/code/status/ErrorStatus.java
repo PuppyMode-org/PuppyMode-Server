@@ -28,8 +28,13 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 위치 관련 예외 처리
     LOCATION_NOT_IN_RANGE(HttpStatus.BAD_REQUEST, "LOCATION400", "약속 장소와의 거리가 1km 이내가 아닙니다."),
-    INVALID_LOCATION_DATA(HttpStatus.BAD_REQUEST, "LOCATION401", "위치 정보가 유효하지 않습니다."),
     DISTANCE_CALCULATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "LOCATION402", "거리 계산 중 오류가 발생했습니다."),
+
+    // 약속 시간 관련 예외 처리
+    APPOINTMENT_TIME_MISMATCH(HttpStatus.BAD_REQUEST, "APPOINTMENT400", "약속 시간이 현재 시간과 다릅니다."),
+
+    // 요청 데이터가 유효하지 않은 경우
+    INVALID_REQUEST_DATA(HttpStatus.BAD_REQUEST, "COMMON4001", "잘못된 요청 데이터입니다."),
 
     // For test
     TEMP_EXCEPTION(HttpStatus.BAD_REQUEST, "TEMP4001", "이거는 테스트");
