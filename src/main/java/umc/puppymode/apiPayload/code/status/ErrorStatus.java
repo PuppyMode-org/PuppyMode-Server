@@ -22,6 +22,14 @@ public enum ErrorStatus implements BaseErrorCode {
     // Firebase 관련 예외 처리
     FIREBASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FIREBASE500", "Firebase 서버 오류"),
     FIREBASE_MESSAGE_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FIREBASE501", "FCM 메시지 전송 실패"),
+    FIREBASE_MISSING_TOKEN(HttpStatus.BAD_REQUEST, "FIREBASE502", "FCM 토큰을 찾을 수 없습니다."),
+    FIREBASE_SCHEDULE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FIREBASE503", "푸시 알림 스케줄 오류"),
+    FIREBASE_MESSAGE_SCHEDULE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "FIREBASE504", "FCM 알림 예약 실패"),
+
+    // 위치 관련 예외 처리
+    LOCATION_NOT_IN_RANGE(HttpStatus.BAD_REQUEST, "LOCATION400", "약속 장소와의 거리가 1km 이내가 아닙니다."),
+    INVALID_LOCATION_DATA(HttpStatus.BAD_REQUEST, "LOCATION401", "위치 정보가 유효하지 않습니다."),
+    DISTANCE_CALCULATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "LOCATION402", "거리 계산 중 오류가 발생했습니다."),
 
     // For test
     TEMP_EXCEPTION(HttpStatus.BAD_REQUEST, "TEMP4001", "이거는 테스트");

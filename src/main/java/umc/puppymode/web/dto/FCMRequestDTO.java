@@ -13,8 +13,7 @@ public class FCMRequestDTO {
     private String body;
     private String image;
 
-    @Builder(toBuilder = true)
-    public FCMRequestDTO(String token, String title, String body, String image) {
+    protected FCMRequestDTO(String token, String title, String body, String image) {
         this.token = token;
         this.title = title;
         this.body = body;
