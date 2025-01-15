@@ -1,9 +1,8 @@
 package umc.puppymode.service.FcmService;
 
 import umc.puppymode.apiPayload.ApiResponse;
-import umc.puppymode.web.dto.FCMPlayRequestDTO;
-import umc.puppymode.web.dto.FCMResponseDTO;
+import umc.puppymode.web.dto.FCMPlayResponseDTO;
 
 public interface FcmPlaytimeService {
-    ApiResponse<FCMResponseDTO> schedulePushAtSpecificTime(FCMPlayRequestDTO fcmPlayRequestDTO);
+    ApiResponse<FCMPlayResponseDTO> schedulePushAtSpecificTime();
 }

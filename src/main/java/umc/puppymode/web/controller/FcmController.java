@@ -8,10 +8,7 @@ import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.FcmService.FcmAppointmentService;
 import umc.puppymode.service.FcmService.FcmPlaytimeService;
 import umc.puppymode.service.FcmService.FcmService;
-import umc.puppymode.web.dto.FCMAppointmentRequestDTO;
-import umc.puppymode.web.dto.FCMPlayRequestDTO;
-import umc.puppymode.web.dto.FCMRequestDTO;
-import umc.puppymode.web.dto.FCMResponseDTO;
+import umc.puppymode.web.dto.*;
 
 @Slf4j
 @RestController
@@ -37,10 +34,10 @@ public class FcmController {
     }
 
     @PostMapping("/playtimes")
-    @Operation(summary = "놀아주기 푸시 알림 전송 API", description = "요청 본문에 포함된 초기 푸시 알림 정보를 바탕으로 즉시 전송하고, 이후 설정된 시간에 정기적으로 푸시 알림을 전송합니다.")
-    public ResponseEntity<ApiResponse<FCMResponseDTO>> schedulePushNotification(@RequestBody FCMPlayRequestDTO fcmPlayRequestDTO ) {
+    @Operation(summary = "놀아주기 푸시 알림 전송 API", description = "매일 정해진 시간에 푸시 알림이 전송됩니다.")
+    public ResponseEntity<ApiResponse<FCMPlayResponseDTO>> schedulePushNotification() {
 
-        ApiResponse<FCMResponseDTO> response = fcmPlaytimeService.schedulePushAtSpecificTime(fcmPlayRequestDTO);
+        ApiResponse<FCMPlayResponseDTO> response = fcmPlaytimeService.schedulePushAtSpecificTime();
         return ResponseEntity.ok(response);
     }
 

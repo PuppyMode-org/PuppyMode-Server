@@ -6,10 +6,9 @@ import org.springframework.stereotype.Service;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
-import umc.puppymode.service.UserService.UserQueryService;
 import umc.puppymode.web.dto.FCMPlayRequestDTO;
-import umc.puppymode.web.dto.FCMRequestDTO;
-import umc.puppymode.web.dto.FCMResponseDTO;
+import umc.puppymode.web.dto.FCMPlayResponseDTO;
+import umc.puppymode.service.UserService.UserQueryService;
 
 import java.util.List;
 
@@ -20,18 +19,8 @@ public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
     private final FcmService fcmService;
     private final UserQueryService userQueryService;
 
-    @Override
-    public ApiResponse<FCMResponseDTO> schedulePushAtSpecificTime(FCMPlayRequestDTO fcmPlayRequestDTO) {
-        try {
-            // 푸시 알림 전송
-            return fcmService.sendMessageTo(fcmPlayRequestDTO);
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.FIREBASE_MESSAGE_SEND_FAILED);
-        }
-    }
-
-    @Scheduled(cron = "0 0 10 * * ?", zone = "Asia/Seoul")
-    public void scheduleDailyPushNotification() {
+    @Scheduled(cron = "0 52 23 * * ?", zone = "Asia/Seoul")
+    public ApiResponse<FCMPlayResponseDTO> schedulePushAtSpecificTime() {
         try {
             // 모든 FCM 토큰 조회
             List<String> fcmTokens = userQueryService.getAllFcmTokens();
@@ -50,6 +39,9 @@ public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
                             .image("이미지 URL")
                             .build())
                     .forEach(fcmService::sendMessageTo);
+
+            FCMPlayResponseDTO responseDTO = new FCMPlayResponseDTO("푸시 알림 예약 성공! 매일 오전 10시에 전송됩니다.");
+            return ApiResponse.onSuccess(responseDTO);
 
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.FIREBASE_SCHEDULE_ERROR);
