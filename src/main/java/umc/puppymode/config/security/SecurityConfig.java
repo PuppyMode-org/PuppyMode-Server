@@ -1,14 +1,15 @@
 package umc.puppymode.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
-import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
+import umc.puppymode.apiPayload.ApiResponse;
 
 @EnableWebSecurity
 @Configuration
@@ -22,14 +23,19 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .bearerTokenResolver(bearerTokenResolver())
-                )
+//                .oauth2ResourceServer(oauth2 -> oauth2
+//                        .jwt()
+//                ) // TODO: jwt구현
                 .logout((logout) -> logout
                         .logoutUrl("/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(200);
-                            response.getWriter().write("{\"message\": \"Logout successful\"}"); // TODO: 응답 형식에 맞게 수정
+                            ApiResponse<String> logoutResponse = ApiResponse.onSuccess("로그아웃 성공");
+
+                            response.setContentType("application/json");
+                            response.setCharacterEncoding("UTF-8");
+                            response.setStatus(HttpServletResponse.SC_OK);
+
+                            response.getWriter().write(new ObjectMapper().writeValueAsString(logoutResponse));
                             response.getWriter().flush();
                         })
                         .permitAll()
@@ -41,13 +47,5 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public BearerTokenResolver bearerTokenResolver() {
-        DefaultBearerTokenResolver resolver = new DefaultBearerTokenResolver();
-        resolver.setAllowFormEncodedBodyParameter(true);
-        resolver.setAllowUriQueryParameter(true);
-        return resolver;
     }
 }
