@@ -25,4 +25,11 @@ public class DrinkController {
         List<DrinkResponseDTO.HangoverResponseDTO> responseDTO = drinkQueryService.getAllHangovers();
         return ResponseEntity.ok(ApiResponse.onSuccess(responseDTO));
     }
+
+    @GetMapping("drinks/categories")
+    @Operation(summary = "술 카테고리 조회 API", description = "술 카테고리를 조회하는 API입니다.")
+    public ResponseEntity<ApiResponse<List<DrinkResponseDTO.CategoryResponseDTO>>> getDrinkCategories() {
+        List<DrinkResponseDTO.CategoryResponseDTO> responseDTO = drinkQueryService.getAllDrinkCategories();
+        return ResponseEntity.ok(ApiResponse.onSuccess(responseDTO));
+    }
 }
