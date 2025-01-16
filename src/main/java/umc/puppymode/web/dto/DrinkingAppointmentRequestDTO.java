@@ -32,14 +32,8 @@ public class DrinkingAppointmentRequestDTO {
         @Size(max = 255, message = "장소 이름은 255자 이하여야 합니다.")
         private String locationName;
 
-        @NotBlank(message = "제목은 필수입니다.")
-        @Size(max = 255, message = "제목은 255자 이하여야 합니다.")
-        private String title;
-
         @NotNull(message = "유저 ID는 필수 입력 사항입니다.")
         private Long userId;
-
-        private String details; // 추가 설명 (선택적 입력)
     }
 }
 

@@ -15,8 +15,6 @@ public class DrinkingAppointmentConverter {
         entity.setLatitude(dto.getLatitude());
         entity.setLongitude(dto.getLongitude());
         entity.setLocationName(dto.getLocationName());
-        entity.setTitle(dto.getTitle());
-        entity.setDetails(dto.getDetails());
         entity.setStatus(AppointmentStatus.SCHEDULED); // 기본값 설정
         return entity;
     }

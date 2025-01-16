@@ -22,9 +22,6 @@ public class DrinkingAppointment extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // 술 약속 생성한 사용자 (FK)
 
-    @Column(nullable = false, length = 255)
-    private String title; // 술 약속 제목
-
     @Column(nullable = false)
     private LocalDateTime dateTime; // 술 약속 일시
 
@@ -39,9 +36,6 @@ public class DrinkingAppointment extends BaseEntity {
 
     @Column(nullable = false, length = 500)
     private String address; // 장소 주소
-
-    @Column(columnDefinition = "TEXT")
-    private String details; // 추가 설명
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
