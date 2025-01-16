@@ -7,4 +7,5 @@ import java.util.List;
 public interface DrinkQueryService {
    List<HangoverResponseDTO> getAllHangovers();
    List<CategoryResponseDTO> getAllDrinkCategories();
+   DrinkItemsByCategoryResponseDTO getAllDrinkItemsByCategory(Long categoryId);
 }
