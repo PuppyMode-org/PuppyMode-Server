@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import umc.puppymode.domain.common.BaseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
