@@ -32,9 +32,11 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 약속 시간 관련 예외 처리
     APPOINTMENT_TIME_MISMATCH(HttpStatus.BAD_REQUEST, "APPOINTMENT400", "약속 시간이 현재 시간과 다릅니다."),
+    APPOINTMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "APPOINTMENT404", "해당 ID의 약속을 찾을 수 없습니다."),
 
     // 요청 데이터가 유효하지 않은 경우
     INVALID_REQUEST_DATA(HttpStatus.BAD_REQUEST, "COMMON4001", "잘못된 요청 데이터입니다."),
+
 
     // For test
     TEMP_EXCEPTION(HttpStatus.BAD_REQUEST, "TEMP4001", "이거는 테스트");
