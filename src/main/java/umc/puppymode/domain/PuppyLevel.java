@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import umc.puppymode.domain.common.BaseEntity;
+import umc.puppymode.domain.enums.PuppyType;
 
 @Entity
 @Getter
@@ -14,10 +15,12 @@ public class PuppyLevel extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long puppyLevelId;
 
-    @ManyToOne
-    @JoinColumn(name = "puppy_id")
-    private Puppy puppy;
+    @Enumerated(EnumType.STRING)
+    private PuppyType puppyType;
 
     private Integer puppyLevel;
-    private String puppyGrowth;
+    private String levelName;
+    private String levelImageUrl;
+    private Integer levelMinExp;
+    private Integer levelMaxEXP;
 }
