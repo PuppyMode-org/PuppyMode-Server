@@ -36,8 +36,11 @@ public class Puppy extends BaseEntity {
 
     public void updatePuppyExp(Integer puppyExp) {
         this.puppyExp += puppyExp;
+        if (this.puppyExp >= puppyLevel.getLevelMaxEXP()) {
+            PuppyLevel nextLevel = puppyLevel.getNextLevel();
+            if (nextLevel != null) {
+                this.puppyLevel = nextLevel;
+            } // nextLevel이 null인 경우 현재 레벨이 최대 레벨
+        }
     }
-
-    // Exp 변경 시마다 puppyLevel.MaxExp 값을 넘는지 체크한 후, 넘는다면 puppyLevel 을 바꿔주는 메서드 추가하면 좋을 것 같음.
-    // updatePuppyExp 메서드 내부에, puppyExp를 증가시킨 후 해당 메서드를 넣어주면 될듯.
 }

@@ -18,6 +18,10 @@ public class PuppyLevel extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PuppyType puppyType;
 
+    @ManyToOne
+    @JoinColumn(name = "next_level_id")
+    private PuppyLevel nextLevel;
+
     private Integer puppyLevel;
     private String levelName;
     private String levelImageUrl;
