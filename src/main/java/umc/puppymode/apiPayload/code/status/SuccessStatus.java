@@ -10,7 +10,13 @@ import umc.puppymode.apiPayload.code.ReasonDTO;
 @AllArgsConstructor
 public enum SuccessStatus implements BaseCode {
 
-    _OK(HttpStatus.OK, "COMMON200", "성공입니다.");
+    _OK(HttpStatus.OK, "COMMON200", "성공입니다."),
+
+    //술 약속
+    APPOINTMENT_DELETE_SUCCESS(HttpStatus.OK, "SUCCESS_DELETE_APPOINTMENT", "술 약속 삭제 성공"),
+    APPOINTMENT_GET_SUCCESS(HttpStatus.OK, "SUCCESS_GET_APPOINTMENT", "술 약속 조회 성공"),
+    APPOINTMENT_POST_SUCCESS(HttpStatus.OK, "SUCCESS_POST_APPOINTMENT", "술 약속 설정 성공");
+
 
     private final HttpStatus httpStatus;
     private final String code;
