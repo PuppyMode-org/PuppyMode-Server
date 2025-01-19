@@ -15,7 +15,7 @@ public class Puppy extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long puppyId;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
 
