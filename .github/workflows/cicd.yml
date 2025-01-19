@@ -34,13 +34,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      # Firebase 설정 json 파일 생성
+      - name: Make firebase json file
+        run: |
+          mkdir -p ./src/main/resources/firebase
+          echo "${{ secrets.FIREBASE_ADMIN_SDK_BASE64 }}" | base64 -d > ./src/main/resources/firebase/puppymode-53d9a-firebase-adminsdk-myzbc-7e65f856a6.json
+
       # yml 파일 생성
       - name: Make application.yml
         run: |
           mkdir -p ./src/main/resources
-          cd ./src/main/resources
-          touch ./application.yml
-          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
         shell: bash
 
       # Spring Boot 어플리케이션 Build

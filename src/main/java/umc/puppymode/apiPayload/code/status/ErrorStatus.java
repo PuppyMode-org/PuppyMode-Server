@@ -39,7 +39,13 @@ public enum ErrorStatus implements BaseErrorCode {
 
 
     // For test
-    TEMP_EXCEPTION(HttpStatus.BAD_REQUEST, "TEMP4001", "이거는 테스트");
+    TEMP_EXCEPTION(HttpStatus.BAD_REQUEST, "TEMP4001", "이거는 테스트"),
+
+    // 강아지 관련 예외 처리
+    PUPPY_NOT_FOUND(HttpStatus.NOT_FOUND, "PUPPY404", "해당 ID를 가진 강아지를 찾을 수 없습니다."),
+    UNAUTHORIZED_PUPPY_ACCESS(HttpStatus.UNAUTHORIZED, "PUPPY401", "강아지에 대한 접근 권한이 없습니다.")
+
+    ;
 
     private final HttpStatus httpStatus;
     private final String code;
