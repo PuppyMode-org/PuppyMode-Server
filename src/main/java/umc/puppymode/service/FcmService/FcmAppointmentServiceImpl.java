@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
+import umc.puppymode.domain.DrinkingAppointment;
+import umc.puppymode.repository.DrinkingAppointmentRepository;
 import umc.puppymode.util.DistanceCalculator;
 import umc.puppymode.util.RandomMessages;
 import umc.puppymode.web.dto.FCMAppointmentRequestDTO;
@@ -23,7 +25,7 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
 
     private final FcmService fcmService;
     private final DistanceCalculator distanceCalculator;
-
+    private final DrinkingAppointmentRepository drinkingAppointmentRepository;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // Task scheduler
 
     @Override
@@ -31,20 +33,23 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
             FCMAppointmentRequestDTO fcmAppointmentRequestDTO
     ) {
         try {
+            // 약속 정보 조회
+            DrinkingAppointment appointment = drinkingAppointmentRepository.findById(fcmAppointmentRequestDTO.getAppointmentId())
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.APPOINTMENT_NOT_FOUND));
+
+            // 약속 장소 위치 가져오기
+            double targetLatitude = appointment.getLatitude();
+            double targetLongitude = appointment.getLongitude();
+
             // TODO: 사용자 현재 위치 API 구현 후 실제 위치로 수정 필요
-            double userLatitude = 37.6378;
-            double userLongitude = 127.0262;
+            double userLatitude = 37.498095;
+            double userLongitude = 127.02761;
 
             // 약속 장소 도착 확인 (1km 이내)
-            if (fcmAppointmentRequestDTO.getTargetLatitude() == null
-                    || fcmAppointmentRequestDTO.getTargetLongitude() == null) {
-                throw new GeneralException(ErrorStatus.INVALID_REQUEST_DATA);
-            }
+            boolean isWithinRange = isWithinArrivalRange(userLatitude, userLongitude, targetLatitude, targetLongitude);
 
-            boolean isWithinRange = isWithinArrivalRange(userLatitude, userLongitude, fcmAppointmentRequestDTO);
-
-            // TODO: 술 약속 API 구현 후 실제 약속 시간으로 수정 필요
-            ZonedDateTime appointmentTime = ZonedDateTime.of(2025, 1, 16, 1, 47, 0, 0, ZoneId.of("Asia/Seoul"));
+            // 약속 시간 확인
+            ZonedDateTime appointmentTime = appointment.getDateTime().atZone(ZoneId.of("Asia/Seoul"));
             boolean isAppointmentTimeNow = isAppointmentTimeNow(appointmentTime);
 
             // 시간이랑 장소가 모두 맞을 때만 푸시 알림 전송
@@ -80,13 +85,11 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
     }
 
     private boolean isWithinArrivalRange(
-            double userLatitude, double userLongitude, FCMAppointmentRequestDTO fcmAppointmentRequestDTO
+            double userLatitude, double userLongitude, double targetLatitude, double targetLongitude
     ) {
         try {
             double distance = distanceCalculator.calculateDistance(
-                    userLatitude, userLongitude,
-                    fcmAppointmentRequestDTO.getTargetLatitude(),
-                    fcmAppointmentRequestDTO.getTargetLongitude()
+                    userLatitude, userLongitude, targetLatitude, targetLongitude
             );
             return distance <= 1.0; // 1km 이내
         } catch (Exception e) {
