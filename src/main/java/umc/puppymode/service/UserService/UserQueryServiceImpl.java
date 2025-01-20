@@ -22,8 +22,8 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     private final UserRepository userRepository;
     private final PuppyRepository puppyRepository;
-    private final Logger logger = LoggerFactory.getLogger(UserQueryServiceImpl.class);
 
+    // 사용자 알림 수신 상태 조회
     @Override
     public UserResponseDTO getUserNotificationStatus(Long userId) {
         User user = userRepository.findById(userId)
@@ -32,11 +32,13 @@ public class UserQueryServiceImpl implements UserQueryService {
         return new UserResponseDTO(user.getReceiveNotifications());
     }
 
+    // 모든 FCM 토큰 조회
     @Override
     public List<String> getAllFcmTokens() {
         return userRepository.findAllFcmTokensWithNotification();
     }
 
+    // FCM 토큰으로 사용자 정보 조회
     @Override
     public User getUserByFcmToken(String token) {
         if (token == null || token.isEmpty()) {
@@ -46,9 +48,9 @@ public class UserQueryServiceImpl implements UserQueryService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
     }
 
+    // 사용자 id로 강아지 정보 조회
     @Override
     public Puppy getUserPuppy(Long userId) {
-        // userId로 강아지 찾기
         return puppyRepository.findByUserId(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.PUPPY_NOT_FOUND));
     }
