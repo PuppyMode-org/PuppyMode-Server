@@ -1,6 +1,7 @@
 package umc.puppymode.service.AwsS3Service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -65,7 +66,15 @@ public class AwsS3ServiceImpl implements AwsS3Service {
         String imageName = imageUrl.substring(imageUrl.lastIndexOf("/") + 1);
 
         DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, imageName);
-        amazonS3.deleteObject(deleteObjectRequest);
+        try {
+            amazonS3.deleteObject(deleteObjectRequest);
+        } catch (AmazonS3Exception e) {
+            if (e.getStatusCode() == 404) {
+                throw new GeneralException(ErrorStatus.IMAGE_NOT_FOUND);
+            }
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.FILE_DELETE_FAILED);
+        }
     }
 
     // UUID 사용하여 새로운 파일 이름 생성

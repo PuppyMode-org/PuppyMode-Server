@@ -32,7 +32,7 @@ public class AwsS3Controller {
     }
 
     @DeleteMapping
-    @Operation(summary = "AWS S3 이미지 삭제 API", description = "S3 버킷에서 이미지를 삭제합니다.")
+    @Operation(summary = "AWS S3 이미지 삭제 API", description = "S3 버킷에서 이미지를 삭제합니다. 요청 파라미터에는 삭제하고자 하는 이미지의 접근 가능한 url 전체를 넣어주시면 됩니다.")
     public ApiResponse<String> deleteImageFromCapsule(@RequestParam String imageUrl) {
 
         awsS3Service.deleteImage(imageUrl);
