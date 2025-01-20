@@ -43,7 +43,12 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // 강아지 관련 예외 처리
     PUPPY_NOT_FOUND(HttpStatus.NOT_FOUND, "PUPPY404", "해당 ID를 가진 강아지를 찾을 수 없습니다."),
-    UNAUTHORIZED_PUPPY_ACCESS(HttpStatus.UNAUTHORIZED, "PUPPY401", "강아지에 대한 접근 권한이 없습니다.")
+    UNAUTHORIZED_PUPPY_ACCESS(HttpStatus.UNAUTHORIZED, "PUPPY401", "강아지에 대한 접근 권한이 없습니다."),
+
+    // 이미지 관련 예외 처리
+    EMPTY_FILE_LIST(HttpStatus.BAD_REQUEST, "IMAGE4001", "요청 파일 목록이 비어있습니다."),
+    INVALID_FILE_UPLOAD(HttpStatus.BAD_REQUEST, "IMAGE4002", "파일이 비어있거나 유효하지 않습니다."),
+    FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "AWS500", "파일 업로드에 실패했습니다")
 
     ;
 
