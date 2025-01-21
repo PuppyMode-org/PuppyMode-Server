@@ -1,5 +1,6 @@
 package umc.puppymode.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -32,5 +33,25 @@ public class DrinkingAppointmentResponseDTO {
     public static class AppointmentListResultDTO {
         private long totalCount;
         private List<AppointmentSimpleDTO> appointments;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class AppointmentStatusResultDTO {
+        private Long appointmentId;
+
+        @Getter(AccessLevel.NONE)
+        private boolean isActive;
+
+        public boolean getIsActive() {
+            return isActive;
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class RescheduleResultDTO {
+        private Long appointmentId;
+        private LocalDateTime rescheduledTime;
     }
 }

@@ -35,10 +35,10 @@ public class FcmController {
     }
 
     @PostMapping("/playtimes")
-    @Operation(summary = "놀아주기 푸시 알림 전송 API", description = "매일 정해진 시간에 푸시 알림이 전송됩니다.")
+    @Operation(summary = "놀아주기 푸시 알림 전송 API", description = "매일 정해진 시간(오전 10시)에 푸시 알림이 전송됩니다.")
     public ResponseEntity<ApiResponse<FCMPlayResponseDTO>> schedulePushNotification() {
 
-        ApiResponse<FCMPlayResponseDTO> response = fcmPlaytimeService.schedulePushAtSpecificTime();
+        ApiResponse<FCMPlayResponseDTO> response = fcmPlaytimeService.schedulePlaytimeNotification();
         return ResponseEntity.ok(response);
     }
 

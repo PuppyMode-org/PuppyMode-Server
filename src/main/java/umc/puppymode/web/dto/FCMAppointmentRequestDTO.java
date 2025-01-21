@@ -7,17 +7,15 @@ import lombok.*;
 @ToString(callSuper = true)
 public class FCMAppointmentRequestDTO extends FCMRequestDTO {
 
-    private Double targetLatitude;
-    private Double targetLongitude;
+    private Long appointmentId;
 
     public FCMAppointmentRequestDTO() {
     }
 
     @Builder
     public FCMAppointmentRequestDTO(String token, String title, String body, String image,
-                                    Double targetLatitude, Double targetLongitude) {
+                                    Long appointmentId) {
         super(token, title, body, image);
-        this.targetLatitude = targetLatitude;
-        this.targetLongitude = targetLongitude;
+        this.appointmentId = appointmentId;
     }
 }

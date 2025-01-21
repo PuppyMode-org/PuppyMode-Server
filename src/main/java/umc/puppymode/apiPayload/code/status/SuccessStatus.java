@@ -15,7 +15,9 @@ public enum SuccessStatus implements BaseCode {
     //술 약속
     APPOINTMENT_DELETE_SUCCESS(HttpStatus.OK, "SUCCESS_DELETE_APPOINTMENT", "술 약속 삭제 성공"),
     APPOINTMENT_GET_SUCCESS(HttpStatus.OK, "SUCCESS_GET_APPOINTMENT", "술 약속 조회 성공"),
-    APPOINTMENT_POST_SUCCESS(HttpStatus.OK, "SUCCESS_POST_APPOINTMENT", "술 약속 설정 성공");
+    APPOINTMENT_POST_SUCCESS(HttpStatus.OK, "SUCCESS_POST_APPOINTMENT", "술 약속 설정 성공"),
+    APPOINTMENT_STATUS_GET_SUCCESS(HttpStatus.OK, "SUCCESS_GET_APPOINTMENT_STATUS", "술 약속 활성화 상태 조회 성공"),
+    APPOINTMENT_RESCHEDULED_PATCH_SUCCESS(HttpStatus.OK, "SUCCESS_PUT_APPOINTMENT_RESCHEDULED", "술 약속 미루기 성공");
 
 
     private final HttpStatus httpStatus;

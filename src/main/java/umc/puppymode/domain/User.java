@@ -24,5 +24,9 @@ public class User extends BaseEntity {
     private Integer points;
     private Boolean receiveNotifications;
     private String fcmToken;
+
+    public void updatePoints(Integer points) {
+        this.points += points;
+    }
 }
 
