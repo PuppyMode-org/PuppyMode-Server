@@ -19,8 +19,9 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/auth/kakao/login", "/auth/apple/login", "/auth/logout").permitAll()
-                        .anyRequest().authenticated()
+//                        .requestMatchers("/auth/kakao/login", "/auth/apple/login", "/auth/logout").permitAll()
+//                        .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
 //                .oauth2ResourceServer(oauth2 -> oauth2
