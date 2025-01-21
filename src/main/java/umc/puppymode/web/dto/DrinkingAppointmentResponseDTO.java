@@ -2,6 +2,7 @@ package umc.puppymode.web.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import umc.puppymode.domain.enums.AppointmentStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,5 +54,12 @@ public class DrinkingAppointmentResponseDTO {
     public static class RescheduleResultDTO {
         private Long appointmentId;
         private LocalDateTime rescheduledTime;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class CompletedResultDTO {
+        private LocalDateTime completedTime;
+        private AppointmentStatus appointmentStatus;
     }
 }

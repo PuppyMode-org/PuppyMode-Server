@@ -61,4 +61,15 @@ public class DrinkingAppointmentCommendServiceImpl implements DrinkingAppointmen
 
         appointment.setDateTime(request.getDateTime());
     }
+
+    @Override
+    @Transactional
+    public void completeDrinkingAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.CompletedAppointmentRequestDTO request) {
+
+        // 약속 조회
+        DrinkingAppointment appointment = repository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 약속을 찾을 수 없습니다."));
+
+        appointment.setStatus(request.getStatus());
+    }
 }

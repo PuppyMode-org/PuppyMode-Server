@@ -100,4 +100,22 @@ public class DrinkingAppointmentController {
 
     }
 
+    @PatchMapping("/{appointmentId}/status")
+    @Operation(summary = "음주 상태 종료하기", description = "술 약속 완료 후 음주 상태 종료")
+    public ApiResponse<?> completedAppointmentStatus(
+            @PathVariable Long appointmentId,
+            @Valid @RequestBody DrinkingAppointmentRequestDTO.CompletedAppointmentRequestDTO request) {
+
+        // 상태 업데이트
+        drinkingAppointmentCommendService.completeDrinkingAppointment(appointmentId, request);
+
+        // 업데이트된 상태를 엔티티에서 가져와서 "COMPLETED"로 전환된 시점에 updated_at 값을 가져오기
+        DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalStateException("업데이트 후 약속을 찾을 수 없습니다."));
+
+        DrinkingAppointmentResponseDTO.CompletedResultDTO response = new DrinkingAppointmentResponseDTO.CompletedResultDTO(appointment.getUpdatedAt(), appointment.getStatus());
+
+        return ApiResponse.onSuccess(response, "SUCCESS_END_DRINKING_APPOINTMENT", "음주 상태 종료 성공");
+    }
+
 }
