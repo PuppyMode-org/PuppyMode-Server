@@ -50,8 +50,10 @@ public enum ErrorStatus implements BaseErrorCode {
     INVALID_FILE_UPLOAD(HttpStatus.BAD_REQUEST, "IMAGE4002", "파일이 비어있거나 유효하지 않습니다."),
     FILE_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE500", "파일 업로드에 실패했습니다"),
     IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "IMAGE404", "해당 이름의 이미지가 버킷에 존재하지 않습니다."),
-    FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE500", "이미지를 버킷에서 삭제하는데 실패했습니다.")
+    FILE_DELETE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "IMAGE500", "이미지를 버킷에서 삭제하는데 실패했습니다."),
 
+    // 음주 기록 관련 예외 처리
+    DRINK_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "DRINK4001", "해당 ID의 주종을 찾을 수 없습니다.")
     ;
 
     private final HttpStatus httpStatus;

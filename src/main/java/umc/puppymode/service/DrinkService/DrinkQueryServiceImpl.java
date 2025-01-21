@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class DrinkQueryServiceImpl implements DrinkQueryService {
 
     private final HangoverRepository hangoverRepository;

@@ -46,4 +46,18 @@ public class DrinkResponseDTO {
         private String categoryName;
         private List<DrinksResponseDTO> items;
     }
+
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DrinksRecordResponseDTO {
+        private String message;
+        private String feedImageUrl;
+        private String feed;
+        private Long dogLevel;
+        private String dogLevelName;
+        private Float dogPercent;
+    }
 }
