@@ -53,12 +53,14 @@ public class DrinkingAppointmentQueryServiceImpl implements DrinkingAppointmentQ
     }
 
     @Override
-    public boolean isAppointmentActive(Long appointmentId) {
+    public boolean isDrinkingActive(Long appointmentId) {
 
         DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 약속을 찾을 수 없습니다."));
 
-        // isActive 판별
-        return appointment.getStatus() == AppointmentStatus.SCHEDULED;
+        if (appointment.getStatus() == AppointmentStatus.ONGOING) {
+            return true;
+        }
+        return false;
     }
 }

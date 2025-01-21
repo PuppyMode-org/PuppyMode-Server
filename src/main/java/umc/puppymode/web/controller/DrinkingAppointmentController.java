@@ -65,11 +65,17 @@ public class DrinkingAppointmentController {
     }
 
     @GetMapping("/{appointmentId}/status")
-    @Operation(summary = "술 약속 활성화 상태 조회 API", description = "술 약속 활성화 상태를 조회하며, 술 약속이 'SCHEDULED' 상태일 때 true로 반환합니다.:)")
+    @Operation(summary = "술 약속 및 음주 상태 조회하기  API", description = "술 약속 상태를 조회하며, 술 약속이 'ONGOING'일 때 음주 상태는 true로 반환합니다.:)")
     public ApiResponse<?> getAppointmentStatus(@PathVariable Long appointmentId) {
 
-        boolean isActive = drinkingAppointmentQueryService.isAppointmentActive(appointmentId);
-        DrinkingAppointmentResponseDTO.AppointmentStatusResultDTO response = new DrinkingAppointmentResponseDTO.AppointmentStatusResultDTO(appointmentId, isActive);
+        // 음주 상태 가져오기
+        boolean isDrinking = drinkingAppointmentQueryService.isDrinkingActive(appointmentId);
+
+        // 업데이트된 상태를 엔티티에서 가져옴
+        DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new IllegalStateException("업데이트 후 약속을 찾을 수 없습니다."));
+
+        DrinkingAppointmentResponseDTO.AppointmentStatusResultDTO response = new DrinkingAppointmentResponseDTO.AppointmentStatusResultDTO(appointmentId, isDrinking, appointment.getStatus());
         return ApiResponse.onSuccess(response, SuccessStatus.APPOINTMENT_STATUS_GET_SUCCESS.getCode(), SuccessStatus.APPOINTMENT_STATUS_GET_SUCCESS.getMessage());
     }
 

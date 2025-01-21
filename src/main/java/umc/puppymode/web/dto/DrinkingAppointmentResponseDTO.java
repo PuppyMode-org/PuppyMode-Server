@@ -42,11 +42,14 @@ public class DrinkingAppointmentResponseDTO {
         private Long appointmentId;
 
         @Getter(AccessLevel.NONE)
-        private boolean isActive;
+        private boolean isDrinking; //음주 상태 (술 약속이 ONGOING 일 때 true)
 
-        public boolean getIsActive() {
-            return isActive;
+        public boolean getIsDrinking() {
+            return isDrinking;
         }
+
+        private AppointmentStatus appointmentStatus;
+
     }
 
     @Getter
