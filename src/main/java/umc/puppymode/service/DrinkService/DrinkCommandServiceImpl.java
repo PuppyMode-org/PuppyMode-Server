@@ -72,8 +72,8 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
 
         Puppy puppy = puppyRepository.findByUserId(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));;
-        recordResponseDTO.setPuppyLevel(Long.valueOf(puppy.getPuppyLevel().getPuppyLevel()));
-        recordResponseDTO.setPuppyName(puppy.getPuppyName());
+        recordResponseDTO.setPuppyLevel(puppy.getPuppyLevel().getPuppyLevel());
+        recordResponseDTO.setPuppyLevelName(puppy.getPuppyLevel().getLevelName());
         recordResponseDTO.setPuppyPercent(puppy.getPuppyExp());
 
         // 획득 먹이 10개 중 랜덤
