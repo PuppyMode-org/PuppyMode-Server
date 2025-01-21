@@ -6,11 +6,14 @@ import org.springframework.transaction.annotation.Transactional;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.domain.*;
+import umc.puppymode.domain.enums.FeedingItem;
+import umc.puppymode.domain.enums.PuppyType;
 import umc.puppymode.repository.*;
 import umc.puppymode.web.dto.DrinkRequestDTO.*;
 import umc.puppymode.web.dto.DrinkResponseDTO.*;
 
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,8 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
     private final DrinkHistoryRepository drinkHistoryRepository;
     private final DrinkHistoryItemRepository drinkHistoryItemRepository;
     private final HangoverRepository hangoverRepository;
+    private final PuppyRepository puppyRepository;
+    private final FeedRepository feedRepository;
 
     @Override
     public DrinksRecordResponseDTO postDrinksRecord(Long userId, DrinkRecordDTO drinkRecordDTO) {
@@ -65,12 +70,27 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
             recordResponseDTO.setMessage("건강을 생각해서 다음에는 꼭 주량을 지켜주세요!");
         }
 
-        // 획득 먹이 10개 중 랜덤
+        Puppy puppy = puppyRepository.findByUserId(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));;
+        recordResponseDTO.setPuppyLevel(Long.valueOf(puppy.getPuppyLevel().getPuppyLevel()));
+        recordResponseDTO.setPuppyName(puppy.getPuppyName());
+        recordResponseDTO.setPuppyPercent(puppy.getPuppyExp());
 
-        recordResponseDTO.setFeed("랜덤으로 뽑은 먹이입니다!");
-        recordResponseDTO.setDogLevel(1L); // 예제 값
-        recordResponseDTO.setDogLevelName("초보 강아지");
-        recordResponseDTO.setDogPercent(75.0f); // 예제 값
+        // 획득 먹이 10개 중 랜덤
+        Random RANDOM = new Random();
+        FeedingItem[] types = FeedingItem.values();
+        FeedingItem type = types[RANDOM.nextInt(types.length)];
+
+        Feed feed = new Feed();
+        feed.setDrinkHistory(drinkHistory);
+        feed.setPuppy(puppy);
+        feed.setFeedingType(type.getDescription());
+        feed.setFeedImageUrl(type.getImageUrl());
+
+        recordResponseDTO.setFeedType(type.getDescription());
+        recordResponseDTO.setFeedImageUrl(type.getImageUrl());
+
+        feedRepository.save(feed);
 
         return recordResponseDTO;
     }

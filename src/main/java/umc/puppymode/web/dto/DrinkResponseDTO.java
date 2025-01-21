@@ -55,9 +55,9 @@ public class DrinkResponseDTO {
     public static class DrinksRecordResponseDTO {
         private String message;
         private String feedImageUrl;
-        private String feed;
-        private Long dogLevel;
-        private String dogLevelName;
-        private Float dogPercent;
+        private String feedType;
+        private Long puppyLevel;
+        private String puppyName;
+        private Integer puppyPercent;
     }
 }
