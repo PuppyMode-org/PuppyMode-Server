@@ -2,7 +2,7 @@ package umc.puppymode.web.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+//import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import umc.puppymode.domain.User;
 import umc.puppymode.service.PuppyService.PuppyItemService;
@@ -43,26 +43,48 @@ public class PuppyItemController {
         );
     }
 
+    // 유저 구현 X
     @Operation(summary = "아이템 구매 API", description = "아이템을 구매하고 잔여 포인트와 아이템 ID를 반환하는 API")
-    @PostMapping("/{categoryId}/items/{itemId}")
+    @PostMapping("/{categoryId}/items/{itemId}/{userId}")
     public ResponseEntity<ApiResponse<Map<String, Object>>> purchaseItem(
             @PathVariable Long categoryId,
             @PathVariable Long itemId,
-            @AuthenticationPrincipal User user) {
-        Map<String, Object> result = puppyItemService.purchaseItem(categoryId, itemId, user);
-        // 유저 아이디 관련 추가 수정 필요
+            @PathVariable Long userId) {
+        Map<String, Object> result = puppyItemService.purchaseItem(categoryId, itemId, userId);
         return ResponseEntity.ok(
                 new ApiResponse<>(true, "SUCCESS_POST_PUPPY_ITEM", "아이템 구매 성공", result)
         );
     }
 
     @Operation(summary = "아이템 착용 API", description = "강아지에게 아이템을 착용시키는 API")
-    @PostMapping("/{categoryId}/items/{itemId}/equip")
+    @PostMapping("/{categoryId}/items/{itemId}/equip/{userId}")
     public ApiResponse<Map<String, Object>> equipItem(@PathVariable Long categoryId,
                                                       @PathVariable Long itemId,
-                                                      @AuthenticationPrincipal User user) {
-        Map<String, Object> result = puppyItemService.equipItem(categoryId, itemId, user);
+                                                      @PathVariable Long userId) {
+        Map<String, Object> result = puppyItemService.equipItem(categoryId, itemId, userId);
         return new ApiResponse<>(true, "SUCCESS_EQUIP_PUPPY_ITEM", "아이템 착용 성공", result);
     }
+    // 유저 구현
+//    @Operation(summary = "아이템 구매 API", description = "아이템을 구매하고 잔여 포인트와 아이템 ID를 반환하는 API")
+//    @PostMapping("/{categoryId}/items/{itemId}")
+//    public ResponseEntity<ApiResponse<Map<String, Object>>> purchaseItem(
+//            @PathVariable Long categoryId,
+//            @PathVariable Long itemId,
+//            @AuthenticationPrincipal User user) {
+//        Map<String, Object> result = puppyItemService.purchaseItem(categoryId, itemId, user);
+//        // 유저 아이디 관련 추가 수정 필요
+//        return ResponseEntity.ok(
+//                new ApiResponse<>(true, "SUCCESS_POST_PUPPY_ITEM", "아이템 구매 성공", result)
+//        );
+//    }
+//
+//    @Operation(summary = "아이템 착용 API", description = "강아지에게 아이템을 착용시키는 API")
+//    @PostMapping("/{categoryId}/items/{itemId}/equip")
+//    public ApiResponse<Map<String, Object>> equipItem(@PathVariable Long categoryId,
+//                                                      @PathVariable Long itemId,
+//                                                      @AuthenticationPrincipal User user) {
+//        Map<String, Object> result = puppyItemService.equipItem(categoryId, itemId, user);
+//        return new ApiResponse<>(true, "SUCCESS_EQUIP_PUPPY_ITEM", "아이템 착용 성공", result);
+//    }
 
 }
