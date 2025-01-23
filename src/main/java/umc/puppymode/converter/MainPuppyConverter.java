@@ -1,14 +1,17 @@
 package umc.puppymode.converter;
 
 import umc.puppymode.domain.Puppy;
+import umc.puppymode.domain.PuppyLevel;
+import umc.puppymode.domain.User;
 import umc.puppymode.web.dto.MainPuppyDTO.MainPuppyResDTO;
 
 public class MainPuppyConverter {
 
-    public static MainPuppyResDTO.RandomPuppyViewDTO toRandomPuppyViewDTO(String type, String imageUrl) {
+    public static MainPuppyResDTO.RandomPuppyViewDTO toRandomPuppyViewDTO(Puppy puppy) {
         return MainPuppyResDTO.RandomPuppyViewDTO.builder()
-                .puppyType(type)
-                .puppyImageUrl(imageUrl)
+                .userId(puppy.getUser().getUserId())
+                .puppyType(puppy.getPuppyLevel().getPuppyType().getType())
+                .puppyImageUrl(puppy.getPuppyLevel().getLevelImageUrl())
                 .build();
     }
 
@@ -18,7 +21,7 @@ public class MainPuppyConverter {
                 .puppyName(puppy.getPuppyName())
                 .level(puppy.getPuppyLevel().getPuppyLevel())
                 .levelName(puppy.getPuppyLevel().getLevelName())
-                .imageUrl(puppy.getPuppyImageUrl())
+                .imageUrl(puppy.getPuppyLevel().getLevelImageUrl())
                 .levelMinExp(puppy.getPuppyLevel().getLevelMinExp())
                 .levelMaxExp(puppy.getPuppyLevel().getLevelMaxEXP())
                 .puppyExp(puppy.getPuppyExp())
@@ -31,6 +34,14 @@ public class MainPuppyConverter {
                 .levelMinExp(puppy.getPuppyLevel().getLevelMinExp())
                 .levelMaxExp(puppy.getPuppyLevel().getLevelMaxEXP())
                 .puppyExp(puppy.getPuppyExp())
+                .build();
+    }
+
+    public static Puppy toPuppy(PuppyLevel puppyLevel, User user) {
+        return Puppy.builder()
+                .user(user)
+                .puppyLevel(puppyLevel)
+                .puppyExp(0)
                 .build();
     }
 }
