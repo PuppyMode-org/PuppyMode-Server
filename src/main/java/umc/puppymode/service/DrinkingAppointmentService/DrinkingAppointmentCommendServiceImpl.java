@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import umc.puppymode.converter.DrinkingAppointmentConverter;
 import umc.puppymode.domain.DrinkingAppointment;
 import umc.puppymode.domain.User;
+import umc.puppymode.domain.enums.AppointmentStatus;
 import umc.puppymode.repository.DrinkingAppointmentRepository;
 import umc.puppymode.repository.UserRepository;
 import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
@@ -13,7 +14,6 @@ import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 @Service
 @RequiredArgsConstructor
@@ -78,12 +78,17 @@ public class DrinkingAppointmentCommendServiceImpl implements DrinkingAppointmen
 
     @Override
     @Transactional
-    public void completeDrinkingAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.CompletedAppointmentRequestDTO request) {
+    public void completeDrinkingAppointment(Long appointmentId) {
 
         // 약속 조회
         DrinkingAppointment appointment = repository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 약속을 찾을 수 없습니다."));
 
-        appointment.setStatus(request.getStatus());
+        // 해당 약속 상태가 ONGOING 상태 인지 확인
+        AppointmentStatus status = appointment.getStatus();
+        if (status == AppointmentStatus.ONGOING){
+            appointment.setStatus(AppointmentStatus.COMPLETED);
+        }
+        else throw new IllegalArgumentException("현재 진행 중인 약속이 아닙니다.");
     }
 }

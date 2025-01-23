@@ -111,11 +111,10 @@ public class DrinkingAppointmentController {
     @PatchMapping("/{appointmentId}/status")
     @Operation(summary = "음주 상태 종료하기", description = "술 약속 완료 후 음주 상태 종료")
     public ApiResponse<?> completedAppointmentStatus(
-            @PathVariable Long appointmentId,
-            @Valid @RequestBody DrinkingAppointmentRequestDTO.CompletedAppointmentRequestDTO request) {
+            @PathVariable Long appointmentId) {
 
         // 상태 업데이트
-        drinkingAppointmentCommendService.completeDrinkingAppointment(appointmentId, request);
+        drinkingAppointmentCommendService.completeDrinkingAppointment(appointmentId);
 
         // 업데이트된 상태를 엔티티에서 가져와서 "COMPLETED"로 전환된 시점에 updated_at 값을 가져오기
         DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)

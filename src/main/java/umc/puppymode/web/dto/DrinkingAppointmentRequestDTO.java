@@ -3,7 +3,6 @@ package umc.puppymode.web.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
-import umc.puppymode.domain.enums.AppointmentStatus;
 
 import java.time.LocalDateTime;
 
@@ -47,11 +46,6 @@ public class DrinkingAppointmentRequestDTO {
         private LocalDateTime dateTime;
     }
 
-    @Getter
-    public static class CompletedAppointmentRequestDTO {
-        @NotNull(message = "술 약속 상태는 필수 입력 사항입니다.")
-        private AppointmentStatus status;
-    }
 
     @Getter
     public static class StartAppointmentRequestDTO {
