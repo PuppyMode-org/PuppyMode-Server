@@ -5,6 +5,7 @@ import lombok.Setter;
 import jakarta.persistence.*;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.PuppyItem;
+import umc.puppymode.domain.PuppyItemCategory;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +25,10 @@ public class PuppyCustomization {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
     private PuppyItem puppyItem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private PuppyItemCategory puppyItemCategory;
 
     private Boolean isEquipped; // 아이템 장착 여부
 

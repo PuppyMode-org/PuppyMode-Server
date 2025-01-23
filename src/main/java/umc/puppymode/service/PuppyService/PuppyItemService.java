@@ -1,10 +1,5 @@
 package umc.puppymode.service.PuppyService;
 
-import umc.puppymode.domain.User;
-import umc.puppymode.web.dto.ItemCategoryResponseDto;
-import umc.puppymode.web.dto.ItemResponseDto;
-
-import java.util.List;
 import java.util.Map;
 
 public interface PuppyItemService {
