@@ -5,4 +5,5 @@ import umc.puppymode.web.dto.LoginResponseDTO;
 
 public interface UserAuthService {
     LoginResponseDTO createOrUpdateUser(KakaoUserInfoResponseDTO userInfo);
+    Long getCurrentUserId();
 }
