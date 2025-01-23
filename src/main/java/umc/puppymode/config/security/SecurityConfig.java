@@ -1,52 +1,54 @@
 package umc.puppymode.config.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import umc.puppymode.apiPayload.ApiResponse;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@EnableWebSecurity
 @Configuration
+@RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfig {
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomJwtAuthenticationEntryPoint customJwtAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
+    private static final String[] AUTH_WHITELIST = {
+            "/auth/kakao/login",
+            "/auth/kakao/callback/**",
+            "/auth/apple/login",
+            "/auth/logout"
+    };
+
+    private static final String[] SWAGGER_WHITELIST = {
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
+    };
 
     @Bean
-    public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests((requests) -> requests
-//                        .requestMatchers("/auth/kakao/login", "/auth/apple/login", "/auth/logout").permitAll()
-//                        .anyRequest().authenticated()
-                                .anyRequest().permitAll()
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .formLogin(formLogin -> formLogin.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .csrf(csrf -> csrf.disable())
-//                .oauth2ResourceServer(oauth2 -> oauth2
-//                        .jwt()
-//                ) // TODO: jwt구현
-                .logout((logout) -> logout
-                        .logoutUrl("/auth/logout")
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            ApiResponse<String> logoutResponse = ApiResponse.onSuccess("로그아웃 성공");
-
-                            response.setContentType("application/json");
-                            response.setCharacterEncoding("UTF-8");
-                            response.setStatus(HttpServletResponse.SC_OK);
-
-                            response.getWriter().write(new ObjectMapper().writeValueAsString(logoutResponse));
-                            response.getWriter().flush();
-                        })
-                        .permitAll()
-                );
+                .exceptionHandling(exception -> {
+                    exception.authenticationEntryPoint(customJwtAuthenticationEntryPoint);
+                    exception.accessDeniedHandler(customAccessDeniedHandler);
+                })
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(AUTH_WHITELIST).permitAll();
+                    auth.requestMatchers(SWAGGER_WHITELIST).permitAll();
+                    auth.anyRequest().authenticated();
+                })
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }

@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.KakaoService;
+import umc.puppymode.service.UserService.UserAuthService;
 import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
+import umc.puppymode.web.dto.LoginResponseDTO;
 
 @Slf4j
 @RestController
@@ -18,9 +21,10 @@ import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 public class KakaoLoginController {
 
     private final KakaoService kakaoService;
+    private final UserAuthService userAuthService;
 
     @GetMapping("/callback")
-    public ResponseEntity<?> callback(@RequestParam("code") String code) {
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> callback(@RequestParam("code") String code) {
         try {
             // 카카오에서 Access Token 가져오기
             String accessToken = kakaoService.getAccessTokenFromKakao(code);
@@ -29,22 +33,30 @@ public class KakaoLoginController {
             // 사용자 정보 가져오기
             KakaoUserInfoResponseDTO userInfo = kakaoService.getUserInfo(accessToken);
 
-            //TODO: null 검사 후 response 파싱하여 로그인/회원가입 로직 추가. 자체 jwt 토큰으로 인가해야함.
-            // 카카오 리턴 id 를 식별자로 사용.
-            // db에 id 존재하면 로그인, 없으면 회원가입 진행.
-            // password: null, auth id 만 추가하여 회원가입.
+            // 사용자 정보 유효성 검사
+            if (userInfo.getKakaoAccount().getProfile().getNickName() == null) {
+                throw new IllegalArgumentException("닉네임이 존재하지 않습니다.");
+            }
+
+            if (userInfo.getKakaoAccount().getEmail() == null) {
+                throw new IllegalArgumentException("이메일이 존재하지 않습니다.");
+            }
+
+            // 로그인 또는 회원가입 처리
+            LoginResponseDTO loginResponse = userAuthService.createOrUpdateUser(userInfo);
 
             // 성공 응답 반환
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok(ApiResponse.onSuccess(loginResponse));
         } catch (Exception e) {
             log.error("카카오 로그인 오류 발생: {}", e.getMessage(), e);
 
             // 실패 응답 반환
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-//                    "message", "카카오 로그인 오류가 발생했습니다.",
-//                    "error", e.getMessage()
-//            ));
+            ApiResponse<LoginResponseDTO> errorResponse = ApiResponse.onFailure(
+                    "AUTH_ERROR",
+                    "카카오 로그인 오류가 발생했습니다.",
+                    null
+            );
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
