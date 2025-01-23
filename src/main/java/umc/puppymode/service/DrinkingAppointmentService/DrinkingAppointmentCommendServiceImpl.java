@@ -10,7 +10,10 @@ import umc.puppymode.repository.DrinkingAppointmentRepository;
 import umc.puppymode.repository.UserRepository;
 import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
 import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +30,17 @@ public class DrinkingAppointmentCommendServiceImpl implements DrinkingAppointmen
         // User 엔티티 조회
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
+
+        // 사용자가 요청한 날짜 확인
+        LocalDate appointmentDate = request.getDateTime().toLocalDate();
+
+        // 해당 날짜에 이미 약속이 있는지 확인
+        boolean alreadyExists = repository.existsByUserAndDate(user, appointmentDate);
+
+        if (alreadyExists) {
+            throw new IllegalStateException(appointmentDate + "에 이미 약속이 생성되었습니다.");
+        }
+
         // DTO → Entity 변환
         DrinkingAppointment entity = DrinkingAppointmentConverter.toEntity(request);
         // User 설정
