@@ -83,7 +83,6 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
 
         Feed feed = new Feed();
         feed.setDrinkHistory(drinkHistory);
-        feed.setPuppy(puppy);
         feed.setFeedingType(type.getDescription());
         feed.setFeedImageUrl(type.getImageUrl());
 

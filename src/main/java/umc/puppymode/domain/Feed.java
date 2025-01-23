@@ -15,10 +15,6 @@ public class Feed extends BaseEntity {
     private Long feedId;
 
     @OneToOne
-    @JoinColumn(name = "puppy_id")
-    private Puppy puppy;
-
-    @OneToOne
     @JoinColumn(name = "drink_history_id")
     private DrinkHistory drinkHistory;
 
