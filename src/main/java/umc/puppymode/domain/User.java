@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import umc.puppymode.domain.common.BaseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -22,5 +25,10 @@ public class User extends BaseEntity {
     private String password;
     private Integer points;
     private Boolean receiveNotifications;
+    private String fcmToken;
+
+    public void updatePoints(Integer points) {
+        this.points += points;
+    }
 }
 
