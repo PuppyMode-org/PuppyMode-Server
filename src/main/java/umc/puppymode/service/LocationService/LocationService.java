@@ -1,5 +1,9 @@
 package umc.puppymode.service.LocationService;
 
+import umc.puppymode.apiPayload.ApiResponse;
+import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
+import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
+
 public interface LocationService {
-    // 술 약속 설정 위치와 사용자 현재 위치 간 거리계산 (필요 시)
+    ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> startAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.StartAppointmentRequestDTO request);
 }

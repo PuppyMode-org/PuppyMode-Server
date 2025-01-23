@@ -1,7 +1,7 @@
 package umc.puppymode.web.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import umc.puppymode.domain.enums.AppointmentStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,11 +41,13 @@ public class DrinkingAppointmentResponseDTO {
         private Long appointmentId;
 
         @Getter(AccessLevel.NONE)
-        private boolean isActive;
-
-        public boolean getIsActive() {
-            return isActive;
+        private boolean isDrinking; //음주 상태 (술 약속이 ONGOING 일 때 true)
+        public boolean getIsDrinking() {
+            return isDrinking;
         }
+
+        private AppointmentStatus appointmentStatus;
+
     }
 
     @Getter
@@ -53,5 +55,29 @@ public class DrinkingAppointmentResponseDTO {
     public static class RescheduleResultDTO {
         private Long appointmentId;
         private LocalDateTime rescheduledTime;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class CompletedResultDTO {
+        private LocalDateTime completedTime;
+        private AppointmentStatus appointmentStatus;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class StartAppointmentResultDTO {
+        private Long appointmentId;
+        private String address;
+        private String locationName;
+        private AppointmentStatus appointmentStatus;
+
+        @Getter(AccessLevel.NONE)
+        private boolean isDrinking; //음주 상태 (술 약속이 ONGOING 일 때 true)
+        public boolean getIsDrinking() {
+            return isDrinking;
+        }
+
+        private LocalDateTime startTime;
     }
 }

@@ -45,6 +45,20 @@ public class DrinkingAppointmentRequestDTO {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime dateTime;
     }
+
+
+    @Getter
+    public static class StartAppointmentRequestDTO {
+        @NotNull(message = "위도 값은 필수입니다.")
+        @Min(value = -90, message = "위도 값은 -90 이상이어야 합니다.")
+        @Max(value = 90, message = "위도 값은 90 이하여야 합니다.")
+        private Double latitude;
+
+        @NotNull(message = "경도 값은 필수입니다.")
+        @Min(value = -180, message = "경도 값은 -180 이상이어야 합니다.")
+        @Max(value = 180, message = "경도 값은 180 이하여야 합니다.")
+        private Double longitude;
+    }
 }
 
 
