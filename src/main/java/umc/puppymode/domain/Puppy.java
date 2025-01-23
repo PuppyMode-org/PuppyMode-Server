@@ -1,14 +1,16 @@
 package umc.puppymode.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import umc.puppymode.domain.common.BaseEntity;
 import umc.puppymode.domain.enums.CustomizingItem;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Puppy extends BaseEntity {
 
     @Id
@@ -23,7 +25,6 @@ public class Puppy extends BaseEntity {
     @JoinColumn(name = "puppy_level_id")
     private PuppyLevel puppyLevel;
 
-    private String puppyImageUrl;
     private String puppyName;
     private Integer puppyExp;
 

@@ -9,6 +9,7 @@ public class MainPuppyResDTO {
     @Builder
     // 온보딩 화면에 보여지는 랜덤선택된 강아지의 정보
     public static class RandomPuppyViewDTO {
+        private Long userId;
         private String puppyType;
         private String puppyImageUrl;
     }

@@ -18,9 +18,10 @@ public class MainPuppyController {
 
     @PostMapping
     @Operation(summary = "강아지 랜덤 선택 API", description = "강아지를 랜덤으로 선택하는 API입니다.")
-    public ApiResponse<MainPuppyResDTO.RandomPuppyViewDTO> getRandomPuppy() {
+    public ApiResponse<MainPuppyResDTO.RandomPuppyViewDTO> getRandomPuppy(
+            @RequestParam Long userId) {
 
-        MainPuppyResDTO.RandomPuppyViewDTO randomPuppyViewDTO = mainPuppyCommandService.getRandomPuppy();
+        MainPuppyResDTO.RandomPuppyViewDTO randomPuppyViewDTO = mainPuppyCommandService.getRandomPuppy(userId);
         return ApiResponse.onSuccess(randomPuppyViewDTO);
     }
 

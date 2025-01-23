@@ -4,15 +4,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
+import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.apiPayload.exception.handler.TempHandler;
 import umc.puppymode.converter.MainPuppyConverter;
 import umc.puppymode.domain.Puppy;
+import umc.puppymode.domain.PuppyLevel;
 import umc.puppymode.domain.User;
-import umc.puppymode.domain.enums.PuppyType;
+import umc.puppymode.repository.PuppyLevelRepository;
 import umc.puppymode.repository.PuppyRepository;
 import umc.puppymode.repository.UserRepository;
 import umc.puppymode.web.dto.MainPuppyDTO.MainPuppyResDTO;
 
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -22,17 +25,24 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
 
     private final PuppyRepository puppyRepository;
     private final UserRepository userRepository;
+    private final PuppyLevelRepository puppyLevelRepository;
 
     @Override
     // 랜덤으로 강아지를 선택
-    public MainPuppyResDTO.RandomPuppyViewDTO getRandomPuppy() {
+    public MainPuppyResDTO.RandomPuppyViewDTO getRandomPuppy(Long userId) {
 
-        Random RANDOM = new Random();
-        PuppyType[] types = PuppyType.values();
-        PuppyType type = types[RANDOM.nextInt(types.length)];
+        // 1단계인 강아지 레벨만 분류하여 랜덤 선택
+        List<PuppyLevel> puppyLevels = puppyLevelRepository.findByPuppyLevel(1);
+        Random random = new Random();
+        int randomIndex = random.nextInt(puppyLevels.size());
+        PuppyLevel puppyLevel = puppyLevels.get(randomIndex);
 
-        // 강아지 종의 이름과, 해당 종의 레벨 1 이미지를 ResponseDTO로 만들어 반환
-        return MainPuppyConverter.toRandomPuppyViewDTO(type.getType(), type.getImageUrl());
+        // 선택된 레벨과 유저 정보를 사용하여 강아지 객체 생성 및 저장
+        User user = userRepository.findById(userId).orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        Puppy puppy = MainPuppyConverter.toPuppy(puppyLevel, user);
+        puppyRepository.save(puppy);
+
+        return MainPuppyConverter.toRandomPuppyViewDTO(puppy);
     }
 
     @Override
@@ -57,8 +67,8 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
         }
         // 사용자 포인트 10p 증가
         user.updatePoints(10);
-        // 현재 레벨의 전체 경험치의 5% 만큼의 경험치 계산
-        Integer fivePercentExp = (puppy.getPuppyLevel().getLevelMaxEXP() - puppy.getPuppyLevel().getLevelMinExp()) * 5 / 100;
+        // 현재 레벨의 전체 경험치의 1% 만큼의 경험치 계산
+        Integer fivePercentExp = (puppy.getPuppyLevel().getLevelMaxEXP() - puppy.getPuppyLevel().getLevelMinExp()) / 100;
         puppy.updatePuppyExp(fivePercentExp); // 이 내부에서 레벨 업도 진행해준다고 가정
 
         return MainPuppyConverter.toPlayResDTO(puppy);
