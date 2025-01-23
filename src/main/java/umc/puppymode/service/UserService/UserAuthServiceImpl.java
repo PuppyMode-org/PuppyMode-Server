@@ -2,8 +2,11 @@ package umc.puppymode.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import umc.puppymode.apiPayload.code.status.ErrorStatus;
+import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.config.security.JwtTokenProvider;
 import umc.puppymode.config.security.UserAuthentication;
 import umc.puppymode.domain.User;
@@ -40,5 +43,24 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         // 응답 DTO 생성 및 반환
         return new LoginResponseDTO(user.getUserId(), user.getUsername(), user.getEmail(), token, user.getPoints());
+    }
+
+    @Override
+    public Long getCurrentUserId() {
+
+        // 인증 객체를 SecurityContext에서 가져옴
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 인증 정보가 없거나 인증 객체가 UserAuthentication 타입이 아닌 경우 예외 발생
+        if (authentication == null || !(authentication instanceof UserAuthentication)) {
+            throw new GeneralException(ErrorStatus._UNAUTHORIZED);
+        }
+
+        // 인증된 사용자 정보가 있으면, 그 사용자 ID를 반환
+        try {
+            return Long.valueOf(authentication.getPrincipal().toString());
+        } catch (NumberFormatException e) {
+            throw new GeneralException(ErrorStatus._UNAUTHORIZED);
+        }
     }
 }
