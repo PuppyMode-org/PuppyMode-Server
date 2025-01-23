@@ -3,6 +3,7 @@ package umc.puppymode.web.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.SuccessStatus;
@@ -11,10 +12,10 @@ import umc.puppymode.domain.enums.AppointmentStatus;
 import umc.puppymode.repository.DrinkingAppointmentRepository;
 import umc.puppymode.service.DrinkingAppointmentService.DrinkingAppointmentCommendService;
 import umc.puppymode.service.DrinkingAppointmentService.DrinkingAppointmentQueryService;
+import umc.puppymode.service.LocationService.LocationService;
 import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
 import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
 
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class DrinkingAppointmentController {
     private final DrinkingAppointmentCommendService drinkingAppointmentCommendService;
     private final DrinkingAppointmentQueryService drinkingAppointmentQueryService;
     private final DrinkingAppointmentRepository drinkingAppointmentRepository;
+    private final LocationService locationService;
 
     @PostMapping
     @Operation(summary = "술 약속 생성 API", description = "술 약속 생성 API입니다 :)")
@@ -122,6 +124,18 @@ public class DrinkingAppointmentController {
         DrinkingAppointmentResponseDTO.CompletedResultDTO response = new DrinkingAppointmentResponseDTO.CompletedResultDTO(appointment.getUpdatedAt(), appointment.getStatus());
 
         return ApiResponse.onSuccess(response, "SUCCESS_END_DRINKING_APPOINTMENT", "음주 상태 종료 성공");
+    }
+
+    @PatchMapping("/{appointmentId}")
+    @Operation(summary = "술 약속 시작하기 API", description = "사용자 현재 위치에 기반해 시간 + 장소가 범위 내에 들어오면 술 약속을 시작합니다.")
+    public ResponseEntity<ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO>> startAppointment(
+            @PathVariable Long appointmentId,
+            @Valid @RequestBody DrinkingAppointmentRequestDTO.StartAppointmentRequestDTO request) {
+
+        // 사용자의 현 위치와 약속 위치 및 시간 확인 + 상태 업데이트
+        ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> response = locationService.startAppointment(appointmentId, request);
+
+        return ResponseEntity.ok(response);
     }
 
 }
