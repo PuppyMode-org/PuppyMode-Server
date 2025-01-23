@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -19,7 +18,7 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private static final String MEMBER_ID = "memberId";
+    private static final String USER_ID = "userId";
     private static final Long TOKEN_EXPIRATION_TIME = 24 * 60 * 60 * 1000L;
 
     @Value("${jwt.secret}")
@@ -40,7 +39,7 @@ public class JwtTokenProvider {
 
         log.info("Principal: {}", authentication.getPrincipal());
 
-        claims.put(MEMBER_ID, authentication.getPrincipal());
+        claims.put(USER_ID, authentication.getPrincipal());
 
         log.info("Claims before signing: {}", claims); // JWT 생성 전 Claims 확인
         return Jwts.builder()
@@ -80,7 +79,7 @@ public class JwtTokenProvider {
 
     public Long getUserFromJwt(String token) {
         Claims claims = getBody(token);
-        return Long.valueOf(claims.get(MEMBER_ID).toString());
+        return Long.valueOf(claims.get(USER_ID).toString());
     }
 }
 

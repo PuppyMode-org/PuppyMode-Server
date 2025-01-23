@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import umc.puppymode.apiPayload.ApiResponse;
-import umc.puppymode.service.KakaoService;
+import umc.puppymode.service.AuthService.KakaoService;
 import umc.puppymode.service.UserService.UserAuthService;
 import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
