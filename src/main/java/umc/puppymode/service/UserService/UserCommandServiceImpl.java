@@ -5,8 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
+import umc.puppymode.config.security.UserAuthentication;
 import umc.puppymode.domain.User;
 import umc.puppymode.repository.UserRepository;
+import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
+import umc.puppymode.web.dto.LoginResponseDTO;
 import umc.puppymode.web.dto.UserRequestDTO;
 
 @Service
