@@ -7,9 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ItemCategoryResponseDto {
+public class ItemCategoryResponseDTO {
     private Long categoryId; // 카테고리 ID
     private String name; // 카테고리 이름
     private Long itemCount; // 아이템 수
 }
-

@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import umc.puppymode.domain.User;
 import umc.puppymode.service.PuppyService.PuppyItemService;
-import umc.puppymode.web.dto.ItemCategoryResponseDto;
-import umc.puppymode.web.dto.ItemResponseDto;
 import umc.puppymode.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 
@@ -64,6 +61,7 @@ public class PuppyItemController {
         Map<String, Object> result = puppyItemService.equipItem(categoryId, itemId, userId);
         return new ApiResponse<>(true, "SUCCESS_EQUIP_PUPPY_ITEM", "아이템 착용 성공", result);
     }
+
     // 유저 구현
 //    @Operation(summary = "아이템 구매 API", description = "아이템을 구매하고 잔여 포인트와 아이템 ID를 반환하는 API")
 //    @PostMapping("/{categoryId}/items/{itemId}")
