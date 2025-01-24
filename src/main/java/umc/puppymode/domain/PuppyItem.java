@@ -24,8 +24,5 @@ public class PuppyItem extends BaseEntity {
     private String itemName; // 아이템 이름
     private String imageUrl; // 아이템 이미지 URL
     private Integer price; // 아이템 가격
-
-    private Boolean isPurchased; // 구매 여부
-
     private Boolean mission_item; // 도전 과제 보상 아이템 여부
 }
