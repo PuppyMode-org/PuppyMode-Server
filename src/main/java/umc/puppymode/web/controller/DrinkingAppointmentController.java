@@ -13,6 +13,7 @@ import umc.puppymode.repository.DrinkingAppointmentRepository;
 import umc.puppymode.service.DrinkingAppointmentService.DrinkingAppointmentCommendService;
 import umc.puppymode.service.DrinkingAppointmentService.DrinkingAppointmentQueryService;
 import umc.puppymode.service.LocationService.LocationService;
+import umc.puppymode.service.UserService.UserAuthService;
 import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
 import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
 
@@ -25,15 +26,19 @@ public class DrinkingAppointmentController {
     private final DrinkingAppointmentQueryService drinkingAppointmentQueryService;
     private final DrinkingAppointmentRepository drinkingAppointmentRepository;
     private final LocationService locationService;
+    private final UserAuthService userAuthService;
 
     @PostMapping
-    @Operation(summary = "술 약속 생성 API", description = "술 약속 생성 API입니다 :)")
+    @Operation(summary = "술 약속 생성 API", description = "술 약속 생성 API 입니다 :)")
     public ApiResponse<DrinkingAppointmentResponseDTO.AppointmentResultDTO> createAppointment(
             @Valid @RequestBody DrinkingAppointmentRequestDTO.AppointmentDTO request) {
 
+        //userId
+        Long userId = userAuthService.getCurrentUserId();
+
         // 서비스 호출
         DrinkingAppointmentResponseDTO.AppointmentResultDTO response =
-                drinkingAppointmentCommendService.createDrinkingAppointment(request);
+                drinkingAppointmentCommendService.createDrinkingAppointment(request, userId);
 
         // 응답 반환
         return ApiResponse.onSuccess(response, SuccessStatus.APPOINTMENT_POST_SUCCESS.getCode(), SuccessStatus.APPOINTMENT_POST_SUCCESS.getMessage());

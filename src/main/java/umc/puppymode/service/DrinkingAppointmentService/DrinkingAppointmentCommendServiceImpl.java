@@ -25,10 +25,10 @@ public class DrinkingAppointmentCommendServiceImpl implements DrinkingAppointmen
     @Transactional
     @Override
     public DrinkingAppointmentResponseDTO.AppointmentResultDTO createDrinkingAppointment(
-            DrinkingAppointmentRequestDTO.AppointmentDTO request) {
+            DrinkingAppointmentRequestDTO.AppointmentDTO request, Long userId) {
 
         // User 엔티티 조회
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 사용자 ID 입니다."));
 
         // 사용자가 요청한 날짜 확인
