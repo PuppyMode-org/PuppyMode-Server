@@ -37,7 +37,7 @@ public class Puppy extends BaseEntity {
 
     public void updatePuppyExp(Integer puppyExp) {
         this.puppyExp += puppyExp;
-        if (this.puppyExp >= puppyLevel.getLevelMaxEXP()) {
+        if (this.puppyExp >= puppyLevel.getLevelMaxExp()) {
             PuppyLevel nextLevel = puppyLevel.getNextLevel();
             if (nextLevel != null) {
                 this.puppyLevel = nextLevel;

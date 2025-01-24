@@ -23,7 +23,7 @@ public class MainPuppyConverter {
                 .levelName(puppy.getPuppyLevel().getLevelName())
                 .imageUrl(puppy.getPuppyLevel().getLevelImageUrl())
                 .levelMinExp(puppy.getPuppyLevel().getLevelMinExp())
-                .levelMaxExp(puppy.getPuppyLevel().getLevelMaxEXP())
+                .levelMaxExp(puppy.getPuppyLevel().getLevelMaxExp())
                 .puppyExp(puppy.getPuppyExp())
                 .build();
     }
@@ -32,7 +32,7 @@ public class MainPuppyConverter {
         return MainPuppyResDTO.PlayResDTO.builder()
                 .level(puppy.getPuppyLevel().getPuppyLevel())
                 .levelMinExp(puppy.getPuppyLevel().getLevelMinExp())
-                .levelMaxExp(puppy.getPuppyLevel().getLevelMaxEXP())
+                .levelMaxExp(puppy.getPuppyLevel().getLevelMaxExp())
                 .puppyExp(puppy.getPuppyExp())
                 .build();
     }
