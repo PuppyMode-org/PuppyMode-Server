@@ -52,9 +52,18 @@ public class PuppyItemServiceImpl implements PuppyItemService {
     }
 
     @Override
-    public Map<String, Object> getItemsByCategory(Long categoryId) {
+    public Map<String, Object> getItemsByCategory(Long categoryId, Long userId) {
         // 해당 카테고리의 아이템 목록
         List<PuppyItem> items = itemRepository.findAllByCategory_CategoryId(categoryId);
+
+        // 유저의 강아지 찾기
+        Puppy puppy = puppyRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
+
+        // 유저가 구매한 아이템 리스트
+        List<Long> purchasedItemIds = puppyCustomizationRepository.findByPuppy(puppy).stream()
+                .map(customization -> customization.getPuppyItem().getItemId())
+                .collect(Collectors.toList());
 
         List<ItemResponseDTO> itemResponseList = items.stream()
                 .map(item -> new ItemResponseDTO(
@@ -62,7 +71,7 @@ public class PuppyItemServiceImpl implements PuppyItemService {
                         item.getItemName(),
                         item.getPrice(),
                         item.getImageUrl(),
-                        item.getIsPurchased(),
+                        purchasedItemIds.contains(item.getItemId()), // 구매 여부
                         item.getMission_item()
                 ))
                 .collect(Collectors.toList());
@@ -76,12 +85,12 @@ public class PuppyItemServiceImpl implements PuppyItemService {
 
     @Override
     public Map<String, Object> purchaseItem(Long categoryId, Long itemId, Long userId) {
-
+        // 유저 찾기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
-        // 강아지 조회
-        Puppy puppy = puppyRepository.findByUser(user)
+        // 유저의 강아지 찾기
+        Puppy puppy = puppyRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
 
         // 아이템 조회
@@ -101,7 +110,8 @@ public class PuppyItemServiceImpl implements PuppyItemService {
         }
 
         // 아이템 구매 여부 확인
-        if (item.getIsPurchased()) {
+        boolean isPurchased = puppyCustomizationRepository.existsByPuppyAndPuppyItem(puppy, item);
+        if (isPurchased) {
             throw new IllegalArgumentException("이미 구매한 아이템입니다.");
         }
 
@@ -112,8 +122,6 @@ public class PuppyItemServiceImpl implements PuppyItemService {
 
         // 포인트 차감 및 아이템 구매 처리
         user.setPoints(user.getPoints() - item.getPrice());
-        item.setIsPurchased(true);
-        itemRepository.save(item);
         PuppyCustomization customization = new PuppyCustomization();
         customization.setPuppy(puppy);
         customization.setPuppyItem(item);
@@ -135,12 +143,12 @@ public class PuppyItemServiceImpl implements PuppyItemService {
 
     @Override
     public Map<String, Object> equipItem(Long categoryId, Long itemId, Long userId) {
-
+        // 유저 찾기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
         // 유저의 강아지 찾기
-        Puppy puppy = puppyRepository.findByUser(user)
+        Puppy puppy = puppyRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
 
         // 아이템 찾기
@@ -187,90 +195,5 @@ public class PuppyItemServiceImpl implements PuppyItemService {
 
         return result;
     }
-
-    // 유저 구현
-//    @Override
-//    public Map<String, Object> purchaseItem(Long categoryId, Long itemId, User user) {
-//        // 강아지 조회
-//        Puppy puppy = puppyRepository.findByUser(user)
-//                .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
-//
-//        // 아이템 조회
-//        PuppyItem item = itemRepository.findById(itemId)
-//                .orElseThrow(() -> new IllegalArgumentException("해당 아이템이 존재하지 않습니다."));
-//
-//        // 카테고리 검증
-//        if (!item.getCategory().getCategoryId().equals(categoryId)) {
-//            throw new IllegalArgumentException("아이템이 해당 카테고리에 속하지 않습니다.");
-//        }
-//
-//        // 이미 구매된 아이템인지 확인
-//        boolean alreadyPurchased = puppyCustomizationRepository.existsByPuppyAndPuppyItem(puppy, item);
-//        if (alreadyPurchased) {
-//            throw new IllegalArgumentException("이미 구매한 아이템입니다.");
-//        }
-//
-//        // 포인트 검증
-//        if (user.getPoints() < item.getPrice()) {
-//            throw new IllegalArgumentException("잔여 포인트가 부족합니다.");
-//        }
-//
-//        // 포인트 차감 및 아이템 구매 처리
-//        user.setPoints(user.getPoints() - item.getPrice());
-//        PuppyCustomization customization = new PuppyCustomization();
-//        customization.setPuppy(puppy);
-//        customization.setPuppyItem(item);
-//        customization.setIsEquipped(false); // 기본값은 장착되지 않은 상태
-//        puppyCustomizationRepository.save(customization);
-//
-//        // 저장
-//        userRepository.save(user);
-//
-//        // 응답 데이터 구성
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("currentPoint", user.getPoints());
-//        response.put("itemId", item.getItemId());
-//
-//        return response;
-//    }
-//
-//    @Override
-//    public Map<String, Object> equipItem(Long categoryId, Long itemId, User user) {
-//        // 유저의 강아지 찾기
-//        Puppy puppy = puppyRepository.findByUser(user)
-//                .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
-//
-//        // 아이템 찾기
-//        PuppyItem item = itemRepository.findById(itemId)
-//                .orElseThrow(() -> new IllegalArgumentException("아이템이 존재하지 않습니다."));
-//
-//        // 카테고리 검증
-//        if (!item.getCategory().getCategoryId().equals(categoryId)) {
-//            throw new IllegalArgumentException("아이템이 해당 카테고리에 속하지 않습니다.");
-//        }
-//
-//        // 아이템 구매 여부 확인
-//        PuppyCustomization customization = puppyCustomizationRepository.findByPuppyAndPuppyItem(puppy, item)
-//                .orElseThrow(() -> new IllegalArgumentException("강아지에게 해당 아이템이 없습니다."));
-//
-//        // 이미 착용 중인 아이템인지 확인
-//        if (customization.getIsEquipped()) {
-//            throw new IllegalArgumentException("이미 착용한 아이템입니다.");
-//        }
-//
-//        // 아이템 착용 처리
-//        customization.setIsEquipped(true);
-//        puppyCustomizationRepository.save(customization);
-//
-//        // 강아지 이미지 갱신 (추후에 강아지의 이미지 URL을 업데이트하는 로직을 추가)
-//        String updatedImageUrl = "";
-//
-//        // 응답 데이터 구성
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("updatedPuppyImageUrl", updatedImageUrl);
-//        response.put("equippedItemInfo", new EquippedItemInfoDTO(item.getItemId(), item.getItemName()));
-//
-//        return response;
-//    }
 
 }
