@@ -26,5 +26,5 @@ public class PuppyLevel extends BaseEntity {
     private String levelName;
     private String levelImageUrl;
     private Integer levelMinExp;
-    private Integer levelMaxEXP;
+    private Integer levelMaxExp;
 }

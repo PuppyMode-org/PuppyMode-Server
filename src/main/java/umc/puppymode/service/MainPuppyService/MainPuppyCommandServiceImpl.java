@@ -68,7 +68,7 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
         // 사용자 포인트 10p 증가
         user.updatePoints(10);
         // 현재 레벨의 전체 경험치의 1% 만큼의 경험치 계산
-        Integer fivePercentExp = (puppy.getPuppyLevel().getLevelMaxEXP() - puppy.getPuppyLevel().getLevelMinExp()) / 100;
+        Integer fivePercentExp = (puppy.getPuppyLevel().getLevelMaxExp() - puppy.getPuppyLevel().getLevelMinExp()) / 100;
         puppy.updatePuppyExp(fivePercentExp); // 이 내부에서 레벨 업도 진행해준다고 가정
 
         return MainPuppyConverter.toPlayResDTO(puppy);
