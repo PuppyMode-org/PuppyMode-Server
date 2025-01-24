@@ -32,10 +32,6 @@ public class DrinkingAppointmentRequestDTO {
         @NotBlank(message = "장소 이름은 필수입니다.")
         @Size(max = 255, message = "장소 이름은 255자 이하여야 합니다.")
         private String locationName;
-
-        // userId는 시큐리티 구현 후 토큰 발급이 되면 추후 수정.
-        @NotNull(message = "유저 ID는 필수 입력 사항입니다.")
-        private Long userId;
     }
 
     @Getter
