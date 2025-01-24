@@ -1,7 +1,5 @@
 package umc.puppymode.service.PuppyService;
 
-import umc.puppymode.domain.User;
-
 import java.util.Map;
 
 public interface PuppyItemService {
