@@ -9,8 +9,8 @@ import umc.puppymode.domain.DrinkingAppointment;
 import umc.puppymode.repository.DrinkingAppointmentRepository;
 import umc.puppymode.util.DistanceCalculator;
 import umc.puppymode.util.RandomMessages;
-import umc.puppymode.web.dto.FCMAppointmentRequestDTO;
-import umc.puppymode.web.dto.FCMResponseDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMAppointmentRequestDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
 
 import java.time.Duration;
 import java.time.ZoneId;

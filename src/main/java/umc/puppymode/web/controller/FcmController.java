@@ -8,7 +8,10 @@ import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.FcmService.FcmAppointmentService;
 import umc.puppymode.service.FcmService.FcmPlaytimeService;
 import umc.puppymode.service.FcmService.FcmService;
-import umc.puppymode.web.dto.*;
+import umc.puppymode.web.dto.FCMDTO.FCMAppointmentRequestDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMPlayResponseDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMRequestDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
 
 @Slf4j
 @RestController

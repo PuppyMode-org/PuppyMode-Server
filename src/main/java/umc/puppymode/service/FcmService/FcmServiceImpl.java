@@ -14,8 +14,8 @@ import org.springframework.web.client.RestTemplate;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
-import umc.puppymode.web.dto.FCMRequestDTO;
-import umc.puppymode.web.dto.FCMResponseDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMRequestDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -8,8 +8,8 @@ import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.User;
-import umc.puppymode.web.dto.FCMPlayRequestDTO;
-import umc.puppymode.web.dto.FCMPlayResponseDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMPlayRequestDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMPlayResponseDTO;
 import umc.puppymode.service.UserService.UserQueryService;
 
 import java.util.List;
