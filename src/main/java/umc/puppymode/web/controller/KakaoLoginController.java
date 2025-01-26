@@ -1,5 +1,6 @@
 package umc.puppymode.web.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,13 +24,13 @@ public class KakaoLoginController {
     private final KakaoService kakaoService;
     private final UserAuthService userAuthService;
 
-    @GetMapping("/callback")
-    public ResponseEntity<ApiResponse<LoginResponseDTO>> callback(@RequestParam("code") String code) {
+    @GetMapping("/login")
+    @Operation(summary = "카카오 로그인 API",
+            description = "카카오 서버로부터 발급받은 `Access Token`을 사용하여,  \n" +
+                    "사용자 정보를 가져온 뒤, 서버에서 JWT를 발급받는 API입니다.  \n" +
+                    "로그인 및 회원가입 처리를 포함합니다.")
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> callback(@RequestParam("accessToken") String accessToken) {
         try {
-            // 카카오에서 Access Token 가져오기
-            String accessToken = kakaoService.getAccessTokenFromKakao(code);
-            log.info("Received authorization code: {}", code);
-
             // 사용자 정보 가져오기
             KakaoUserInfoResponseDTO userInfo = kakaoService.getUserInfo(accessToken);
 
