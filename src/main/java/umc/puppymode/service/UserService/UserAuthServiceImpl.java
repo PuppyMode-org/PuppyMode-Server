@@ -1,6 +1,7 @@
 package umc.puppymode.service.UserService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import umc.puppymode.domain.User;
 import umc.puppymode.repository.UserRepository;
 import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
+import umc.puppymode.web.dto.UserInfoDTO;
 
 @Service
 @RequiredArgsConstructor
@@ -41,8 +43,19 @@ public class UserAuthServiceImpl implements UserAuthService {
         // JWT 토큰 생성
         String token = jwtTokenProvider.generateToken(authentication);
 
-        // 응답 DTO 생성 및 반환
-        return new LoginResponseDTO(user.getUserId(), user.getUsername(), user.getEmail(), token, user.getPoints());
+        // UserInfoDTO 생성
+        UserInfoDTO userInfoDTO = UserInfoDTO.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .build();
+
+        // LoginResponseDTO 생성 및 반환
+        return LoginResponseDTO.builder()
+                .jwt(token)
+                .userInfo(userInfoDTO)
+                .build();
+
     }
 
     @Override
