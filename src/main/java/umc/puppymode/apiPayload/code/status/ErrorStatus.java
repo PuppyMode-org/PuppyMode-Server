@@ -44,6 +44,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // 강아지 관련 예외 처리
     PUPPY_NOT_FOUND(HttpStatus.NOT_FOUND, "PUPPY404", "해당 ID를 가진 강아지를 찾을 수 없습니다."),
     UNAUTHORIZED_PUPPY_ACCESS(HttpStatus.UNAUTHORIZED, "PUPPY401", "강아지에 대한 접근 권한이 없습니다."),
+    PUPPY_ALREADY_EXISTS(HttpStatus.CONFLICT, "PUPPY409", "최대 강아지 보유량을 초과하였습니다. (최대: 1)"),
 
     // 이미지 관련 예외 처리
     EMPTY_FILE_LIST(HttpStatus.BAD_REQUEST, "IMAGE4001", "요청 파일 목록이 비어있습니다."),

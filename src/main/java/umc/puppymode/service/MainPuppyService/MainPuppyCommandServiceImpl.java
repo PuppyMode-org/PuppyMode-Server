@@ -16,6 +16,7 @@ import umc.puppymode.repository.UserRepository;
 import umc.puppymode.web.dto.MainPuppyDTO.MainPuppyResDTO;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -31,6 +32,13 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
     // 랜덤으로 강아지를 선택
     public MainPuppyResDTO.RandomPuppyViewDTO getRandomPuppy(Long userId) {
 
+        // 해당 유저의 강아지 객체 생성 가능 여부 검증
+        User user = userRepository.findById(userId).orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        Optional<Puppy> existPuppy = puppyRepository.findByUserId(userId);
+        if (existPuppy.isPresent()) {
+            throw new GeneralException(ErrorStatus.PUPPY_ALREADY_EXISTS);
+        }
+
         // 1단계인 강아지 레벨만 분류하여 랜덤 선택
         List<PuppyLevel> puppyLevels = puppyLevelRepository.findByPuppyLevel(1);
         Random random = new Random();
@@ -38,7 +46,6 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
         PuppyLevel puppyLevel = puppyLevels.get(randomIndex);
 
         // 선택된 레벨과 유저 정보를 사용하여 강아지 객체 생성 및 저장
-        User user = userRepository.findById(userId).orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         Puppy puppy = MainPuppyConverter.toPuppy(puppyLevel, user);
         puppyRepository.save(puppy);
 
@@ -47,9 +54,14 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
 
     @Override
     // 강아지의 이름을 수정
-    public String updatePuppyName(Long puppyId, String newPuppyName) {
+    public String updatePuppyName(Long userId, Long puppyId, String newPuppyName) {
 
+        userRepository.findById(userId).orElseThrow(() -> new TempHandler(ErrorStatus.USER_NOT_FOUND));
         Puppy puppy = puppyRepository.findById(puppyId).orElseThrow(() -> new TempHandler(ErrorStatus.PUPPY_NOT_FOUND));
+        // 강아지가 현재 사용자의 강아지가 아닌 경우 에러 발생
+        if (!userId.equals(puppy.getUser().getUserId())) {
+            throw new TempHandler(ErrorStatus.UNAUTHORIZED_PUPPY_ACCESS);
+        }
         puppy.updatePuppyName(newPuppyName);
 
         return puppy.getPuppyName();
