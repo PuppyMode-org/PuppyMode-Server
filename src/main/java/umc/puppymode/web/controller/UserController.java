@@ -64,7 +64,8 @@ public class UserController {
     @Operation(summary = "사용자 정보 조회 API", description = "사용자의 정보를 조회하는 API입니다.")
     public ResponseEntity<ApiResponse<UserInfoDTO>> getUserInfo() {
         // userId 추출
-        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String principal = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = Long.valueOf(principal);
 
         UserInfoDTO userInfoDTO = userInfoService.getUserInfo(userId);
 
