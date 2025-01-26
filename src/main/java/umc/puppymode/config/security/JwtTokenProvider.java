@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -55,6 +56,7 @@ public class JwtTokenProvider {
     }
 
     public JwtValidationType validateToken(String token) {
+        log.info("JWT Validation Result: {}", token);
         try {
             final Claims claims = getBody(token);
             return JwtValidationType.VALID_JWT;
@@ -70,6 +72,7 @@ public class JwtTokenProvider {
     }
 
     private Claims getBody(final String token) {
+        log.info("Parsing JWT: {}", token);
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
                 .build()
@@ -78,8 +81,22 @@ public class JwtTokenProvider {
     }
 
     public Long getUserFromJwt(String token) {
+        if (!StringUtils.hasText(token)) {
+            log.error("JWT is null or empty");
+            throw new IllegalArgumentException("JWT is null or empty");
+        }
+
         Claims claims = getBody(token);
-        return Long.valueOf(claims.get(USER_ID).toString());
+        log.info("Parsed Claims: {}", claims);
+
+        if (claims.get(USER_ID) == null) {
+            log.error("JWT does not contain userId");
+            throw new IllegalArgumentException("Invalid JWT: missing userId");
+        }
+
+        return Long.valueOf(claims.get("userId").toString());
     }
+
+
 }
 
