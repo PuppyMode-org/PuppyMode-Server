@@ -85,4 +85,19 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
 
         return MainPuppyConverter.toPlayResDTO(puppy);
     }
+
+    @Override
+    // 사용자의 강아지 객체 삭제
+    public String deletePuppy(Long userId) {
+
+        userRepository.findById(userId).orElseThrow(() -> new TempHandler(ErrorStatus.USER_NOT_FOUND));
+        Optional<Puppy> puppy = puppyRepository.findByUserId(userId);
+        if (puppy.isPresent()) {
+            Long puppyId = puppy.get().getPuppyId();
+            puppyRepository.delete(puppy.get());
+            return "강아지 객체가 성공적으로 삭제되었습니다. 삭제된 puppyId: " + puppyId;
+        } else {
+            return "사용자의 강아지 객체가 존재하지 않습니다. 삭제에 실패하였습니다.";
+        }
+    }
 }

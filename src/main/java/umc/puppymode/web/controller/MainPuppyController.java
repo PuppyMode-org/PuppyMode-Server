@@ -2,6 +2,7 @@ package umc.puppymode.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.MainPuppyService.MainPuppyCommandService;
@@ -55,5 +56,14 @@ public class MainPuppyController {
         Long userId = userAuthService.getCurrentUserId();
         MainPuppyResDTO.PlayResDTO playResDTO = mainPuppyCommandService.platWithPuppy(userId, puppyId);
         return ApiResponse.onSuccess(playResDTO);
+    }
+
+    @DeleteMapping
+    @Operation(summary = "강아지 객체 삭제 API", description = "현재 유저의 강아지를 hard delete하는 API입니다. (실사용 목적 x)")
+    public ApiResponse<String> deletePuppy() {
+
+        Long userId = userAuthService.getCurrentUserId();
+        String result = mainPuppyCommandService.deletePuppy(userId);
+        return ApiResponse.onSuccess(result);
     }
 }
