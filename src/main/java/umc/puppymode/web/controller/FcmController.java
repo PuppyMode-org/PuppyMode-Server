@@ -46,7 +46,7 @@ public class FcmController {
     }
 
     @PostMapping("/appointments")
-    @Operation(summary = "술 약속 푸시 알림 API", description = "약속 시간에 맞춰 약속 장소 1km 이내 도달 시 최초 알림을 전송하고, 이후 1시간 간격으로 랜덤 알림을 5회 제공합니다.")
+    @Operation(summary = "술 약속 푸시 알림 API", description = "약속 시간에 맞춰 약속 장소 1km 이내 도달 시 최초 알림을 전송하고, 이후 1분 간격으로 랜덤 알림을 5회 제공합니다.")
     public ResponseEntity<ApiResponse<FCMResponseDTO>> sendDrinkingScheduleNotification() {
 
         ApiResponse<FCMResponseDTO> response = fcmAppointmentService.scheduleDrinkingNotifications();

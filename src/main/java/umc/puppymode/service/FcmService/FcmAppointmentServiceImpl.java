@@ -1,6 +1,7 @@
 package umc.puppymode.service.FcmService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
@@ -19,7 +20,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +31,7 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
     private final FcmService fcmService;
     private final DrinkingAppointmentRepository drinkingAppointmentRepository;
     private final TokenRepository tokenRepository;
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // Task scheduler
+    private final ScheduledExecutorService scheduler;
 
     @Override
     public ApiResponse<FCMResponseDTO> scheduleDrinkingNotifications() {
@@ -41,26 +42,8 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
                 throw new GeneralException(ErrorStatus.APPOINTMENT_TIME_MISMATCH);
             }
 
-            // 각 약속에 대해 알림을 전송
             for (DrinkingAppointment appointment : ongoingAppointments) {
-                if (appointment.getStatus() == AppointmentStatus.ONGOING) {
-                    Long userId = appointment.getUser().getUserId();
-
-                    // FCM 토큰 조회 부분
-                    Token fcmToken = tokenRepository.findByUserAndTokenType(appointment.getUser(), TokenType.FCM)
-                            .orElse(null);
-
-                    if (fcmToken == null) {
-                        continue; // 이 유저는 건너뜀
-                    }
-
-                    // FCM 알림 생성
-                    FCMAppointmentRequestDTO fcmAppointmentRequestDTO = createFCMRequestDTO(fcmToken.getToken());
-
-                    // 알림 전송
-                    sendInitialNotification(fcmAppointmentRequestDTO);
-                    scheduleRandomNotifications(fcmAppointmentRequestDTO);
-                }
+                scheduleNotificationsForAppointment(appointment);
             }
 
             FCMResponseDTO response = FCMResponseDTO.builder()
@@ -81,15 +64,29 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
         }
     }
 
+    private void scheduleNotificationsForAppointment(DrinkingAppointment appointment) {
+        if (appointment.getStatus() != AppointmentStatus.ONGOING) return;
+
+        Token fcmToken = tokenRepository.findByUserAndTokenType(appointment.getUser(), TokenType.FCM)
+                .orElse(null);
+
+        if (fcmToken == null) return;
+
+        FCMAppointmentRequestDTO fcmAppointmentRequestDTO = createFCMRequestDTO(fcmToken.getToken());
+        sendInitialNotificationAsync(fcmAppointmentRequestDTO);
+        scheduleRandomNotificationsAsync(fcmAppointmentRequestDTO);
+    }
+
     private FCMAppointmentRequestDTO createFCMRequestDTO(String fcmToken) {
         return FCMAppointmentRequestDTO.builder()
-                .token(fcmToken)  // 조회한 FCM 토큰 사용
+                .token(fcmToken)
                 .title("음주 약속 알림")
                 .body("약속이 진행 중입니다!")
                 .build();
     }
 
-    private void sendInitialNotification(FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
+    @Async
+    public void sendInitialNotificationAsync(FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
         try {
             fcmService.sendMessageTo(
                     FCMAppointmentRequestDTO.builder()
@@ -103,40 +100,43 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
         }
     }
 
-    private void scheduleRandomNotifications(FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
+    @Async
+    public CompletableFuture<Void> scheduleRandomNotificationsAsync(FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
         ZonedDateTime startTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-
         for (int i = 0; i < 5; i++) {
             long delay = i + 1;
             try {
                 scheduler.schedule(() -> {
-                    // 경과 시간 계산
-                    long minutesElapsed = Duration.between(startTime, ZonedDateTime.now(ZoneId.of("Asia/Seoul"))).toMinutes();
+                    try {
+                        long minutesElapsed = Duration.between(startTime, ZonedDateTime.now(ZoneId.of("Asia/Seoul"))).toMinutes();
 
-                    // 랜덤 메시지
-                    RandomMessages randomMessage = RandomMessages.getRandom();
-                    String messageToSend;
+                        RandomMessages randomMessage = RandomMessages.getRandom();
+                        String messageToSend;
 
-                    if (randomMessage == RandomMessages.DRINK_TIME_ELAPSED) {
-                        messageToSend = String.format("벌써 음주하신 지 %d분 지났어요!", minutesElapsed);
-                    } else {
-                        messageToSend = randomMessage.getMessage();
+                        if (randomMessage == RandomMessages.DRINK_TIME_ELAPSED) {
+                            messageToSend = String.format("벌써 음주하신 지 %d분 지났어요!", minutesElapsed);
+                        } else {
+                            messageToSend = randomMessage.getMessage();
+                        }
+
+                        fcmService.sendMessageTo(
+                                FCMAppointmentRequestDTO.builder()
+                                        .token(fcmAppointmentRequestDTO.getToken())
+                                        .title(messageToSend)
+                                        .body("음주를 마무리하셨다면 음주 종료하기를 눌러주세요.")
+                                        .build()
+                        );
+
+                        System.out.println("음주 알림 전송 시간: " + minutesElapsed + "분");
+                    } catch (Exception ex) {
+                        System.err.println("알림 전송 실패. 다시 시도합니다: " + ex.getMessage());
+                        scheduler.schedule(() -> scheduleRandomNotificationsAsync(fcmAppointmentRequestDTO), 1, TimeUnit.MINUTES);
                     }
-
-                    fcmService.sendMessageTo(
-                            FCMAppointmentRequestDTO.builder()
-                                    .token(fcmAppointmentRequestDTO.getToken())
-                                    .title(messageToSend)
-                                    .body("음주를 마무리하셨다면 음주 종료하기를 눌러주세요.")
-                                    .build()
-                    );
-
-                    // 경과 시간 출력
-                    System.out.println("음주 알림 전송 시간: " + minutesElapsed + "분");
                 }, delay, TimeUnit.MINUTES);
             } catch (Exception e) {
                 throw new GeneralException(ErrorStatus.FIREBASE_MESSAGE_SCHEDULE_FAILED);
             }
         }
+        return CompletableFuture.completedFuture(null);
     }
 }
