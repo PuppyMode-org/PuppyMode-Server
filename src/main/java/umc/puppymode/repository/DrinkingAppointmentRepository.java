@@ -11,6 +11,7 @@ import umc.puppymode.domain.User;
 import umc.puppymode.domain.enums.AppointmentStatus;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface DrinkingAppointmentRepository extends JpaRepository<DrinkingAppointment, Long> {
@@ -20,4 +21,6 @@ public interface DrinkingAppointmentRepository extends JpaRepository<DrinkingApp
             "FROM DrinkingAppointment a " +
             "WHERE a.user = :user AND DATE(a.dateTime) = :date")
     boolean existsByUserAndDate(@Param("user") User user, @Param("date") LocalDate date);
+
+    List<DrinkingAppointment> findByStatus(AppointmentStatus status);
 }

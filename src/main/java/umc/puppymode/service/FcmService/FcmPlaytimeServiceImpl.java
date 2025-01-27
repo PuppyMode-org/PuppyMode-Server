@@ -19,6 +19,7 @@ import java.util.List;
 public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
 
     private final FcmService fcmService;
+    private final FcmQueryService fcmQueryService;
     private final UserQueryService userQueryService;
 
     @Override
@@ -31,7 +32,7 @@ public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
     @Scheduled(cron = "0 0 10 * * ?", zone = "Asia/Seoul")
     public void sendScheduledPushNotification() {
         try {
-            List<String> fcmTokens = userQueryService.getAllFcmTokens();
+            List<String> fcmTokens = fcmQueryService.getAllFcmTokensWithNotification();
 
             // 토큰이 없으면 예외 처리
             if (fcmTokens.isEmpty()) {
@@ -41,15 +42,17 @@ public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
             // 모든 FCM 토큰에 대해 알림 발송
             for (String token : fcmTokens) {
                 try {
-                    User user = userQueryService.getUserByFcmToken(token);
+                    User user = fcmQueryService.getUserByFcmToken(token);
 
-                    // 사용자 정보 없으면 건너뛰기
-                    if (user == null) continue;
+                    if (user == null) {
+                        continue;
+                    }
 
                     Puppy puppy = userQueryService.getUserPuppy(user.getUserId());
 
-                    // 강아지 정보 없으면 건너뛰기
-                    if (puppy == null) continue;
+                    if (puppy == null) {
+                        continue;
+                    }
 
                     // 푸시 알림 발송
                     fcmService.sendMessageTo(
@@ -68,4 +71,5 @@ public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
             throw new GeneralException(ErrorStatus.FIREBASE_SCHEDULE_ERROR);
         }
     }
+
 }

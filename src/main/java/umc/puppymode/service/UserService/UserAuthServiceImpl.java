@@ -19,7 +19,6 @@ import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
 import umc.puppymode.web.dto.UserInfoDTO;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -89,21 +88,20 @@ public class UserAuthServiceImpl implements UserAuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
+        // FCM 토큰을 찾고, 없으면 새로 생성
         Token token = tokenRepository.findByUserAndTokenType(user, TokenType.FCM)
-                .orElseGet(() -> createNewToken(user));
+                .orElse(null);
 
-        updateTokenIfChanged(token, fcmToken);
-    }
-
-    private Token createNewToken(User user) {
-        return Token.builder()
-                .user(user)
-                .tokenType(TokenType.FCM)
-                .build();
-    }
-
-    private void updateTokenIfChanged(Token token, String fcmToken) {
-        if (!fcmToken.equals(token.getToken())) {
+        if (token == null) {
+            // 기존에 FCM 토큰이 없으면 새로 생성하고 저장
+            token = Token.builder()
+                    .user(user)
+                    .tokenType(TokenType.FCM)
+                    .token(fcmToken)
+                    .build();
+            tokenRepository.save(token);
+        } else if (!fcmToken.equals(token.getToken())) {
+            // 기존 토큰과 다른 경우에만 업데이트
             token.setToken(fcmToken);
             tokenRepository.save(token);
         }

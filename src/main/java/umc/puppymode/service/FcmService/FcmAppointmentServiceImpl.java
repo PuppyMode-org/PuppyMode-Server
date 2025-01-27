@@ -6,8 +6,11 @@ import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.domain.DrinkingAppointment;
+import umc.puppymode.domain.Token;
+import umc.puppymode.domain.enums.AppointmentStatus;
+import umc.puppymode.domain.enums.TokenType;
 import umc.puppymode.repository.DrinkingAppointmentRepository;
-import umc.puppymode.util.DistanceCalculator;
+import umc.puppymode.repository.TokenRepository;
 import umc.puppymode.util.RandomMessages;
 import umc.puppymode.web.dto.FCMDTO.FCMAppointmentRequestDTO;
 import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
@@ -15,6 +18,7 @@ import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -24,43 +28,38 @@ import java.util.concurrent.TimeUnit;
 public class FcmAppointmentServiceImpl implements FcmAppointmentService {
 
     private final FcmService fcmService;
-    private final DistanceCalculator distanceCalculator;
     private final DrinkingAppointmentRepository drinkingAppointmentRepository;
+    private final TokenRepository tokenRepository;
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); // Task scheduler
 
     @Override
-    public ApiResponse<FCMResponseDTO> scheduleDrinkingNotifications(
-            FCMAppointmentRequestDTO fcmAppointmentRequestDTO
-    ) {
+    public ApiResponse<FCMResponseDTO> scheduleDrinkingNotifications() {
         try {
-            // 약속 정보 조회
-            DrinkingAppointment appointment = drinkingAppointmentRepository.findById(fcmAppointmentRequestDTO.getAppointmentId())
-                    .orElseThrow(() -> new GeneralException(ErrorStatus.APPOINTMENT_NOT_FOUND));
+            List<DrinkingAppointment> ongoingAppointments = drinkingAppointmentRepository.findByStatus(AppointmentStatus.ONGOING);
 
-            // 약속 장소 위치 가져오기
-            double targetLatitude = appointment.getLatitude();
-            double targetLongitude = appointment.getLongitude();
+            if (ongoingAppointments.isEmpty()) {
+                throw new GeneralException(ErrorStatus.APPOINTMENT_TIME_MISMATCH);
+            }
 
-            // TODO: 사용자 현재 위치 API 구현 후 실제 위치로 수정 필요
-            double userLatitude = 37.498095;
-            double userLongitude = 127.02761;
+            // 각 약속에 대해 알림을 전송
+            for (DrinkingAppointment appointment : ongoingAppointments) {
+                if (appointment.getStatus() == AppointmentStatus.ONGOING) {
+                    Long userId = appointment.getUser().getUserId();
 
-            // 약속 장소 도착 확인 (1km 이내)
-            boolean isWithinRange = isWithinArrivalRange(userLatitude, userLongitude, targetLatitude, targetLongitude);
+                    // FCM 토큰 조회 부분
+                    Token fcmToken = tokenRepository.findByUserAndTokenType(appointment.getUser(), TokenType.FCM)
+                            .orElse(null);
 
-            // 약속 시간 확인
-            ZonedDateTime appointmentTime = appointment.getDateTime().atZone(ZoneId.of("Asia/Seoul"));
-            boolean isAppointmentTimeNow = isAppointmentTimeNow(appointmentTime);
+                    if (fcmToken == null) {
+                        continue; // 이 유저는 건너뜀
+                    }
 
-            // 시간이랑 장소가 모두 맞을 때만 푸시 알림 전송
-            if (isWithinRange && isAppointmentTimeNow) {
-                sendInitialNotification(fcmAppointmentRequestDTO);
-                scheduleRandomNotifications(fcmAppointmentRequestDTO);
-            } else {
-                if (!isWithinRange) {
-                    throw new GeneralException(ErrorStatus.LOCATION_NOT_IN_RANGE);
-                } else {
-                    throw new GeneralException(ErrorStatus.APPOINTMENT_TIME_MISMATCH);
+                    // FCM 알림 생성
+                    FCMAppointmentRequestDTO fcmAppointmentRequestDTO = createFCMRequestDTO(fcmToken.getToken());
+
+                    // 알림 전송
+                    sendInitialNotification(fcmAppointmentRequestDTO);
+                    scheduleRandomNotifications(fcmAppointmentRequestDTO);
                 }
             }
 
@@ -68,11 +67,9 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
                     .validateOnly(false)
                     .message(new FCMResponseDTO.Message(
                             new FCMResponseDTO.Notification(
-                                    fcmAppointmentRequestDTO.getTitle(),
-                                    fcmAppointmentRequestDTO.getBody(),
-                                    fcmAppointmentRequestDTO.getImage()
+                                    "음주 알림", "약속이 진행 중입니다.", null
                             ),
-                            fcmAppointmentRequestDTO.getToken()
+                            "allUsers"
                     ))
                     .build();
 
@@ -84,23 +81,12 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
         }
     }
 
-    private boolean isWithinArrivalRange(
-            double userLatitude, double userLongitude, double targetLatitude, double targetLongitude
-    ) {
-        try {
-            double distance = distanceCalculator.calculateDistance(
-                    userLatitude, userLongitude, targetLatitude, targetLongitude
-            );
-            return distance <= 1.0; // 1km 이내
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.DISTANCE_CALCULATION_FAILED);
-        }
-    }
-
-    private boolean isAppointmentTimeNow(ZonedDateTime appointmentTime) {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
-        return now.getHour() == appointmentTime.getHour() &&
-                now.getMinute() == appointmentTime.getMinute();
+    private FCMAppointmentRequestDTO createFCMRequestDTO(String fcmToken) {
+        return FCMAppointmentRequestDTO.builder()
+                .token(fcmToken)  // 조회한 FCM 토큰 사용
+                .title("음주 약속 알림")
+                .body("약속이 진행 중입니다!")
+                .build();
     }
 
     private void sendInitialNotification(FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
