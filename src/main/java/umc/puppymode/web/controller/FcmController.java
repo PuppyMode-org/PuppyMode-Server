@@ -8,7 +8,7 @@ import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.FcmService.FcmAppointmentService;
 import umc.puppymode.service.FcmService.FcmPlaytimeService;
 import umc.puppymode.service.FcmService.FcmService;
-import umc.puppymode.web.dto.*;
+import umc.puppymode.web.dto.FCMDTO.*;
 
 @Slf4j
 @RestController
@@ -43,11 +43,10 @@ public class FcmController {
     }
 
     @PostMapping("/appointments")
-    @Operation(summary = "술 약속 푸시 알림 API", description = "약속 시간에 맞춰 약속 장소 1km 이내 도달 시 최초 알림을 전송하고, 이후 1시간 간격으로 랜덤 알림을 5회 제공합니다.")
-    public ResponseEntity<ApiResponse<FCMResponseDTO>> sendDrinkingScheduleNotification(
-            @RequestBody FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
+    @Operation(summary = "술 약속 푸시 알림 API", description = "진행 중인 약속에 대해 첫 알림을 전송하고 이후 1분 간격으로 랜덤 푸시 알림을 전송합니다.")
+    public ResponseEntity<ApiResponse<FCMAppointmentResponseDTO>> sendDrinkingScheduleNotification() {
 
-        ApiResponse<FCMResponseDTO> response = fcmAppointmentService.scheduleDrinkingNotifications(fcmAppointmentRequestDTO);
+        ApiResponse<FCMAppointmentResponseDTO> response = fcmAppointmentService.scheduleDrinkingNotifications();
         return ResponseEntity.ok(response);
     }
 }

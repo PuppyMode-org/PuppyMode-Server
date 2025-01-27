@@ -5,15 +5,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.config.security.JwtTokenProvider;
 import umc.puppymode.config.security.UserAuthentication;
+import umc.puppymode.domain.Token;
 import umc.puppymode.domain.User;
+import umc.puppymode.domain.enums.TokenType;
+import umc.puppymode.repository.TokenRepository;
 import umc.puppymode.repository.UserRepository;
 import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
 import umc.puppymode.web.dto.UserInfoDTO;
+
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +27,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenRepository tokenRepository;
 
     @Override
     public LoginResponseDTO createOrUpdateUser(KakaoUserInfoResponseDTO userInfo) {
@@ -75,4 +81,38 @@ public class UserAuthServiceImpl implements UserAuthService {
             throw new GeneralException(ErrorStatus._UNAUTHORIZED);
         }
     }
+
+    @Transactional
+    @Override
+    public void saveFcmToken(Long userId, String fcmToken) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        // FCM 토큰을 찾고, 없으면 새로 생성
+        Token token = tokenRepository.findByUserAndTokenType(user, TokenType.FCM)
+                .orElse(null);
+
+        if (token == null) {
+            // 기존에 FCM 토큰이 없으면 새로 생성하고 저장
+            token = Token.builder()
+                    .user(user)
+                    .tokenType(TokenType.FCM)
+                    .token(fcmToken)
+                    .build();
+            tokenRepository.save(token);
+        } else if (!fcmToken.equals(token.getToken())) {
+            // 기존 토큰과 다른 경우에만 업데이트
+            token.setToken(fcmToken);
+            tokenRepository.save(token);
+        }
+    }
+
+    @Override
+    public LoginResponseDTO loginWithFcmToken(LoginResponseDTO loginResponseDTO, String fcmToken) {
+        if (StringUtils.hasText(fcmToken)) {
+            saveFcmToken(loginResponseDTO.getUserInfo().getUserId(), fcmToken);
+        }
+        return loginResponseDTO;
+    }
+
 }
