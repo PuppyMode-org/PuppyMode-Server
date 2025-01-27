@@ -73,6 +73,13 @@ public class DrinkingAppointmentCommendServiceImpl implements DrinkingAppointmen
             throw new IllegalArgumentException("현재 시간 이전으로 설정할 수 없습니다.");
         }
 
+        // 술 약속 상태 검증
+        if (appointment.getStatus() == AppointmentStatus.ONGOING){
+            throw new IllegalArgumentException("이미 진행 중인 약속은 미룰 수 없습니다.");
+        } else if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new IllegalArgumentException("이미 완료 된 약속은 미를 수 없습니다.");
+        }
+
         appointment.setDateTime(request.getDateTime());
     }
 
