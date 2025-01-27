@@ -14,11 +14,13 @@ import umc.puppymode.repository.DrinkingAppointmentRepository;
 import umc.puppymode.repository.TokenRepository;
 import umc.puppymode.util.RandomMessages;
 import umc.puppymode.web.dto.FCMDTO.FCMAppointmentRequestDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMAppointmentResponseDTO;
 import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
 
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
@@ -34,7 +36,7 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
     private final ScheduledExecutorService scheduler;
 
     @Override
-    public ApiResponse<FCMResponseDTO> scheduleDrinkingNotifications() {
+    public ApiResponse<FCMAppointmentResponseDTO> scheduleDrinkingNotifications() {
         try {
             List<DrinkingAppointment> ongoingAppointments = drinkingAppointmentRepository.findByStatus(AppointmentStatus.ONGOING);
 
@@ -42,21 +44,20 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
                 throw new GeneralException(ErrorStatus.APPOINTMENT_TIME_MISMATCH);
             }
 
+            List<Long> appointmentIdsWithNotifications = new ArrayList<>();
+
             for (DrinkingAppointment appointment : ongoingAppointments) {
                 scheduleNotificationsForAppointment(appointment);
+                appointmentIdsWithNotifications.add(appointment.getAppointmentId());
             }
 
-            FCMResponseDTO response = FCMResponseDTO.builder()
-                    .validateOnly(false)
-                    .message(new FCMResponseDTO.Message(
-                            new FCMResponseDTO.Notification(
-                                    "음주 알림", "약속이 진행 중입니다.", null
-                            ),
-                            "allUsers"
-                    ))
-                    .build();
+            FCMAppointmentResponseDTO responseDTO = new FCMAppointmentResponseDTO(
+                    "진행 중인 술 약속에 대해 푸시 알림이 전송되었습니다.",
+                    appointmentIdsWithNotifications
+            );
 
-            return ApiResponse.onSuccess(response);
+            return ApiResponse.onSuccess(responseDTO);
+
         } catch (GeneralException e) {
             throw e;
         } catch (Exception e) {
@@ -82,6 +83,7 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
                 .token(fcmToken)
                 .title("음주 약속 알림")
                 .body("약속이 진행 중입니다!")
+                .image("https://d1le4wcgenmery.cloudfront.net/5527d0c2-8511-463b-b456-628ee5c18716PuppyModeLogo.png")
                 .build();
     }
 
@@ -93,6 +95,7 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
                             .token(fcmAppointmentRequestDTO.getToken())
                             .title("음주 시작을 확인했어요!")
                             .body("아직 음주 중이 아니라면 미루기를 눌러주세요.")
+                            .image("https://d1le4wcgenmery.cloudfront.net/5527d0c2-8511-463b-b456-628ee5c18716PuppyModeLogo.png")
                             .build()
             );
         } catch (Exception e) {
@@ -124,6 +127,7 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
                                         .token(fcmAppointmentRequestDTO.getToken())
                                         .title(messageToSend)
                                         .body("음주를 마무리하셨다면 음주 종료하기를 눌러주세요.")
+                                        .image("https://d1le4wcgenmery.cloudfront.net/5527d0c2-8511-463b-b456-628ee5c18716PuppyModeLogo.png")
                                         .build()
                         );
 
