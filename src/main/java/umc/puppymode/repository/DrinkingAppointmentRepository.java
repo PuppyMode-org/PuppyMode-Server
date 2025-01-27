@@ -22,5 +22,8 @@ public interface DrinkingAppointmentRepository extends JpaRepository<DrinkingApp
             "WHERE a.user = :user AND DATE(a.dateTime) = :date")
     boolean existsByUserAndDate(@Param("user") User user, @Param("date") LocalDate date);
 
-    List<DrinkingAppointment> findByStatus(AppointmentStatus status);
+    @Query("SELECT DISTINCT da FROM DrinkingAppointment da " +
+            "JOIN FETCH da.user " +
+            "WHERE da.status = :status")
+    List<DrinkingAppointment> findByStatusWithUser(@Param("status") AppointmentStatus status);
 }

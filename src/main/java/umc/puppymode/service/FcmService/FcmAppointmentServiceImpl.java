@@ -8,6 +8,7 @@ import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.domain.DrinkingAppointment;
 import umc.puppymode.domain.Token;
+import umc.puppymode.domain.User;
 import umc.puppymode.domain.enums.AppointmentStatus;
 import umc.puppymode.domain.enums.TokenType;
 import umc.puppymode.repository.DrinkingAppointmentRepository;
@@ -15,16 +16,17 @@ import umc.puppymode.repository.TokenRepository;
 import umc.puppymode.util.RandomMessages;
 import umc.puppymode.web.dto.FCMDTO.FCMAppointmentRequestDTO;
 import umc.puppymode.web.dto.FCMDTO.FCMAppointmentResponseDTO;
-import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
 
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,17 +40,34 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
     @Override
     public ApiResponse<FCMAppointmentResponseDTO> scheduleDrinkingNotifications() {
         try {
-            List<DrinkingAppointment> ongoingAppointments = drinkingAppointmentRepository.findByStatus(AppointmentStatus.ONGOING);
+            List<DrinkingAppointment> ongoingAppointments = drinkingAppointmentRepository.findByStatusWithUser(AppointmentStatus.ONGOING);
 
             if (ongoingAppointments.isEmpty()) {
                 throw new GeneralException(ErrorStatus.APPOINTMENT_TIME_MISMATCH);
             }
 
+            List<User> users = ongoingAppointments.stream()
+                    .map(DrinkingAppointment::getUser)
+                    .toList();
+
+            List<Token> fcmTokens = tokenRepository.findByUsersAndTokenType(users, TokenType.FCM);
+
+            Map<Long, Token> userTokenMap = fcmTokens.stream()
+                    .collect(Collectors.toMap(
+                            token -> token.getUser().getUserId(),
+                            token -> token
+                    ));
+
             List<Long> appointmentIdsWithNotifications = new ArrayList<>();
 
             for (DrinkingAppointment appointment : ongoingAppointments) {
-                scheduleNotificationsForAppointment(appointment);
-                appointmentIdsWithNotifications.add(appointment.getAppointmentId());
+                Token fcmToken = userTokenMap.get(appointment.getUser().getUserId());
+                if (fcmToken != null) {
+                    FCMAppointmentRequestDTO fcmAppointmentRequestDTO = createFCMRequestDTO(fcmToken.getToken());
+                    sendInitialNotificationAsync(fcmAppointmentRequestDTO);
+                    scheduleRandomNotificationsAsync(fcmAppointmentRequestDTO);
+                    appointmentIdsWithNotifications.add(appointment.getAppointmentId());
+                }
             }
 
             FCMAppointmentResponseDTO responseDTO = new FCMAppointmentResponseDTO(
@@ -63,19 +82,6 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.FIREBASE_MESSAGE_SEND_FAILED);
         }
-    }
-
-    private void scheduleNotificationsForAppointment(DrinkingAppointment appointment) {
-        if (appointment.getStatus() != AppointmentStatus.ONGOING) return;
-
-        Token fcmToken = tokenRepository.findByUserAndTokenType(appointment.getUser(), TokenType.FCM)
-                .orElse(null);
-
-        if (fcmToken == null) return;
-
-        FCMAppointmentRequestDTO fcmAppointmentRequestDTO = createFCMRequestDTO(fcmToken.getToken());
-        sendInitialNotificationAsync(fcmAppointmentRequestDTO);
-        scheduleRandomNotificationsAsync(fcmAppointmentRequestDTO);
     }
 
     private FCMAppointmentRequestDTO createFCMRequestDTO(String fcmToken) {
