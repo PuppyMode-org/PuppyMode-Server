@@ -40,18 +40,23 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
     @Override
     public ApiResponse<FCMAppointmentResponseDTO> scheduleDrinkingNotifications() {
         try {
+            // 진행 중인 술 약속 조회
             List<DrinkingAppointment> ongoingAppointments = drinkingAppointmentRepository.findByStatusWithUser(AppointmentStatus.ONGOING);
 
+            // 진행 중인 술 약속이 없는 경우 예외 처리
             if (ongoingAppointments.isEmpty()) {
                 throw new GeneralException(ErrorStatus.APPOINTMENT_TIME_MISMATCH);
             }
 
+            // 술 약속에 포함된 사용자 리스트 생성
             List<User> users = ongoingAppointments.stream()
                     .map(DrinkingAppointment::getUser)
                     .toList();
 
+            // 사용자별 FCM 토큰 조회
             List<Token> fcmTokens = tokenRepository.findByUsersAndTokenType(users, TokenType.FCM);
 
+            // 사용자 ID와 FCM 토큰 매핑
             Map<Long, Token> userTokenMap = fcmTokens.stream()
                     .collect(Collectors.toMap(
                             token -> token.getUser().getUserId(),
@@ -60,12 +65,19 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
 
             List<Long> appointmentIdsWithNotifications = new ArrayList<>();
 
+            // 술 약속별 푸시 알림 전송
             for (DrinkingAppointment appointment : ongoingAppointments) {
                 Token fcmToken = userTokenMap.get(appointment.getUser().getUserId());
                 if (fcmToken != null) {
                     FCMAppointmentRequestDTO fcmAppointmentRequestDTO = createFCMRequestDTO(fcmToken.getToken());
+
+                    // 초기 알림 전송
                     sendInitialNotificationAsync(fcmAppointmentRequestDTO);
+
+                    // 랜덤 알림 스케줄링
                     scheduleRandomNotificationsAsync(fcmAppointmentRequestDTO);
+
+                    // 알림이 전송된 술 약속 ID 추가
                     appointmentIdsWithNotifications.add(appointment.getAppointmentId());
                 }
             }
@@ -112,18 +124,27 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
     @Async
     public CompletableFuture<Void> scheduleRandomNotificationsAsync(FCMAppointmentRequestDTO fcmAppointmentRequestDTO) {
         ZonedDateTime startTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+
         for (int i = 0; i < 5; i++) {
             long delay = i + 1;
             try {
                 scheduler.schedule(() -> {
                     try {
-                        long minutesElapsed = Duration.between(startTime, ZonedDateTime.now(ZoneId.of("Asia/Seoul"))).toMinutes();
+                        // 경과 시간 계산
+                        long minutesElapsed = Duration.between(
+                                startTime,
+                                ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
+                        ).toMinutes();
 
+                        // 랜덤 메시지 생성
                         RandomMessages randomMessage = RandomMessages.getRandom();
                         String messageToSend;
 
                         if (randomMessage == RandomMessages.DRINK_TIME_ELAPSED) {
-                            messageToSend = String.format("벌써 음주하신 지 %d분 지났어요!", minutesElapsed);
+                            messageToSend = String.format(
+                                    "벌써 음주하신 지 %d분 지났어요!",
+                                    minutesElapsed
+                            );
                         } else {
                             messageToSend = randomMessage.getMessage();
                         }
@@ -138,15 +159,18 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
                         );
 
                         System.out.println("음주 알림 전송 시간: " + minutesElapsed + "분");
+
                     } catch (Exception ex) {
                         System.err.println("알림 전송 실패. 다시 시도합니다: " + ex.getMessage());
                         scheduler.schedule(() -> scheduleRandomNotificationsAsync(fcmAppointmentRequestDTO), 1, TimeUnit.MINUTES);
                     }
                 }, delay, TimeUnit.MINUTES);
+
             } catch (Exception e) {
                 throw new GeneralException(ErrorStatus.FIREBASE_MESSAGE_SCHEDULE_FAILED);
             }
         }
+
         return CompletableFuture.completedFuture(null);
     }
 }
