@@ -17,6 +17,7 @@ import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.web.dto.FCMDTO.FCMRequestDTO;
 import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -32,6 +33,27 @@ public class FcmServiceImpl implements FcmService {
     @Value("${fcm.firebase-key-path}")
     private String firebaseConfigPath;
 
+    private final ObjectMapper objectMapper;
+    private GoogleCredentials googleCredentials;
+    private final RestTemplate restTemplate;
+
+    @PostConstruct
+    public void initialize() {
+        try {
+            this.googleCredentials = GoogleCredentials
+                    .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
+                    .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
+
+            // UTF-8 인코딩 설정
+            restTemplate.getMessageConverters().add(0,
+                    new StringHttpMessageConverter(StandardCharsets.UTF_8));
+
+        } catch (IOException e) {
+            log.error("FCM 초기화 실패: {}", e.getMessage(), e);
+            throw new RuntimeException("FCM 초기화 실패", e);
+        }
+    }
+
     /**
      * 푸시 메시지를 전송하는 비즈니스 로직
      *
@@ -43,10 +65,6 @@ public class FcmServiceImpl implements FcmService {
         try {
             // FCM 메시지 만들기
             String message = makeMessage(fcmRequestDTO);
-            RestTemplate restTemplate = new RestTemplate();
-
-            // UTF-8 인코딩 설정
-            restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
             // 요청 헤더 설정
             HttpHeaders headers = new HttpHeaders();
@@ -57,26 +75,52 @@ public class FcmServiceImpl implements FcmService {
             HttpEntity<String> entity = new HttpEntity<>(message, headers);
             String apiUrl = String.format("https://fcm.googleapis.com/v1/projects/%s/messages:send", projectName);
 
+            log.debug("FCM 메시지 전송 시도. token: {}", fcmRequestDTO.getToken());
+
             // FCM API 호출
-            ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    apiUrl,
+                    HttpMethod.POST,
+                    entity,
+                    String.class
+            );
 
             // 응답 상태 확인 후 ApiResponse 반환
             if (response.getStatusCode() == HttpStatus.OK) {
-                // FCMResponseDTO 객체 생성 시 builder 사용
+                log.debug("FCM 메시지 전송 성공. token: {}", fcmRequestDTO.getToken());
+
                 FCMResponseDTO fcmResponseDTO = FCMResponseDTO.builder()
                         .validateOnly(true)
                         .message(new FCMResponseDTO.Message(
-                                new FCMResponseDTO.Notification(fcmRequestDTO.getTitle(), fcmRequestDTO.getBody(), null),
+                                new FCMResponseDTO.Notification(
+                                        fcmRequestDTO.getTitle(),
+                                        fcmRequestDTO.getBody(),
+                                        null
+                                ),
                                 fcmRequestDTO.getToken()
                         ))
                         .build();
                 return ApiResponse.onSuccess(fcmResponseDTO);
             } else {
+                log.error("FCM 메시지 전송 실패. Status: {}, token: {}",
+                        response.getStatusCode(),
+                        fcmRequestDTO.getToken()
+                );
                 throw new GeneralException(ErrorStatus.FIREBASE_MESSAGE_SEND_FAILED);
             }
         } catch (IOException e) {
+            log.error("Firebase 에러 발생. token: {}, error: {}",
+                    fcmRequestDTO.getToken(),
+                    e.getMessage(),
+                    e
+            );
             throw new GeneralException(ErrorStatus.FIREBASE_ERROR);
         } catch (Exception e) {
+            log.error("FCM 메시지 전송 중 예상치 못한 에러 발생. token: {}, error: {}",
+                    fcmRequestDTO.getToken(),
+                    e.getMessage(),
+                    e
+            );
             throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
         }
     }
@@ -88,14 +132,11 @@ public class FcmServiceImpl implements FcmService {
      */
     private String getAccessToken() throws IOException {
         try {
-            GoogleCredentials googleCredentials = GoogleCredentials
-                    .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                    .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
-
             googleCredentials.refreshIfExpired();
             return googleCredentials.getAccessToken().getTokenValue();
         } catch (IOException e) {
-            throw e; // 예외를 다시 던져서 호출한 곳에서 처리하도록 함
+            log.error("Access Token 갱신 실패: {}", e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -106,7 +147,6 @@ public class FcmServiceImpl implements FcmService {
      * @return JSON 형식의 문자열
      */
     private String makeMessage(FCMRequestDTO fcmRequestDTO) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
         FCMResponseDTO fcmMessageDto = FCMResponseDTO.builder()
                 .message(FCMResponseDTO.Message.builder()
                         .token(fcmRequestDTO.getToken())
