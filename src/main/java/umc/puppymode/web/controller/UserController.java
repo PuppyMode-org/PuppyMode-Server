@@ -1,26 +1,19 @@
 package umc.puppymode.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.config.security.JwtTokenProvider;
-import umc.puppymode.domain.User;
 import umc.puppymode.repository.UserRepository;
 import umc.puppymode.service.UserService.UserAuthService;
 import umc.puppymode.service.UserService.UserCommandService;
 import umc.puppymode.service.UserService.UserInfoService;
 import umc.puppymode.service.UserService.UserQueryService;
-import umc.puppymode.web.dto.UserInfoDTO;
+import umc.puppymode.web.dto.UserInfoResponseDTO;
 import umc.puppymode.web.dto.UserRequestDTO;
 import umc.puppymode.web.dto.UserResponseDTO;
-
-import java.util.IllformedLocaleException;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,11 +55,11 @@ public class UserController {
 
     @GetMapping("")
     @Operation(summary = "사용자 정보 조회 API", description = "사용자의 정보를 조회하는 API입니다.")
-    public ResponseEntity<ApiResponse<UserInfoDTO>> getUserInfo() {
+    public ResponseEntity<ApiResponse<UserInfoResponseDTO>> getUserInfo() {
 
         Long userId = userAuthService.getCurrentUserId();
 
-        UserInfoDTO userInfoDTO = userInfoService.getUserInfo(userId);
+        UserInfoResponseDTO userInfoDTO = userInfoService.getUserInfo(userId);
 
         return ResponseEntity.ok(ApiResponse.onSuccess(userInfoDTO));
     }

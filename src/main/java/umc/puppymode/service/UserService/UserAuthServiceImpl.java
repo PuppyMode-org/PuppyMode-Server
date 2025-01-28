@@ -1,7 +1,6 @@
 package umc.puppymode.service.UserService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,9 @@ import umc.puppymode.domain.User;
 import umc.puppymode.repository.UserRepository;
 import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
-import umc.puppymode.web.dto.UserInfoDTO;
+import umc.puppymode.web.dto.UserInfoResponseDTO;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,10 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     public LoginResponseDTO createOrUpdateUser(KakaoUserInfoResponseDTO userInfo) {
+        AtomicBoolean isNewUser = new AtomicBoolean(false);
         User user = userRepository.findByEmail(userInfo.getKakaoAccount().getEmail())
                 .orElseGet(() -> {
+                    isNewUser.set(true);
                     User newUser = User.builder()
                             .email(userInfo.getKakaoAccount().getEmail())
                             .username(userInfo.getKakaoAccount().getProfile().getNickName())
@@ -43,11 +46,11 @@ public class UserAuthServiceImpl implements UserAuthService {
         // JWT 토큰 생성
         String token = jwtTokenProvider.generateToken(authentication);
 
-        // UserInfoDTO 생성
-        UserInfoDTO userInfoDTO = UserInfoDTO.builder()
+        LoginResponseDTO.LoginUserInfoDTO userInfoDTO = LoginResponseDTO.LoginUserInfoDTO.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .email(user.getEmail())
+                .isNewUser(isNewUser.get())
                 .build();
 
         // LoginResponseDTO 생성 및 반환
@@ -55,7 +58,6 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .jwt(token)
                 .userInfo(userInfoDTO)
                 .build();
-
     }
 
     @Override
