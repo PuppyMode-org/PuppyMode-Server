@@ -11,13 +11,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LoginResponseDTO {
     private String jwt;
-    private LoginUserInfoDTO userInfo;
+    private LoginUserInfo userInfo;
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class LoginUserInfoDTO {
+    public static class LoginUserInfo {
         private Long userId;
         private String email;
         private String username;
