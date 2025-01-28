@@ -13,8 +13,6 @@ import umc.puppymode.domain.User;
 import umc.puppymode.repository.UserRepository;
 import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
-import umc.puppymode.web.dto.UserInfoResponseDTO;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
