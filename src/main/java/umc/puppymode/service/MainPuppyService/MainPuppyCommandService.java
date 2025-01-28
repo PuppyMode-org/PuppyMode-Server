@@ -10,4 +10,6 @@ public interface MainPuppyCommandService {
     String updatePuppyName(Long userId, Long puppyId, String newPuppyName);
     // 강아지 놀아주기 실행
     MainPuppyResDTO.PlayResDTO platWithPuppy(Long userId, Long puppyId);
+    // 사용자의 강아지 객체 삭제
+    String deletePuppy(Long userId);
 }
