@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.DrinkService.DrinkCommandService;
 import umc.puppymode.service.DrinkService.DrinkQueryService;
+import umc.puppymode.service.UserService.UserAuthService;
 import umc.puppymode.web.dto.DrinkRequestDTO;
 import umc.puppymode.web.dto.DrinkResponseDTO.*;
 
@@ -19,6 +20,7 @@ public class DrinkController {
 
     private final DrinkCommandService drinkCommandService;
     private final DrinkQueryService drinkQueryService;
+    private final UserAuthService userAuthService;
 
     @GetMapping("hangover")
     @Operation(summary = "숙취 목록 조회 API", description = "숙취 목록을 조회하는 API입니다.")
@@ -44,8 +46,7 @@ public class DrinkController {
     @PostMapping("record")
     @Operation(summary = "음주 기록 생성 API", description = "음주 기록을 생성하는 API입니다.")
     public ResponseEntity<ApiResponse<DrinksRecordResponseDTO>> postDrinkRecord(@RequestBody DrinkRequestDTO.DrinkRecordDTO drinkRecordDTO) {
-        // 추후 JWT 인증 적용 후 변경 예정
-        Long userId = 1L;
+        Long userId = userAuthService.getCurrentUserId();
         DrinksRecordResponseDTO responseDTO = drinkCommandService.postDrinksRecord(userId, drinkRecordDTO);
         return ResponseEntity.ok(ApiResponse.onSuccess(responseDTO));
     }
