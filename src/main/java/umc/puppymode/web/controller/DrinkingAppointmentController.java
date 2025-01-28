@@ -51,9 +51,12 @@ public class DrinkingAppointmentController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
+        //userId
+        Long userId = userAuthService.getCurrentUserId();
+
         // 서비스 호출
         DrinkingAppointmentResponseDTO.AppointmentListResultDTO response =
-                drinkingAppointmentQueryService.getAllDrinkingAppointments(status, page, size);
+                drinkingAppointmentQueryService.getAllDrinkingAppointments(status, page, size, userId);
 
         return ApiResponse.onSuccess(response, "SUCCESS_GET_ALL_APPOINTMENTS", "술 약속 리스트 조회 성공");
     }
@@ -64,9 +67,12 @@ public class DrinkingAppointmentController {
     public ApiResponse<DrinkingAppointmentResponseDTO.AppointmentResultDTO> getAppointmentById(
             @PathVariable Long appointmentId) {
 
+        //userId
+        Long userId = userAuthService.getCurrentUserId();
+
         // 서비스 호출
         DrinkingAppointmentResponseDTO.AppointmentResultDTO response =
-                drinkingAppointmentQueryService.getDrinkingAppointmentById(appointmentId);
+                drinkingAppointmentQueryService.getDrinkingAppointmentById(appointmentId, userId);
 
         return ApiResponse.onSuccess(response, SuccessStatus.APPOINTMENT_GET_SUCCESS.getCode(), SuccessStatus.APPOINTMENT_GET_SUCCESS.getMessage());
     }
@@ -75,8 +81,11 @@ public class DrinkingAppointmentController {
     @Operation(summary = "술 약속 및 음주 상태 조회하기  API", description = "술 약속 상태를 조회하며, 술 약속이 'ONGOING'일 때 음주 상태는 true로 반환합니다.:)")
     public ApiResponse<?> getAppointmentStatus(@PathVariable Long appointmentId) {
 
+        //userId
+        Long userId = userAuthService.getCurrentUserId();
+
         // 음주 상태 가져오기
-        boolean isDrinking = drinkingAppointmentQueryService.isDrinkingActive(appointmentId);
+        boolean isDrinking = drinkingAppointmentQueryService.isDrinkingActive(appointmentId, userId);
 
         // 업데이트된 상태를 엔티티에서 가져옴
         DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
@@ -90,7 +99,10 @@ public class DrinkingAppointmentController {
     @Operation(summary = "술 약속 삭제 API", description = "술 약속을 삭제하는 API입니다 :)")
     public ApiResponse<Void> deleteAppointment(@PathVariable Long appointmentId) {
 
-        drinkingAppointmentCommendService.deleteDrinkingAppointment(appointmentId);
+        //userId
+        Long userId = userAuthService.getCurrentUserId();
+
+        drinkingAppointmentCommendService.deleteDrinkingAppointment(appointmentId, userId);
         return ApiResponse.onSuccess(SuccessStatus.APPOINTMENT_DELETE_SUCCESS.getCode(), SuccessStatus.APPOINTMENT_DELETE_SUCCESS.getMessage());
     }
 
@@ -100,8 +112,11 @@ public class DrinkingAppointmentController {
             @PathVariable Long appointmentId,
             @Valid @RequestBody DrinkingAppointmentRequestDTO.RescheduleAppointmentRequestDTO request) {
 
+        //userId
+        Long userId = userAuthService.getCurrentUserId();
+
         //시간 업데이트
-        drinkingAppointmentCommendService.rescheduleDrinkingAppointment(appointmentId, request);
+        drinkingAppointmentCommendService.rescheduleDrinkingAppointment(appointmentId, request, userId);
 
         // 업데이트된 상태를 엔티티에서 가져옴
         DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
@@ -118,8 +133,11 @@ public class DrinkingAppointmentController {
     public ApiResponse<?> completedAppointmentStatus(
             @PathVariable Long appointmentId) {
 
+        //userId
+        Long userId = userAuthService.getCurrentUserId();
+
         // 상태 업데이트
-        drinkingAppointmentCommendService.completeDrinkingAppointment(appointmentId);
+        drinkingAppointmentCommendService.completeDrinkingAppointment(appointmentId, userId);
 
         // 업데이트된 상태를 엔티티에서 가져와서 "COMPLETED"로 전환된 시점에 updated_at 값을 가져오기
         DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
@@ -136,8 +154,11 @@ public class DrinkingAppointmentController {
             @PathVariable Long appointmentId,
             @Valid @RequestBody DrinkingAppointmentRequestDTO.StartAppointmentRequestDTO request) {
 
+        //userId
+        Long userId = userAuthService.getCurrentUserId();
+
         // 사용자의 현 위치와 약속 위치 및 시간 확인 + 상태 업데이트
-        ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> response = locationService.startAppointment(appointmentId, request);
+        ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> response = locationService.startAppointment(appointmentId, request, userId);
 
         return ResponseEntity.ok(response);
     }
