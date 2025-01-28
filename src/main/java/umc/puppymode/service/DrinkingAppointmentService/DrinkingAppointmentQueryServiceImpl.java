@@ -20,25 +20,31 @@ public class DrinkingAppointmentQueryServiceImpl implements DrinkingAppointmentQ
     private final DrinkingAppointmentRepository drinkingAppointmentRepository;
 
     @Override
-    public DrinkingAppointmentResponseDTO.AppointmentResultDTO getDrinkingAppointmentById(Long appointmentId) {
+    public DrinkingAppointmentResponseDTO.AppointmentResultDTO getDrinkingAppointmentById(Long appointmentId, Long userId) {
+
         // 약속 조회
         DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 약속을 찾을 수 없습니다."));
+
+        // 약속 소유자 검증
+        if (!appointment.getUser().getUserId().equals(userId)) {
+            throw new IllegalStateException("해당 약속을 조회할 권한이 없습니다.");
+        }
 
         // 엔티티 → DTO 변환
         return DrinkingAppointmentConverter.toDTO(appointment);
     }
 
     @Override
-    public DrinkingAppointmentResponseDTO.AppointmentListResultDTO getAllDrinkingAppointments(AppointmentStatus status, int page, int size) {
+    public DrinkingAppointmentResponseDTO.AppointmentListResultDTO getAllDrinkingAppointments(AppointmentStatus status, int page, int size, Long userId) {
         Pageable pageable = PageRequest.of(page, size);
         Page<DrinkingAppointment> appointments;
 
-        // 상태별 필터링
+        // 상태와 사용자별 필터링
         if (status != null) {
-            appointments = drinkingAppointmentRepository.findByStatus(status, pageable);
+            appointments = drinkingAppointmentRepository.findByUser_UserIdAndStatus(userId, status, pageable);
         } else {
-            appointments = drinkingAppointmentRepository.findAll(pageable);
+            appointments = drinkingAppointmentRepository.findByUser_UserId(userId, pageable);
         }
 
         // DTO 변환
@@ -53,10 +59,15 @@ public class DrinkingAppointmentQueryServiceImpl implements DrinkingAppointmentQ
     }
 
     @Override
-    public boolean isDrinkingActive(Long appointmentId) {
+    public boolean isDrinkingActive(Long appointmentId, Long userId) {
 
         DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 약속을 찾을 수 없습니다."));
+
+        // 약속 소유자 검증
+        if (!appointment.getUser().getUserId().equals(userId)) {
+            throw new IllegalStateException("해당 약속에 접근할 권한이 없습니다.");
+        }
 
         if (appointment.getStatus() == AppointmentStatus.ONGOING) {
             return true;

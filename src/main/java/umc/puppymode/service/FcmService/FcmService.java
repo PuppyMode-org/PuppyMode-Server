@@ -1,8 +1,8 @@
 package umc.puppymode.service.FcmService;
 
 import umc.puppymode.apiPayload.ApiResponse;
-import umc.puppymode.web.dto.FCMRequestDTO;
-import umc.puppymode.web.dto.FCMResponseDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMRequestDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
 
 public interface FcmService {
 

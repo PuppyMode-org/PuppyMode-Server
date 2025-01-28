@@ -5,7 +5,8 @@ import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
 
 public interface DrinkingAppointmentCommendService {
     DrinkingAppointmentResponseDTO.AppointmentResultDTO createDrinkingAppointment(DrinkingAppointmentRequestDTO.AppointmentDTO request, Long userId);
-    void deleteDrinkingAppointment(Long appointmentId);
-    void rescheduleDrinkingAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.RescheduleAppointmentRequestDTO request);
-    void completeDrinkingAppointment(Long appointmentId);
+    void deleteDrinkingAppointment(Long appointmentId, Long userId);
+    DrinkingAppointmentResponseDTO.RescheduleResultDTO rescheduleDrinkingAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.RescheduleAppointmentRequestDTO request, Long userId);
+    void completeDrinkingAppointment(Long appointmentId, Long userId);
+    DrinkingAppointmentResponseDTO.UpdateAppointmentResultDTO updateDrinkingAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.UpdateAppointmentDTO request, Long userId);
 }

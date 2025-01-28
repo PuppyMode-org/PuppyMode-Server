@@ -6,10 +6,12 @@ import umc.puppymode.domain.PuppyItem;
 import umc.puppymode.domain.PuppyItemCategory;
 import umc.puppymode.domain.mapping.PuppyCustomization;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PuppyCustomizationRepository extends JpaRepository<PuppyCustomization, Long> {
     boolean existsByPuppyAndPuppyItem(Puppy puppy, PuppyItem item);
     Optional<PuppyCustomization> findByPuppyAndPuppyItem(Puppy puppy, PuppyItem item);
     Optional<PuppyCustomization> findByPuppyAndPuppyItemCategoryAndIsEquippedTrue(Puppy puppy, PuppyItemCategory puppyItemCategory);
+    List<PuppyCustomization> findByPuppy(Puppy puppy);
 }

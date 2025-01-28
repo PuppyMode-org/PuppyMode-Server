@@ -27,10 +27,15 @@ public class LocationServiceImpl implements LocationService {
     private final UrlPathHelper mvcUrlPathHelper;
 
     @Override
-    public ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> startAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.StartAppointmentRequestDTO request) {
+    public ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> startAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.StartAppointmentRequestDTO request, Long userId) {
         // 약속 정보 조회
         DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.APPOINTMENT_NOT_FOUND));
+
+        // 약속 소유자 검증
+        if (!appointment.getUser().getUserId().equals(userId)) {
+            throw new IllegalStateException("해당 약속을 시작할 권한이 없습니다.");
+        }
 
         // 약속 장소 위도/경도
         double targetLatitude = appointment.getLatitude();
@@ -59,7 +64,7 @@ public class LocationServiceImpl implements LocationService {
         drinkingAppointmentRepository.save(appointment);
 
         //음주 상태 조회
-        boolean idDrinking = drinkingAppointmentQueryService.isDrinkingActive(appointmentId);
+        boolean idDrinking = drinkingAppointmentQueryService.isDrinkingActive(appointmentId, userId);
 
         DrinkingAppointmentResponseDTO.StartAppointmentResultDTO response = new DrinkingAppointmentResponseDTO.StartAppointmentResultDTO(
                 appointment.getAppointmentId(),

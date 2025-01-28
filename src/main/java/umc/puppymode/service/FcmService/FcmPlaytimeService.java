@@ -1,7 +1,7 @@
 package umc.puppymode.service.FcmService;
 
 import umc.puppymode.apiPayload.ApiResponse;
-import umc.puppymode.web.dto.FCMPlayResponseDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMPlayResponseDTO;
 
 public interface FcmPlaytimeService {
 

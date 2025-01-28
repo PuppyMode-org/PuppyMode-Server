@@ -19,8 +19,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     private static final String[] AUTH_WHITELIST = {
-            "/auth/kakao/login",
-            "/auth/kakao/callback/**",
+            "/auth/kakao/login/**",
             "/auth/apple/login",
             "/auth/logout"
     };

@@ -13,6 +13,6 @@ public interface PuppyRepository extends JpaRepository<Puppy, Long> {
     Optional<Puppy> findByUser(User user);
   
     @Query("SELECT p FROM Puppy p WHERE p.user.userId = :userId")
-    Optional<Puppy> findByUserId(Long userId);
+    Optional<Puppy> findByUserId(@Param("userId")Long userId);
 }
 

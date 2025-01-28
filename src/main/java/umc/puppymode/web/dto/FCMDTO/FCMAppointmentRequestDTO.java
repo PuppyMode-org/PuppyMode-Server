@@ -1,4 +1,4 @@
-package umc.puppymode.web.dto;
+package umc.puppymode.web.dto.FCMDTO;
 
 import lombok.*;
 

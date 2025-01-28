@@ -21,9 +21,9 @@ public class CollectionController {
     @GetMapping
     @Operation(summary = "컬렉션 조회 API", description = "컬렉션을 조회하는 API 입니다.")
     public ApiResponse<CollectionResDTO.CollectionListViewDTO> getCollections() {
-        
-        // 유저 아이디 얻는 방식 수정 예정
-        CollectionResDTO.CollectionListViewDTO collectionListViewDTO = collectionQueryService.getCollections(2L);
+
+        Long userId = userAuthService.getCurrentUserId();
+        CollectionResDTO.CollectionListViewDTO collectionListViewDTO = collectionQueryService.getCollections(userId);
         return ApiResponse.onSuccess(collectionListViewDTO);
     }
 }

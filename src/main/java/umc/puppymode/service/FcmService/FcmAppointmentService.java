@@ -1,12 +1,9 @@
 package umc.puppymode.service.FcmService;
 
 import umc.puppymode.apiPayload.ApiResponse;
-import umc.puppymode.web.dto.FCMAppointmentRequestDTO;
-import umc.puppymode.web.dto.FCMResponseDTO;
+import umc.puppymode.web.dto.FCMDTO.FCMAppointmentResponseDTO;
 
 public interface FcmAppointmentService {
 
-    ApiResponse<FCMResponseDTO> scheduleDrinkingNotifications(
-            FCMAppointmentRequestDTO fcmAppointmentRequestDTO
-    );
+    ApiResponse<FCMAppointmentResponseDTO> scheduleDrinkingNotifications();
 }
