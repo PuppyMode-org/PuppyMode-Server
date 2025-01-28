@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
-import umc.puppymode.config.security.JwtTokenProvider;
-import umc.puppymode.repository.UserRepository;
 import umc.puppymode.service.UserService.UserAuthService;
 import umc.puppymode.service.UserService.UserCommandService;
 import umc.puppymode.service.UserService.UserInfoService;
@@ -24,9 +22,6 @@ public class UserController {
     private final UserCommandService userCommandService;
     private final UserAuthService userAuthService;
     private final UserInfoService userInfoService;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
-
 
     @GetMapping("/notifications")
     @Operation(summary = "알림 수신 여부 조회 API", description = "사용자의 알림 수신 여부를 조회하는 API입니다.")
