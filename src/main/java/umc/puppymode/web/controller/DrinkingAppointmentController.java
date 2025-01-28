@@ -141,7 +141,7 @@ public class DrinkingAppointmentController {
         return ApiResponse.onSuccess(response, "SUCCESS_END_DRINKING_APPOINTMENT", "음주 상태 종료 성공");
     }
 
-    @PatchMapping("/{appointmentId}")
+    @PatchMapping("/{appointmentId}/start")
     @Operation(summary = "술 약속 시작하기 API", description = "사용자 현재 위치에 기반해 시간 + 장소가 범위 내에 들어오면 술 약속을 시작합니다.")
     public ResponseEntity<ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO>> startAppointment(
             @PathVariable Long appointmentId,
@@ -154,6 +154,22 @@ public class DrinkingAppointmentController {
         ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> response = locationService.startAppointment(appointmentId, request, userId);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{appointmentId}")
+    @Operation(summary = "술 약속 수정하기 API", description = "기존에 설정된 술 약속을 수정합니다.(술약속 상태가 진행중, 완료일 시 불가)")
+    public ApiResponse<?> updateAppointment(
+            @PathVariable Long appointmentId,
+            @Valid @RequestBody DrinkingAppointmentRequestDTO.UpdateAppointmentDTO request) {
+
+        //userId
+        Long userId = userAuthService.getCurrentUserId();
+
+        //상태 업데이트
+        DrinkingAppointmentResponseDTO.UpdateAppointmentResultDTO response = drinkingAppointmentCommendService.updateDrinkingAppointment(appointmentId, request, userId);
+
+        return ApiResponse.onSuccess(response, "APPOINTMENT_UPDATE_SUCCESS", "술 약속 수정 성공");
+
     }
 
 }
