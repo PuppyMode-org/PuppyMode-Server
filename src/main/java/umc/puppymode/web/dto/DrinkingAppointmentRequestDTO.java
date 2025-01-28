@@ -55,6 +55,26 @@ public class DrinkingAppointmentRequestDTO {
         @Max(value = 180, message = "경도 값은 180 이하여야 합니다.")
         private Double longitude;
     }
+
+    @Getter
+    public static class UpdateAppointmentDTO {
+        //날짜가 오늘로 고정인지, 아니면 변동 가능한 지에 따라 추후 수정가능성 있습니다.
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+        private LocalDateTime dateTime;
+
+        @Min(value = -90, message = "위도 값은 -90 이상이어야 합니다.")
+        @Max(value = 90, message = "위도 값은 90 이하여야 합니다.")
+        private Double latitude;
+
+        @Min(value = -180, message = "경도 값은 -180 이상이어야 합니다.")
+        @Max(value = 180, message = "경도 값은 180 이하여야 합니다.")
+        private Double longitude;
+
+        private String address;
+
+        @Size(max = 255, message = "장소 이름은 255자 이하여야 합니다.")
+        private String locationName;
+    }
 }
 
 

@@ -38,4 +38,14 @@ public class DrinkingAppointmentConverter {
                 .status(entity.getStatus().name().toLowerCase()) //일단 API 명세에는 소문자로 되어있어서 소문자 처리.
                 .build();
     }
+
+    public static DrinkingAppointmentResponseDTO.UpdateAppointmentResultDTO toUpdateAppointmentDTO(DrinkingAppointment appointment) {
+        return DrinkingAppointmentResponseDTO.UpdateAppointmentResultDTO.builder()
+                .appointmentId(appointment.getAppointmentId())
+                .updatedTime(appointment.getDateTime())
+                .address(appointment.getAddress())
+                .locationName(appointment.getLocationName())
+                .appointmentStatus(appointment.getStatus())
+                .build();
+    }
 }
