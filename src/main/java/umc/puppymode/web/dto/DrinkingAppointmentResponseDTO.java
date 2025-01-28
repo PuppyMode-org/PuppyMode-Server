@@ -55,6 +55,7 @@ public class DrinkingAppointmentResponseDTO {
     public static class RescheduleResultDTO {
         private Long appointmentId;
         private LocalDateTime rescheduledTime;
+        private String message;
     }
 
     @Getter
