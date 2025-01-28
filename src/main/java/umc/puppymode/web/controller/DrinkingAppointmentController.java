@@ -116,16 +116,9 @@ public class DrinkingAppointmentController {
         Long userId = userAuthService.getCurrentUserId();
 
         //시간 업데이트
-        drinkingAppointmentCommendService.rescheduleDrinkingAppointment(appointmentId, request, userId);
+        DrinkingAppointmentResponseDTO.RescheduleResultDTO response = drinkingAppointmentCommendService.rescheduleDrinkingAppointment(appointmentId, request, userId);
 
-        // 업데이트된 상태를 엔티티에서 가져옴
-        DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new IllegalStateException("업데이트 후 약속을 찾을 수 없습니다."));
-
-        DrinkingAppointmentResponseDTO.RescheduleResultDTO response = new DrinkingAppointmentResponseDTO.RescheduleResultDTO(appointmentId, appointment.getDateTime());
-
-        return ApiResponse.onSuccess(SuccessStatus.APPOINTMENT_RESCHEDULED_PATCH_SUCCESS.getCode(), SuccessStatus.APPOINTMENT_RESCHEDULED_PATCH_SUCCESS.getMessage());
-
+        return ApiResponse.onSuccess(response, SuccessStatus.APPOINTMENT_RESCHEDULED_PATCH_SUCCESS.getCode(), SuccessStatus.APPOINTMENT_RESCHEDULED_PATCH_SUCCESS.getMessage());
     }
 
     @PatchMapping("/{appointmentId}/status")

@@ -72,7 +72,7 @@ public class DrinkingAppointmentCommendServiceImpl implements DrinkingAppointmen
 
     @Override
     @Transactional
-    public void rescheduleDrinkingAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.RescheduleAppointmentRequestDTO request, Long userId) {
+    public DrinkingAppointmentResponseDTO.RescheduleResultDTO rescheduleDrinkingAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.RescheduleAppointmentRequestDTO request, Long userId) {
 
         // User 엔티티 조회
         User user = userRepository.findById(userId)
@@ -87,14 +87,27 @@ public class DrinkingAppointmentCommendServiceImpl implements DrinkingAppointmen
             throw new IllegalStateException("해당 약속을 미룰 권한이 없습니다.");
         }
 
-        // 시간 유효성 검증
-        if (request.getDateTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("현재 시간 이전으로 설정할 수 없습니다.");
+        // 시간 유효성 검증 및 기본값 복귀
+        LocalDateTime selectedTime = request.getDateTime();
+        boolean isDefaultApplied = false;
+
+        if (selectedTime.isBefore(LocalDateTime.now()) || selectedTime.isBefore(appointment.getDateTime())) {
+            // 기본값 복구
+            selectedTime = appointment.getDateTime();
+            isDefaultApplied = true;
         }
 
+        // 술약속 상태가 SCHEDULED인지 검증
         validateAppointmentStatusForRescheduling(appointment);
 
-        appointment.setDateTime(request.getDateTime());
+        // 수정된 시간으로 약속 업데이트
+        appointment.setDateTime(selectedTime);
+
+        return new DrinkingAppointmentResponseDTO.RescheduleResultDTO(
+                appointment.getAppointmentId(),
+                selectedTime,
+                isDefaultApplied ? "기본값으로 복구되었습니다." : "요청하신 시간으로 성공적으로 변경되었습니다."
+        );
     }
 
     private static void validateAppointmentStatusForRescheduling(DrinkingAppointment appointment) {
