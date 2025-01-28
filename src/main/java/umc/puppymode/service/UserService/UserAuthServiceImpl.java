@@ -51,7 +51,6 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .isNewUser(isNewUser.get())
                 .build();
 
-        // LoginResponseDTO 생성 및 반환
         return LoginResponseDTO.builder()
                 .jwt(token)
                 .userInfo(userInfoDTO)
