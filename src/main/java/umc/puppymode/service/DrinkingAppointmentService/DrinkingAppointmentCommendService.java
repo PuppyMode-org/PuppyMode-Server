@@ -8,4 +8,5 @@ public interface DrinkingAppointmentCommendService {
     void deleteDrinkingAppointment(Long appointmentId, Long userId);
     DrinkingAppointmentResponseDTO.RescheduleResultDTO rescheduleDrinkingAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.RescheduleAppointmentRequestDTO request, Long userId);
     void completeDrinkingAppointment(Long appointmentId, Long userId);
+    DrinkingAppointmentResponseDTO.UpdateAppointmentResultDTO updateDrinkingAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.UpdateAppointmentDTO request, Long userId);
 }

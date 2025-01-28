@@ -81,4 +81,15 @@ public class DrinkingAppointmentResponseDTO {
 
         private LocalDateTime startTime;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class UpdateAppointmentResultDTO {
+        private Long appointmentId;
+        private LocalDateTime updatedTime;
+        private String address;
+        private String locationName;
+        private AppointmentStatus appointmentStatus;
+    }
 }
