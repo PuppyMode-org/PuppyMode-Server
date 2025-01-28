@@ -15,7 +15,6 @@ import java.util.List;
 
 @Repository
 public interface DrinkingAppointmentRepository extends JpaRepository<DrinkingAppointment, Long> {
-    Page<DrinkingAppointment> findByStatus(AppointmentStatus status, Pageable pageable);
 
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END " +
             "FROM DrinkingAppointment a " +
@@ -26,4 +25,10 @@ public interface DrinkingAppointmentRepository extends JpaRepository<DrinkingApp
             "JOIN FETCH da.user " +
             "WHERE da.status = :status")
     List<DrinkingAppointment> findByStatusWithUser(@Param("status") AppointmentStatus status);
+
+    // 특정 사용자와 상태에 따라 약속 조회
+    Page<DrinkingAppointment> findByUser_UserIdAndStatus(Long userId, AppointmentStatus status, Pageable pageable);
+
+    // 특정 사용자의 모든 약속 조회
+    Page<DrinkingAppointment> findByUser_UserId(Long userId, Pageable pageable);
 }
