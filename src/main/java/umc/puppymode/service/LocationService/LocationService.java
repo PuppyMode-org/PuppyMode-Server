@@ -5,5 +5,5 @@ import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
 import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
 
 public interface LocationService {
-    ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> startAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.StartAppointmentRequestDTO request);
+    ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> startAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.StartAppointmentRequestDTO request, Long userId);
 }
