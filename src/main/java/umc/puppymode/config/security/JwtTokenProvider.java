@@ -37,11 +37,9 @@ public class JwtTokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + TOKEN_EXPIRATION_TIME));  // 만료 시간 설정
 
-        log.info("Principal: {}", authentication.getPrincipal());
-
         claims.put(USER_ID, authentication.getPrincipal());
 
-        log.info("Claims before signing: {}", claims); // JWT 생성 전 Claims 확인
+//        log.info("Claims before signing: {}", claims); // JWT 생성 전 Claims 확인
         return Jwts.builder()
                 .setHeaderParam(Header.TYPE, Header.JWT_TYPE) // Header
                 .setClaims(claims) // Claim
