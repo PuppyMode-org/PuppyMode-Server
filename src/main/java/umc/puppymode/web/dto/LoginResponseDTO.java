@@ -11,5 +11,16 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LoginResponseDTO {
     private String jwt;
-    private UserInfoDTO userInfo;
+    private LoginUserInfo userInfo;
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class LoginUserInfo {
+        private Long userId;
+        private String email;
+        private String username;
+        private Boolean isNewUser;
+    }
 }
