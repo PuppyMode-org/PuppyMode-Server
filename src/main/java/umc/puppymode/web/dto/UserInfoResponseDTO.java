@@ -6,11 +6,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class UserInfoResponseDTO {
     private Long userId;
     private String username;
     private String email;
+    private UserPuppyInfo puppy;
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserPuppyInfo {
+        private Long puppyId;
+        private String puppyName;
+    }
 }

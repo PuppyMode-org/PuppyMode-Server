@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.UserService.UserAuthService;
 import umc.puppymode.service.UserService.UserCommandService;
+import umc.puppymode.service.UserService.UserInfoService;
 import umc.puppymode.service.UserService.UserQueryService;
+import umc.puppymode.web.dto.UserInfoResponseDTO;
 import umc.puppymode.web.dto.UserRequestDTO;
 import umc.puppymode.web.dto.UserResponseDTO;
 
@@ -19,7 +21,7 @@ public class UserController {
     private final UserQueryService userQueryService;
     private final UserCommandService userCommandService;
     private final UserAuthService userAuthService;
-
+    private final UserInfoService userInfoService;
 
     @GetMapping("/notifications")
     @Operation(summary = "알림 수신 여부 조회 API", description = "사용자의 알림 수신 여부를 조회하는 API입니다.")
@@ -44,5 +46,16 @@ public class UserController {
         UserResponseDTO responseDto = new UserResponseDTO(requestDTO.isReceiveNotifications());
 
         return ResponseEntity.ok(ApiResponse.onSuccess(responseDto));
+    }
+
+    @GetMapping("")
+    @Operation(summary = "사용자 정보 조회 API", description = "사용자의 정보를 조회하는 API입니다.")
+    public ResponseEntity<ApiResponse<UserInfoResponseDTO>> getUserInfo() {
+
+        Long userId = userAuthService.getCurrentUserId();
+
+        UserInfoResponseDTO userInfoDTO = userInfoService.getUserInfo(userId);
+
+        return ResponseEntity.ok(ApiResponse.onSuccess(userInfoDTO));
     }
 }

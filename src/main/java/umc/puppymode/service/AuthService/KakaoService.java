@@ -70,9 +70,9 @@ public class KakaoService {
                 .bodyToMono(KakaoUserInfoResponseDTO.class)
                 .block();
 
-//        log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
-//        log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
-//        log.info("[ Kakao Service ] email ---> {} ", userInfo.getKakaoAccount().getEmail());
+//        log.info("[ Kakao Service ] Auth ID —> {} ", userInfo.getId());
+//        log.info("[ Kakao Service ] NickName —> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
+//        log.info("[ Kakao Service ] email —> {} ", userInfo.getKakaoAccount().getEmail());
 
         return userInfo;
     }

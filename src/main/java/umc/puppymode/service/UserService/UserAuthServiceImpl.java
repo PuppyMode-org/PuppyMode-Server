@@ -19,7 +19,6 @@ import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -32,7 +31,6 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public LoginResponseDTO createOrUpdateUser(KakaoUserInfoResponseDTO userInfo) {
         AtomicBoolean isNewUser = new AtomicBoolean(false);
-
         User user = userRepository.findByEmail(userInfo.getKakaoAccount().getEmail())
                 .orElseGet(() -> {
                     isNewUser.set(true);
@@ -51,7 +49,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         // JWT 토큰 생성
         String token = jwtTokenProvider.generateToken(authentication);
 
-        LoginResponseDTO.LoginUserInfo userInfoDTO = LoginResponseDTO.LoginUserInfo.builder()
+        LoginResponseDTO.LoginUserInfo loginUserInfo = LoginResponseDTO.LoginUserInfo.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -60,7 +58,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         return LoginResponseDTO.builder()
                 .jwt(token)
-                .userInfo(userInfoDTO)
+                .userInfo(loginUserInfo)
                 .build();
     }
 
