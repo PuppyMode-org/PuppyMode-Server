@@ -39,6 +39,7 @@ public class UserAuthServiceImpl implements UserAuthService {
                             .username(userInfo.getKakaoAccount().getProfile().getNickName())
                             .points(0)
                             .receiveNotifications(false)
+                            .isDeleted(false)
                             .build();
                     return userRepository.save(newUser);
                 });
