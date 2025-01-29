@@ -49,7 +49,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         // JWT 토큰 생성
         String token = jwtTokenProvider.generateToken(authentication);
 
-        LoginResponseDTO.LoginUserInfoDTO userInfoDTO = LoginResponseDTO.LoginUserInfoDTO.builder()
+        LoginResponseDTO.LoginUserInfo loginUserInfo = LoginResponseDTO.LoginUserInfo.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -58,7 +58,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         return LoginResponseDTO.builder()
                 .jwt(token)
-                .userInfo(userInfoDTO)
+                .userInfo(loginUserInfo)
                 .build();
     }
 
