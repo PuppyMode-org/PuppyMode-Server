@@ -20,7 +20,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public UserInfoResponseDTO getUserInfo(Long userId) {
         // 사용자 정보 조회
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByUserIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // 강아지 정보 조회

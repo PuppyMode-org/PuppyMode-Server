@@ -22,9 +22,14 @@ public class User extends BaseEntity {
     private String password;
     private Integer points;
     private Boolean receiveNotifications;
+    private Boolean isDeleted;
 
     public void updatePoints(Integer points) {
         this.points += points;
+    }
+
+    public void deactivate() {
+        this.isDeleted = true;
     }
 }
 
