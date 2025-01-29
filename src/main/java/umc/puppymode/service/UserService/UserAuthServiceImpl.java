@@ -17,6 +17,8 @@ import umc.puppymode.repository.TokenRepository;
 import umc.puppymode.repository.UserRepository;
 import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
+
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
@@ -28,21 +30,32 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenRepository tokenRepository;
 
+    @Transactional
     @Override
     public LoginResponseDTO createOrUpdateUser(KakaoUserInfoResponseDTO userInfo) {
         AtomicBoolean isNewUser = new AtomicBoolean(false);
-        User user = userRepository.findByEmail(userInfo.getKakaoAccount().getEmail())
-                .orElseGet(() -> {
-                    isNewUser.set(true);
-                    User newUser = User.builder()
-                            .email(userInfo.getKakaoAccount().getEmail())
-                            .username(userInfo.getKakaoAccount().getProfile().getNickName())
-                            .points(0)
-                            .receiveNotifications(false)
-                            .isDeleted(false)
-                            .build();
-                    return userRepository.save(newUser);
-                });
+
+        Optional<User> optionalUser = userRepository.findByEmail(userInfo.getKakaoAccount().getEmail());
+
+        User user = optionalUser.map(existingUser -> {
+            if (existingUser.getIsDeleted()) {
+                // 탈퇴한 사용자 복구
+                existingUser.setIsDeleted(false);
+                return userRepository.save(existingUser);
+            }
+            return existingUser;
+        }).orElseGet(() -> {
+            // 새 사용자 생성
+            isNewUser.set(true);
+            User newUser = User.builder()
+                    .email(userInfo.getKakaoAccount().getEmail())
+                    .username(userInfo.getKakaoAccount().getProfile().getNickName())
+                    .points(0)
+                    .receiveNotifications(false)
+                    .isDeleted(false)
+                    .build();
+            return userRepository.save(newUser);
+        });
 
         // 현재 사용자 인증 객체 생성
         Authentication authentication = new UserAuthentication(user.getUserId().toString(), null, null);
