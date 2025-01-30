@@ -5,4 +5,5 @@ import umc.puppymode.web.dto.DrinkResponseDTO.*;
 
 public interface DrinkCommandService {
     DrinksRecordResponseDTO postDrinksRecord(Long userId, DrinkRecordDTO drinkRecordDTO);
+    FeedResponseDTO postFeed(Long userId);
 }

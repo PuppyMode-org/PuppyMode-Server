@@ -93,4 +93,27 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
 
         return recordResponseDTO;
     }
+
+    @Override
+    public FeedResponseDTO postFeed(Long userId) {
+        Puppy puppy = puppyRepository.findByUserId(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.PUPPY_NOT_FOUND));
+
+        // 현재 레벨의 최소 ~ 최대 경험치 차이를 기준으로 5% 증가
+        Integer fivePercentExp = (int) ((puppy.getPuppyLevel().getLevelMaxExp() - puppy.getPuppyLevel().getLevelMinExp()) * 0.05);
+        puppy.updatePuppyExp(fivePercentExp);
+
+        // 현재 경험치 비율 계산 (0~100%)
+        int puppyPercent = (int) (((double) (puppy.getPuppyExp() - puppy.getPuppyLevel().getLevelMinExp()) /
+                (puppy.getPuppyLevel().getLevelMaxExp() - puppy.getPuppyLevel().getLevelMinExp())) * 100);
+
+        // DTO 생성 및 반환
+        return FeedResponseDTO.builder()
+                .puppyName(puppy.getPuppyName())
+                .puppyExp(puppy.getPuppyExp())
+                .puppyLevel(puppy.getPuppyLevel().getPuppyLevel())
+                .puppyLevelName(puppy.getPuppyLevel().getLevelName())
+                .puppyPercent(puppyPercent)
+                .build();
+    }
 }
