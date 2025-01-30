@@ -196,4 +196,43 @@ public class PuppyItemServiceImpl implements PuppyItemService {
         return result;
     }
 
+    @Override
+    public Map<String, Object> unequipItem(Long categoryId, Long itemId, Long userId) {
+        // 유저 찾기
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+
+        // 유저의 강아지 찾기
+        Puppy puppy = puppyRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
+
+        // 아이템 찾기
+        PuppyItem item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("아이템이 존재하지 않습니다."));
+
+        // 카테고리 검증
+        if (!item.getCategory().getCategoryId().equals(categoryId)) {
+            throw new IllegalArgumentException("아이템이 해당 카테고리에 속하지 않습니다.");
+        }
+        PuppyItemCategory puppyItemCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 카테고리가 존재하지 않습니다."));
+
+        // 아이템 구매 여부 확인
+        PuppyCustomization customization = puppyCustomizationRepository.findByPuppyAndPuppyItem(puppy, item)
+                .orElseThrow(() -> new IllegalArgumentException("구매하지 않은 아이템입니다."));
+
+        // 아이템 착용 여부 확인
+        if (customization.getIsEquipped()) {
+            customization.setIsEquipped(false);
+            puppyCustomizationRepository.save(customization);
+        } else {
+            throw new IllegalArgumentException("이미 착용하지 않은 아이템입니다.");
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("unequippedItemInfo", new EquippedItemInfoDTO(item.getItemId(), item.getItemName()));
+
+        return result;
+    }
+
 }
