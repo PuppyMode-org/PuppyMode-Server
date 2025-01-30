@@ -1,5 +1,6 @@
 package umc.puppymode.service.PuppyService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import umc.puppymode.domain.Puppy;
@@ -84,6 +85,7 @@ public class PuppyItemServiceImpl implements PuppyItemService {
     }
 
     @Override
+    @Transactional
     public Map<String, Object> purchaseItem(Long categoryId, Long itemId, Long userId) {
         // 유저 찾기
         User user = userRepository.findById(userId)
@@ -142,10 +144,8 @@ public class PuppyItemServiceImpl implements PuppyItemService {
     }
 
     @Override
+    @Transactional
     public Map<String, Object> equipItem(Long categoryId, Long itemId, Long userId) {
-        // 유저 찾기
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
         // 유저의 강아지 찾기
         Puppy puppy = puppyRepository.findByUserId(userId)
@@ -197,6 +197,7 @@ public class PuppyItemServiceImpl implements PuppyItemService {
     }
 
     @Override
+    @Transactional
     public Map<String, Object> unequipItem(Long categoryId, Long itemId, Long userId) {
         // 유저 찾기
         User user = userRepository.findById(userId)
