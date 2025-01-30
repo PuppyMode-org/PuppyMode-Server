@@ -95,7 +95,7 @@ public class FcmServiceImpl implements FcmService {
                                 new FCMResponseDTO.Notification(
                                         fcmRequestDTO.getTitle(),
                                         fcmRequestDTO.getBody(),
-                                        null
+                                        fcmRequestDTO.getImage()
                                 ),
                                 fcmRequestDTO.getToken()
                         ))
@@ -153,7 +153,7 @@ public class FcmServiceImpl implements FcmService {
                         .notification(FCMResponseDTO.Notification.builder()
                                 .title(fcmRequestDTO.getTitle())
                                 .body(fcmRequestDTO.getBody())
-                                .image(null)
+                                .image(fcmRequestDTO.getImage())
                                 .build())
                         .build())
                 .validateOnly(false)
