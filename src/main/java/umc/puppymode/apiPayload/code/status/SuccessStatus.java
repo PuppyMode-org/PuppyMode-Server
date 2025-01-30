@@ -17,8 +17,10 @@ public enum SuccessStatus implements BaseCode {
     APPOINTMENT_GET_SUCCESS(HttpStatus.OK, "SUCCESS_GET_APPOINTMENT", "술 약속 조회 성공"),
     APPOINTMENT_POST_SUCCESS(HttpStatus.OK, "SUCCESS_POST_APPOINTMENT", "술 약속 설정 성공"),
     APPOINTMENT_STATUS_GET_SUCCESS(HttpStatus.OK, "SUCCESS_GET_APPOINTMENT_STATUS", "술 약속 및 음주 상태 조회 성공"),
-    APPOINTMENT_RESCHEDULED_PATCH_SUCCESS(HttpStatus.OK, "SUCCESS_PUT_APPOINTMENT_RESCHEDULED", "술 약속 미루기 성공");
+    APPOINTMENT_RESCHEDULED_PATCH_SUCCESS(HttpStatus.OK, "SUCCESS_PUT_APPOINTMENT_RESCHEDULED", "술 약속 미루기 성공"),
 
+    // 알림 관련
+    NOTIFICATIONS_DISABLED(HttpStatus.OK, "SUCCESS_NOTIFICATIONS_DISABLED", "알림 수신이 비활성화되어 있습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
