@@ -50,4 +50,12 @@ public class DrinkController {
         DrinksRecordResponseDTO responseDTO = drinkCommandService.postDrinksRecord(userId, drinkRecordDTO);
         return ResponseEntity.ok(ApiResponse.onSuccess(responseDTO));
     }
+
+    @PostMapping("feed")
+    @Operation(summary = "먹이 주기 API", description = "획득한 먹이를 주는 API입니다.")
+    public ResponseEntity<ApiResponse<FeedResponseDTO>> postFeed() {
+        Long userId = userAuthService.getCurrentUserId();
+        FeedResponseDTO  responseDTO = drinkCommandService.postFeed(userId);
+        return ResponseEntity.ok(ApiResponse.onSuccess(responseDTO));
+    }
 }

@@ -60,4 +60,17 @@ public class DrinkResponseDTO {
         private String puppyLevelName;
         private Integer puppyPercent;
     }
+
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FeedResponseDTO {
+        private String puppyName;
+        private Integer puppyExp;
+        private Integer puppyLevel;
+        private String puppyLevelName;
+        private Integer puppyPercent;
+    }
 }
