@@ -13,7 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
+import umc.puppymode.apiPayload.code.status.SuccessStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
+import umc.puppymode.domain.Token;
+import umc.puppymode.domain.User;
+import umc.puppymode.domain.enums.TokenType;
+import umc.puppymode.repository.TokenRepository;
 import umc.puppymode.web.dto.FCMDTO.FCMRequestDTO;
 import umc.puppymode.web.dto.FCMDTO.FCMResponseDTO;
 
@@ -36,6 +41,7 @@ public class FcmServiceImpl implements FcmService {
     private final ObjectMapper objectMapper;
     private GoogleCredentials googleCredentials;
     private final RestTemplate restTemplate;
+    private final TokenRepository tokenRepository;
 
     @PostConstruct
     public void initialize() {
@@ -63,6 +69,20 @@ public class FcmServiceImpl implements FcmService {
     @Override
     public ApiResponse<FCMResponseDTO> sendMessageTo(FCMRequestDTO fcmRequestDTO) {
         try {
+            // token에 해당하는 사용자 찾기
+            Token token = tokenRepository.findByTokenAndTokenType(fcmRequestDTO.getToken(), TokenType.FCM)
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.FIREBASE_MISSING_TOKEN));
+
+            // 사용자 알림 수신 상태 확인
+            User user = token.getUser();
+            if (!user.getReceiveNotifications()) {
+                return ApiResponse.onSuccess(
+                        null,
+                        SuccessStatus.NOTIFICATIONS_DISABLED.getCode(),
+                        SuccessStatus.NOTIFICATIONS_DISABLED.getMessage()
+                );
+            }
+
             // FCM 메시지 만들기
             String message = makeMessage(fcmRequestDTO);
 

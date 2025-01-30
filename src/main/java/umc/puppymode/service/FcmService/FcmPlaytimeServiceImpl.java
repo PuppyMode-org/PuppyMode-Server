@@ -44,7 +44,8 @@ public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
                 try {
                     User user = fcmQueryService.getUserByFcmToken(token);
 
-                    if (user == null) {
+                    // 알림 수신 비활성화된 사용자 건너뛰기
+                    if (user == null || !user.getReceiveNotifications()) {
                         continue;
                     }
 

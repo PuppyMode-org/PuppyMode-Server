@@ -5,6 +5,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
+import umc.puppymode.apiPayload.code.status.SuccessStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.domain.DrinkingAppointment;
 import umc.puppymode.domain.Token;
@@ -68,7 +69,17 @@ public class FcmAppointmentServiceImpl implements FcmAppointmentService {
             // 술 약속별 푸시 알림 전송
             for (DrinkingAppointment appointment : ongoingAppointments) {
                 Token fcmToken = userTokenMap.get(appointment.getUser().getUserId());
+
+                // 알림 수신 상태 확인
                 if (fcmToken != null) {
+                    User user = fcmToken.getUser();
+
+                    // 알림 수신 비활성화된 사용자 건너뛰기
+                    if (user == null || !user.getReceiveNotifications()) {
+                        continue;
+                    }
+
+                    // 알림을 받을 수 있는 사용자에게 알림 전송
                     FCMAppointmentRequestDTO fcmAppointmentRequestDTO = createFCMRequestDTO(fcmToken.getToken());
 
                     // 초기 알림 전송
