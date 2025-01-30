@@ -67,5 +67,15 @@ public class PuppyItemController {
         return new ApiResponse<>(true, "SUCCESS_EQUIP_PUPPY_ITEM", "아이템 착용 성공", result);
     }
 
+    @Operation(summary = "아이템 착용 해제 API", description = "강아지가 착용한 아이템을 해제하는 API")
+    @PatchMapping("/{categoryId}/items/{itemId}/unequip")
+    public ResponseEntity<?> unequipItem(@PathVariable Long categoryId,
+                                         @PathVariable Long itemId) {
+        Long userId = userAuthService.getCurrentUserId();
+
+        Map<String, Object> result = puppyItemService.unequipItem(categoryId, itemId, userId);
+        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS_UNEQUIP_PUPPY_ITEM", "아이템 착용 해제 성공", result));
+    }
+
 
 }
