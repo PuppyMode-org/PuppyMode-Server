@@ -39,11 +39,14 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
             throw new GeneralException(ErrorStatus.PUPPY_ALREADY_EXISTS);
         }
 
-        // 1단계인 강아지 레벨만 분류하여 랜덤 선택
-        List<PuppyLevel> puppyLevels = puppyLevelRepository.findByPuppyLevel(1);
-        Random random = new Random();
-        int randomIndex = random.nextInt(puppyLevels.size());
-        PuppyLevel puppyLevel = puppyLevels.get(randomIndex);
+//        // 1단계인 강아지 레벨만 분류하여 랜덤 선택
+//        List<PuppyLevel> puppyLevels = puppyLevelRepository.findByPuppyLevel(1);
+//        Random random = new Random();
+//        int randomIndex = random.nextInt(puppyLevels.size());
+//        PuppyLevel puppyLevel = puppyLevels.get(randomIndex);
+
+        // 시연을 위한 임시 코드
+        PuppyLevel puppyLevel = puppyLevelRepository.findByLevelName("눈송이 비숑");
 
         // 선택된 레벨과 유저 정보를 사용하여 강아지 객체 생성 및 저장
         Puppy puppy = MainPuppyConverter.toPuppy(puppyLevel, user);
