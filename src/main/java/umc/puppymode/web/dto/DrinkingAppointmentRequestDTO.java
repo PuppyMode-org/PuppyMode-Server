@@ -34,14 +34,6 @@ public class DrinkingAppointmentRequestDTO {
         private String locationName;
     }
 
-    @Getter
-    public static class RescheduleAppointmentRequestDTO {
-        // 술 약속 설정과 마찬가지로 오늘 고정인지, 날짜 자체 변동이 가능한지에 따라 수정가능성 있습니다.
-        @NotNull(message = "날짜 및 시간은 필수입니다.")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
-        private LocalDateTime dateTime;
-    }
-
 
     @Getter
     public static class StartAppointmentRequestDTO {
