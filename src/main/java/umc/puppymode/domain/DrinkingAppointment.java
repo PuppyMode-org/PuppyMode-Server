@@ -41,4 +41,6 @@ public class DrinkingAppointment extends BaseEntity {
     @Column(nullable = false)
     private AppointmentStatus status; // 상태 필드
 
+    private LocalDateTime drinkingStartTime; //술약속 시작 시간
+
 }
