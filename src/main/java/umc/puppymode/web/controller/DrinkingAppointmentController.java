@@ -106,20 +106,6 @@ public class DrinkingAppointmentController {
         return ApiResponse.onSuccess(SuccessStatus.APPOINTMENT_DELETE_SUCCESS.getCode(), SuccessStatus.APPOINTMENT_DELETE_SUCCESS.getMessage());
     }
 
-    @PatchMapping("/{appointmentId}/reschedule")
-    @Operation(summary = "술 약속 미루기 API", description = "술 약속 시간 재설정 후 데이터베이스에 patch합니다.")
-    public ApiResponse<?> rescheduleAppointment(
-            @PathVariable Long appointmentId,
-            @Valid @RequestBody DrinkingAppointmentRequestDTO.RescheduleAppointmentRequestDTO request) {
-
-        //userId
-        Long userId = userAuthService.getCurrentUserId();
-
-        //시간 업데이트
-        DrinkingAppointmentResponseDTO.RescheduleResultDTO response = drinkingAppointmentCommendService.rescheduleDrinkingAppointment(appointmentId, request, userId);
-
-        return ApiResponse.onSuccess(response, SuccessStatus.APPOINTMENT_RESCHEDULED_PATCH_SUCCESS.getCode(), SuccessStatus.APPOINTMENT_RESCHEDULED_PATCH_SUCCESS.getMessage());
-    }
 
     @PatchMapping("/{appointmentId}/status")
     @Operation(summary = "음주 상태 종료하기", description = "술 약속 완료 후 음주 상태 종료")
