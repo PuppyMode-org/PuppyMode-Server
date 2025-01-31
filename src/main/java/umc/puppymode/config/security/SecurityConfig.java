@@ -20,8 +20,9 @@ public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
             "/auth/kakao/login/**",
-            "/auth/apple/login",
-            "/auth/logout"
+            "/auth/apple/login/**",
+            "/logout",
+            "/withdraw/**"
     };
 
     private static final String[] SWAGGER_WHITELIST = {
