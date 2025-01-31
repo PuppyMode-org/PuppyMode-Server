@@ -8,4 +8,5 @@ public interface DrinkingAppointmentQueryService {
     DrinkingAppointmentResponseDTO.AppointmentResultDTO getDrinkingAppointmentById(Long appointmentId, Long userId);
     DrinkingAppointmentResponseDTO.AppointmentListResultDTO getAllDrinkingAppointments(AppointmentStatus status, int page, int size, Long userId);
     boolean isDrinkingActive(Long appointmentId, Long userId);
+    int getDrinkingDuration(Long appointmentId, Long userId);
 }

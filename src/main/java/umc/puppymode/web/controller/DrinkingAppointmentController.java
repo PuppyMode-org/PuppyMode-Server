@@ -8,14 +8,19 @@ import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.SuccessStatus;
 import umc.puppymode.domain.DrinkingAppointment;
+import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.enums.AppointmentStatus;
 import umc.puppymode.repository.DrinkingAppointmentRepository;
+import umc.puppymode.repository.PuppyRepository;
 import umc.puppymode.service.DrinkingAppointmentService.DrinkingAppointmentCommendService;
 import umc.puppymode.service.DrinkingAppointmentService.DrinkingAppointmentQueryService;
 import umc.puppymode.service.LocationService.LocationService;
+import umc.puppymode.service.MainPuppyService.MainPuppyQueryService;
+import umc.puppymode.service.MainPuppyService.MainPuppyQueryServiceImpl;
 import umc.puppymode.service.UserService.UserAuthService;
 import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
 import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
+import umc.puppymode.web.dto.MainPuppyDTO.MainPuppyResDTO;
 
 
 @RestController
@@ -27,6 +32,7 @@ public class DrinkingAppointmentController {
     private final DrinkingAppointmentRepository drinkingAppointmentRepository;
     private final LocationService locationService;
     private final UserAuthService userAuthService;
+    private final MainPuppyQueryService mainPuppyQueryService;
 
     @PostMapping
     @Operation(summary = "술 약속 생성 API", description = "술 약속 생성 API 입니다 :)")
@@ -87,11 +93,19 @@ public class DrinkingAppointmentController {
         // 음주 상태 가져오기
         boolean isDrinking = drinkingAppointmentQueryService.isDrinkingActive(appointmentId, userId);
 
+        // 사용자의 펫 정보 가져오기
+        MainPuppyResDTO.UserPuppyViewDTO userPuppy = mainPuppyQueryService.getUserPuppy(userId);
+        String puppyName = userPuppy.getPuppyName(); // DTO에서 펫 이름 가져오기
+
+
+        //음주 시간 계산
+        int drinkingHours = drinkingAppointmentQueryService.getDrinkingDuration(appointmentId, userId);
+
         // 업데이트된 상태를 엔티티에서 가져옴
         DrinkingAppointment appointment = drinkingAppointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new IllegalStateException("업데이트 후 약속을 찾을 수 없습니다."));
 
-        DrinkingAppointmentResponseDTO.AppointmentStatusResultDTO response = new DrinkingAppointmentResponseDTO.AppointmentStatusResultDTO(appointmentId, isDrinking, appointment.getStatus());
+        DrinkingAppointmentResponseDTO.AppointmentStatusResultDTO response = new DrinkingAppointmentResponseDTO.AppointmentStatusResultDTO(appointmentId, isDrinking, appointment.getStatus(), puppyName, drinkingHours);
         return ApiResponse.onSuccess(response, SuccessStatus.APPOINTMENT_STATUS_GET_SUCCESS.getCode(), SuccessStatus.APPOINTMENT_STATUS_GET_SUCCESS.getMessage());
     }
 

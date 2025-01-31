@@ -14,6 +14,7 @@ import umc.puppymode.util.DistanceCalculator;
 import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
 import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -61,6 +62,7 @@ public class LocationServiceImpl implements LocationService {
 
         // 조건 충족 시 약속 상태 업데이트
         appointment.setStatus(AppointmentStatus.ONGOING); // 상태를 "ONGOING"으로 변경
+        appointment.setDrinkingStartTime((LocalDateTime.now())); // 술 약속 시작 시간 저장
         drinkingAppointmentRepository.save(appointment);
 
         //음주 상태 조회
