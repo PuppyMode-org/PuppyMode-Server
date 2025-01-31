@@ -52,14 +52,6 @@ public class DrinkingAppointmentResponseDTO {
 
     @Getter
     @AllArgsConstructor
-    public static class RescheduleResultDTO {
-        private Long appointmentId;
-        private LocalDateTime rescheduledTime;
-        private String message;
-    }
-
-    @Getter
-    @AllArgsConstructor
     public static class CompletedResultDTO {
         private LocalDateTime completedTime;
         private AppointmentStatus appointmentStatus;
