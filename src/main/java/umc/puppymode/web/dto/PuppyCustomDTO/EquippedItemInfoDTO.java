@@ -1,4 +1,4 @@
-package umc.puppymode.web.dto;
+package umc.puppymode.web.dto.PuppyCustomDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,4 +8,5 @@ import lombok.Getter;
 public class EquippedItemInfoDTO {
     private Long itemId;
     private String itemName;
+    private String equippedImage;
 }

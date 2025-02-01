@@ -1,4 +1,4 @@
-package umc.puppymode.web.dto;
+package umc.puppymode.web.dto.PuppyCustomDTO;
 
 
 import lombok.AllArgsConstructor;
@@ -7,6 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+
 @AllArgsConstructor
 public class ItemResponseDTO {
     private Long itemId; // 아이템 ID

@@ -10,6 +10,8 @@ import umc.puppymode.converter.MainPuppyConverter;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.PuppyLevel;
 import umc.puppymode.domain.User;
+import umc.puppymode.domain.mapping.PuppyCustomization;
+import umc.puppymode.repository.PuppyCustomizationRepository;
 import umc.puppymode.repository.PuppyLevelRepository;
 import umc.puppymode.repository.PuppyRepository;
 import umc.puppymode.repository.UserRepository;
@@ -27,6 +29,7 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
     private final PuppyRepository puppyRepository;
     private final UserRepository userRepository;
     private final PuppyLevelRepository puppyLevelRepository;
+    private final PuppyCustomizationRepository puppyCustomizationRepository;
 
     @Override
     // 랜덤으로 강아지를 선택
@@ -39,11 +42,14 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
             throw new GeneralException(ErrorStatus.PUPPY_ALREADY_EXISTS);
         }
 
-        // 1단계인 강아지 레벨만 분류하여 랜덤 선택
-        List<PuppyLevel> puppyLevels = puppyLevelRepository.findByPuppyLevel(1);
-        Random random = new Random();
-        int randomIndex = random.nextInt(puppyLevels.size());
-        PuppyLevel puppyLevel = puppyLevels.get(randomIndex);
+//        // 1단계인 강아지 레벨만 분류하여 랜덤 선택
+//        List<PuppyLevel> puppyLevels = puppyLevelRepository.findByPuppyLevel(1);
+//        Random random = new Random();
+//        int randomIndex = random.nextInt(puppyLevels.size());
+//        PuppyLevel puppyLevel = puppyLevels.get(randomIndex);
+
+        // 시연을 위한 임시 코드
+        PuppyLevel puppyLevel = puppyLevelRepository.findByLevelName("눈송이 비숑");
 
         // 선택된 레벨과 유저 정보를 사용하여 강아지 객체 생성 및 저장
         Puppy puppy = MainPuppyConverter.toPuppy(puppyLevel, user);
@@ -54,14 +60,11 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
 
     @Override
     // 강아지의 이름을 수정
-    public String updatePuppyName(Long userId, Long puppyId, String newPuppyName) {
+    public String updatePuppyName(Long userId, String newPuppyName) {
 
         userRepository.findById(userId).orElseThrow(() -> new TempHandler(ErrorStatus.USER_NOT_FOUND));
-        Puppy puppy = puppyRepository.findById(puppyId).orElseThrow(() -> new TempHandler(ErrorStatus.PUPPY_NOT_FOUND));
-        // 강아지가 현재 사용자의 강아지가 아닌 경우 에러 발생
-        if (!userId.equals(puppy.getUser().getUserId())) {
-            throw new TempHandler(ErrorStatus.UNAUTHORIZED_PUPPY_ACCESS);
-        }
+        Puppy puppy = puppyRepository.findByUserId(userId).orElseThrow(() -> new TempHandler(ErrorStatus.NO_USERS_PUPPY));
+
         puppy.updatePuppyName(newPuppyName);
 
         return puppy.getPuppyName();
@@ -69,14 +72,11 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
 
     @Override
     // 강아지 놀아주기 실행
-    public MainPuppyResDTO.PlayResDTO platWithPuppy(Long userId, Long puppyId) {
+    public MainPuppyResDTO.PlayResDTO platWithPuppy(Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new TempHandler(ErrorStatus.USER_NOT_FOUND));
-        Puppy puppy = puppyRepository.findById(puppyId).orElseThrow(() -> new TempHandler(ErrorStatus.PUPPY_NOT_FOUND));
-        // 강아지가 현재 사용자의 강아지가 아닌 경우 에러 발생
-        if (!userId.equals(puppy.getUser().getUserId())) {
-            throw new TempHandler(ErrorStatus.UNAUTHORIZED_PUPPY_ACCESS);
-        }
+        Puppy puppy = puppyRepository.findByUserId(userId).orElseThrow(() -> new TempHandler(ErrorStatus.NO_USERS_PUPPY));
+
         // 사용자 포인트 10p 증가
         user.updatePoints(10);
         // 현재 레벨의 전체 경험치의 1% 만큼의 경험치 계산
@@ -94,6 +94,13 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
         Optional<Puppy> puppy = puppyRepository.findByUserId(userId);
         if (puppy.isPresent()) {
             Long puppyId = puppy.get().getPuppyId();
+
+            // 강아지 커스터마이징 객체 삭제
+            List<PuppyCustomization> customizations = puppyCustomizationRepository.findByPuppyId(puppyId);
+            if (!customizations.isEmpty()) {
+                puppyCustomizationRepository.deleteAll(customizations);
+            }
+
             puppyRepository.delete(puppy.get());
             return "강아지 객체가 성공적으로 삭제되었습니다. 삭제된 puppyId: " + puppyId;
         } else {

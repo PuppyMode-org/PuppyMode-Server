@@ -33,6 +33,6 @@ public class UserQueryServiceImpl implements UserQueryService {
     @Override
     public Puppy getUserPuppy(Long userId) {
         return puppyRepository.findByUserId(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.PUPPY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NO_USERS_PUPPY));
     }
 }

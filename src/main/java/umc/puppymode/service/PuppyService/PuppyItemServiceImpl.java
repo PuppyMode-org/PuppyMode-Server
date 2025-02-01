@@ -9,10 +9,10 @@ import umc.puppymode.domain.PuppyItemCategory;
 import umc.puppymode.domain.EquippedItemImage;
 import umc.puppymode.domain.mapping.PuppyCustomization;
 import umc.puppymode.repository.*;
-import umc.puppymode.web.dto.EquippedItemInfoDTO;
-import umc.puppymode.web.dto.ItemCategoryResponseDTO;
+import umc.puppymode.web.dto.PuppyCustomDTO.EquippedItemInfoDTO;
+import umc.puppymode.web.dto.PuppyCustomDTO.ItemCategoryResponseDTO;
 import umc.puppymode.domain.User;
-import umc.puppymode.web.dto.ItemResponseDTO;
+import umc.puppymode.web.dto.PuppyCustomDTO.ItemResponseDTO;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -124,7 +124,7 @@ public class PuppyItemServiceImpl implements PuppyItemService {
 
         // 포인트 차감 및 아이템 구매 처리
         user.setPoints(user.getPoints() - item.getPrice());
-        PuppyCustomization customization = new PuppyCustomization();
+        PuppyCustomization customization = PuppyCustomization.builder().build();
         customization.setPuppy(puppy);
         customization.setPuppyItem(item);
         customization.setPuppyItemCategory(puppyItemCategory);
@@ -145,7 +145,7 @@ public class PuppyItemServiceImpl implements PuppyItemService {
 
     @Override
     @Transactional
-    public Map<String, Object> equipItem(Long categoryId, Long itemId, Long userId) {
+    public EquippedItemInfoDTO equipItem(Long categoryId, Long itemId, Long userId) {
 
         // 유저의 강아지 찾기
         Puppy puppy = puppyRepository.findByUserId(userId)
@@ -166,7 +166,6 @@ public class PuppyItemServiceImpl implements PuppyItemService {
         PuppyCustomization customization = puppyCustomizationRepository.findByPuppyAndPuppyItem(puppy, item)
                 .orElseThrow(() -> new IllegalArgumentException("구매하지 않은 아이템입니다."));
 
-
         // 같은 카테고리에서 현재 착용 중인 아이템 해제
         PuppyCustomization currentEquippedItem = puppyCustomizationRepository.findByPuppyAndPuppyItemCategoryAndIsEquippedTrue(puppy, puppyItemCategory)
                 .orElse(null);
@@ -181,24 +180,19 @@ public class PuppyItemServiceImpl implements PuppyItemService {
         puppyCustomizationRepository.save(customization);
 
         // 아이템 착용 이미지
-        String updatedImageUrl = equippedItemImageRepository.findByPuppyTypeAndLevelNameAndItemId(
+        String equippedImage = equippedItemImageRepository.findByPuppyTypeAndLevelNameAndItemId(
                 puppy.getPuppyLevel().getPuppyType(),
                 puppy.getPuppyLevel().getLevelName(),
                 itemId
         ).map(EquippedItemImage::getImageUrl)
                 .orElseThrow(() -> new IllegalArgumentException("착용 이미지가 존재하지 않습니다."));
 
-        // 응답 데이터 구성
-        Map<String, Object> result = new HashMap<>();
-        result.put("updatedPuppyImageUrl", updatedImageUrl);
-        result.put("equippedItemInfo", new EquippedItemInfoDTO(item.getItemId(), item.getItemName()));
-
-        return result;
+        return new EquippedItemInfoDTO(item.getItemId(), item.getItemName(), equippedImage);
     }
 
     @Override
     @Transactional
-    public Map<String, Object> unequipItem(Long categoryId, Long itemId, Long userId) {
+    public EquippedItemInfoDTO unequipItem(Long categoryId, Long itemId, Long userId) {
         // 유저 찾기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
@@ -230,10 +224,80 @@ public class PuppyItemServiceImpl implements PuppyItemService {
             throw new IllegalArgumentException("이미 착용하지 않은 아이템입니다.");
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("unequippedItemInfo", new EquippedItemInfoDTO(item.getItemId(), item.getItemName()));
+        // 아이템 착용 이미지
+        String equippedImage = equippedItemImageRepository.findByPuppyTypeAndLevelNameAndItemId(
+                        puppy.getPuppyLevel().getPuppyType(),
+                        puppy.getPuppyLevel().getLevelName(),
+                        itemId
+                ).map(EquippedItemImage::getImageUrl)
+                .orElseThrow(() -> new IllegalArgumentException("착용 이미지가 존재하지 않습니다."));
 
-        return result;
+        return new EquippedItemInfoDTO(item.getItemId(), item.getItemName(), equippedImage);
+    }
+
+    @Override
+    public Integer getPoints(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+
+        return user.getPoints();
+    }
+
+    @Override
+    public List<ItemResponseDTO> getOwnedItems(Long userId) {
+        // 유저의 강아지 찾기
+        Puppy puppy = puppyRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
+
+        // 모든 아이템 조회
+        List<PuppyItem> items = itemRepository.findAll();
+
+        // 유저가 소유한 아이템 리스트
+        List<Long> OwnedItemIds = puppyCustomizationRepository.findByPuppy(puppy).stream()
+                .map(customization -> customization.getPuppyItem().getItemId())
+                .collect(Collectors.toList());
+
+        List<ItemResponseDTO> itemResponseList = items.stream()
+                .filter(item -> OwnedItemIds.contains(item.getItemId())) // 소유한 아이템만 필터링
+                .map(item -> new ItemResponseDTO(
+                        item.getItemId(),
+                        item.getItemName(),
+                        item.getPrice(),
+                        item.getImageUrl(),
+                        OwnedItemIds.contains(item.getItemId()),
+                        item.getMission_item()
+                ))
+                .collect(Collectors.toList());
+
+        return itemResponseList;
+    }
+
+    @Override
+    public List<EquippedItemInfoDTO> getEquippedItems(Long userId) {
+        // 유저의 강아지 찾기
+        Puppy puppy = puppyRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
+
+        // 구매한 아이템 목록
+        List<PuppyCustomization> equippedItems = puppyCustomizationRepository.findByPuppyAndIsEquippedTrue(puppy);
+
+        // 리스트 변환
+        List<EquippedItemInfoDTO> equippedItemInfoDTOList = equippedItems.stream()
+                .map(customization -> {
+                    PuppyItem item = customization.getPuppyItem();
+                    // 아이템 착용 이미지
+                    String equippedImage = equippedItemImageRepository.findByPuppyTypeAndLevelNameAndItemId(
+                                    puppy.getPuppyLevel().getPuppyType(),
+                                    puppy.getPuppyLevel().getLevelName(),
+                                    item.getItemId()
+                            ).map(EquippedItemImage::getImageUrl)
+                            .orElseThrow(() -> new IllegalArgumentException("착용 이미지가 존재하지 않습니다."));
+
+                    return new EquippedItemInfoDTO(item.getItemId(), item.getItemName(), equippedImage);
+                })
+                .collect(Collectors.toList());
+
+        return equippedItemInfoDTOList;
     }
 
 }

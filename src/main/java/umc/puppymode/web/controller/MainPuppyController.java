@@ -39,21 +39,19 @@ public class MainPuppyController {
     @PatchMapping
     @Operation(summary = "강아지 이름 수정 API", description = "강아지의 이름을 수정하는 API입니다.")
     public ApiResponse<String> updatePuppyName(
-            @RequestParam Long puppyId,
             @RequestParam String newPuppyName) {
 
         Long userId = userAuthService.getCurrentUserId();
-        String updatedPuppyName = mainPuppyCommandService.updatePuppyName(userId, puppyId, newPuppyName);
+        String updatedPuppyName = mainPuppyCommandService.updatePuppyName(userId, newPuppyName);
         return ApiResponse.onSuccess(updatedPuppyName);
     }
 
     @PostMapping("/play")
     @Operation(summary = "강아지 놀아주기 API", description = "강아지 놀아주기를 실행하는 API입니다.")
-    public ApiResponse<MainPuppyResDTO.PlayResDTO> playWithPuppy(
-            @RequestParam Long puppyId) {
+    public ApiResponse<MainPuppyResDTO.PlayResDTO> playWithPuppy() {
 
         Long userId = userAuthService.getCurrentUserId();
-        MainPuppyResDTO.PlayResDTO playResDTO = mainPuppyCommandService.platWithPuppy(userId, puppyId);
+        MainPuppyResDTO.PlayResDTO playResDTO = mainPuppyCommandService.platWithPuppy(userId);
         return ApiResponse.onSuccess(playResDTO);
     }
 

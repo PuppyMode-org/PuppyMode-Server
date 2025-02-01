@@ -1,4 +1,4 @@
-package umc.puppymode.web.dto;
+package umc.puppymode.web.dto.PuppyCustomDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
