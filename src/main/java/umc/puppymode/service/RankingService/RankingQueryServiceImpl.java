@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.User;
 import umc.puppymode.repository.PuppyRepository;
-import umc.puppymode.repository.UserAuthProviderRepository;
+import umc.puppymode.repository.UserAuthRepository;
 import umc.puppymode.web.dto.RankingDTO;
 import umc.puppymode.web.dto.RankingResponseDTO;
 
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RankingQueryServiceImpl implements RankingQueryService {
 
-    private final UserAuthProviderRepository userAuthProviderRepository;
+    private final UserAuthRepository userAuthProviderRepository;
     private final PuppyRepository puppyRepository;
 
     /**
@@ -27,7 +27,7 @@ public class RankingQueryServiceImpl implements RankingQueryService {
     @Override
     public RankingResponseDTO getFriendRankings(List<String> authIds, int page, int size, Long currentUserId) {
         // authIds를 기반으로 해당 유저 목록 가져오기
-        List<User> kakaoUsers = userAuthProviderRepository.findUsersByAuthProviderAndAuthIdIn("kakao", authIds);
+        List<User> kakaoUsers = userAuthProviderRepository.findUsersByAuthProviderAndAuthIdIn("KAKAO", authIds);
 
         // 해당 유저들의 강아지 정보 조회
         List<Puppy> puppies = puppyRepository.findByUserIn(kakaoUsers);
