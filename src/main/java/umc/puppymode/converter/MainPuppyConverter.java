@@ -11,7 +11,7 @@ public class MainPuppyConverter {
         return MainPuppyResDTO.RandomPuppyViewDTO.builder()
                 .userId(puppy.getUser().getUserId())
                 .puppyType(puppy.getPuppyLevel().getPuppyType().getType())
-                .puppyImageUrl(puppy.getPuppyLevel().getLevelImageUrl())
+                .puppyImageUrl(puppy.getImageUrl())
                 .build();
     }
 
@@ -22,7 +22,7 @@ public class MainPuppyConverter {
                 .puppyName(puppy.getPuppyName())
                 .level(puppy.getPuppyLevel().getPuppyLevel())
                 .levelName(puppy.getPuppyLevel().getLevelName())
-                .imageUrl(puppy.getPuppyLevel().getLevelImageUrl())
+                .imageUrl(puppy.getImageUrl())
                 .levelMinExp(puppy.getPuppyLevel().getLevelMinExp())
                 .levelMaxExp(puppy.getPuppyLevel().getLevelMaxExp())
                 .puppyExp(puppy.getPuppyExp())
@@ -48,6 +48,7 @@ public class MainPuppyConverter {
                 .puppyLevel(puppyLevel)
                 .puppyName(puppyName)
                 .puppyExp(0)
+                .imageUrl(puppyLevel.getLevelImageUrl())
                 .build();
     }
 }
