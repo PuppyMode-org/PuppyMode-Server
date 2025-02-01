@@ -24,7 +24,7 @@ public class MainPuppyQueryServiceImpl implements MainPuppyQueryService {
     public MainPuppyResDTO.UserPuppyViewDTO getUserPuppy(Long userId) {
 
         userRepository.findById(userId).orElseThrow(() -> new TempHandler(ErrorStatus.USER_NOT_FOUND));
-        Puppy puppy = puppyRepository.findByUserId(userId).orElseThrow(() -> new TempHandler(ErrorStatus.PUPPY_NOT_FOUND));
+        Puppy puppy = puppyRepository.findByUserId(userId).orElseThrow(() -> new TempHandler(ErrorStatus.NO_USERS_PUPPY));
 
         return MainPuppyConverter.toUserPuppyViewDTO(puppy);
     }

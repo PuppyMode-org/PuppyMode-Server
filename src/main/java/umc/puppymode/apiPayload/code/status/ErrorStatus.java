@@ -42,7 +42,8 @@ public enum ErrorStatus implements BaseErrorCode {
     TEMP_EXCEPTION(HttpStatus.BAD_REQUEST, "TEMP4001", "이거는 테스트"),
 
     // 강아지 관련 예외 처리
-    PUPPY_NOT_FOUND(HttpStatus.NOT_FOUND, "PUPPY404", "해당 ID를 가진 강아지를 찾을 수 없습니다."),
+    PUPPY_NOT_FOUND(HttpStatus.NOT_FOUND, "PUPPY4041", "해당 ID를 가진 강아지를 찾을 수 없습니다."),
+    NO_USERS_PUPPY(HttpStatus.NOT_FOUND, "PUPPY4042", "해당 사용자의 강아지가 존재하지 않습니다."),
     UNAUTHORIZED_PUPPY_ACCESS(HttpStatus.UNAUTHORIZED, "PUPPY401", "강아지에 대한 접근 권한이 없습니다."),
     PUPPY_ALREADY_EXISTS(HttpStatus.CONFLICT, "PUPPY409", "최대 강아지 보유량을 초과하였습니다. (최대: 1)"),
 

@@ -1,7 +1,6 @@
 package umc.puppymode.domain.mapping;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import jakarta.persistence.*;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.PuppyItem;
@@ -12,6 +11,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PuppyCustomization {
 
     @Id

@@ -9,6 +9,7 @@ import umc.puppymode.domain.*;
 import umc.puppymode.domain.enums.FeedingItem;
 import umc.puppymode.domain.enums.PuppyType;
 import umc.puppymode.repository.*;
+import umc.puppymode.service.UserCollectionService.UserCollectionCommandService;
 import umc.puppymode.web.dto.DrinkRequestDTO.*;
 import umc.puppymode.web.dto.DrinkResponseDTO.*;
 
@@ -26,6 +27,7 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
     private final HangoverRepository hangoverRepository;
     private final PuppyRepository puppyRepository;
     private final FeedRepository feedRepository;
+    private final UserCollectionCommandService userCollectionCommandService;
 
     @Override
     public DrinksRecordResponseDTO postDrinksRecord(Long userId, DrinkRecordDTO drinkRecordDTO) {
@@ -71,7 +73,7 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         }
 
         Puppy puppy = puppyRepository.findByUserId(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));;
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NO_USERS_PUPPY));;
         recordResponseDTO.setPuppyLevel(puppy.getPuppyLevel().getPuppyLevel());
         recordResponseDTO.setPuppyLevelName(puppy.getPuppyLevel().getLevelName());
         recordResponseDTO.setPuppyPercent(puppy.getPuppyExp());
@@ -91,13 +93,18 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
 
         feedRepository.save(feed);
 
+        // 경험 숙취 증상 목록에 따른 해당 유저의 컬렉션 업데이트
+        if (!hangoverItems.isEmpty()) {
+            userCollectionCommandService.updateCollection(user, hangoverItems);
+        }
+
         return recordResponseDTO;
     }
 
     @Override
     public FeedResponseDTO postFeed(Long userId) {
         Puppy puppy = puppyRepository.findByUserId(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.PUPPY_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NO_USERS_PUPPY));
 
         // 현재 레벨의 최소 ~ 최대 경험치 차이를 기준으로 5% 증가
         Integer fivePercentExp = (int) ((puppy.getPuppyLevel().getLevelMaxExp() - puppy.getPuppyLevel().getLevelMinExp()) * 0.05);
