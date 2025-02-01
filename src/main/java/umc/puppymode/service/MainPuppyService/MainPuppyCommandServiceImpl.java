@@ -10,6 +10,8 @@ import umc.puppymode.converter.MainPuppyConverter;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.PuppyLevel;
 import umc.puppymode.domain.User;
+import umc.puppymode.domain.mapping.PuppyCustomization;
+import umc.puppymode.repository.PuppyCustomizationRepository;
 import umc.puppymode.repository.PuppyLevelRepository;
 import umc.puppymode.repository.PuppyRepository;
 import umc.puppymode.repository.UserRepository;
@@ -27,6 +29,7 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
     private final PuppyRepository puppyRepository;
     private final UserRepository userRepository;
     private final PuppyLevelRepository puppyLevelRepository;
+    private final PuppyCustomizationRepository puppyCustomizationRepository;
 
     @Override
     // 랜덤으로 강아지를 선택
@@ -91,6 +94,13 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
         Optional<Puppy> puppy = puppyRepository.findByUserId(userId);
         if (puppy.isPresent()) {
             Long puppyId = puppy.get().getPuppyId();
+
+            // 강아지 커스터마이징 객체 삭제
+            List<PuppyCustomization> customizations = puppyCustomizationRepository.findByPuppyId(puppyId);
+            if (!customizations.isEmpty()) {
+                puppyCustomizationRepository.deleteAll(customizations);
+            }
+
             puppyRepository.delete(puppy.get());
             return "강아지 객체가 성공적으로 삭제되었습니다. 삭제된 puppyId: " + puppyId;
         } else {
