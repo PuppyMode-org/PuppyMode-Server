@@ -16,6 +16,7 @@ public interface PuppyCustomizationRepository extends JpaRepository<PuppyCustomi
     Optional<PuppyCustomization> findByPuppyAndPuppyItem(Puppy puppy, PuppyItem item);
     Optional<PuppyCustomization> findByPuppyAndPuppyItemCategoryAndIsEquippedTrue(Puppy puppy, PuppyItemCategory puppyItemCategory);
     List<PuppyCustomization> findByPuppy(Puppy puppy);
+    List<PuppyCustomization> findByPuppyAndIsEquippedTrue(Puppy puppy);
 
     @Query("SELECT p FROM PuppyCustomization p WHERE p.puppy.puppyId = :puppyId")
     List<PuppyCustomization> findByPuppyId(@Param("puppyId")Long puppyId);

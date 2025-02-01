@@ -8,4 +8,5 @@ import lombok.Getter;
 public class EquippedItemInfoDTO {
     private Long itemId;
     private String itemName;
+    private String equippedImage;
 }

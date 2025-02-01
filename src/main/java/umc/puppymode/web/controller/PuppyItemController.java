@@ -7,6 +7,7 @@ import umc.puppymode.service.PuppyService.PuppyItemService;
 import umc.puppymode.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import umc.puppymode.service.UserService.UserAuthService;
+import umc.puppymode.web.dto.PuppyCustomDTO.EquippedItemInfoDTO;
 import umc.puppymode.web.dto.PuppyCustomDTO.ItemResponseDTO;
 
 import java.util.List;
@@ -61,22 +62,22 @@ public class PuppyItemController {
 
     @Operation(summary = "아이템 착용 API", description = "강아지에게 아이템을 착용시키는 API(이미지는 강아지 상태에 따른 아이템 단일 이미지로, 레이어드 할 투명 배경 이미지입니다)")
     @PostMapping("/{categoryId}/items/{itemId}/equip")
-    public ApiResponse<Map<String, Object>> equipItem(@PathVariable Long categoryId,
+    public ApiResponse<EquippedItemInfoDTO> equipItem(@PathVariable Long categoryId,
                                                       @PathVariable Long itemId) {
         Long userId = userAuthService.getCurrentUserId();
 
-        Map<String, Object> result = puppyItemService.equipItem(categoryId, itemId, userId);
+        EquippedItemInfoDTO result = puppyItemService.equipItem(categoryId, itemId, userId);
         return new ApiResponse<>(true, "SUCCESS_EQUIP_PUPPY_ITEM", "아이템 착용 성공", result);
     }
 
     @Operation(summary = "아이템 착용 해제 API", description = "강아지가 착용한 아이템을 해제하는 API")
     @PatchMapping("/{categoryId}/items/{itemId}/unequip")
-    public ResponseEntity<?> unequipItem(@PathVariable Long categoryId,
+    public ApiResponse<EquippedItemInfoDTO> unequipItem(@PathVariable Long categoryId,
                                          @PathVariable Long itemId) {
         Long userId = userAuthService.getCurrentUserId();
 
-        Map<String, Object> result = puppyItemService.unequipItem(categoryId, itemId, userId);
-        return ResponseEntity.ok(new ApiResponse<>(true, "SUCCESS_UNEQUIP_PUPPY_ITEM", "아이템 착용 해제 성공", result));
+        EquippedItemInfoDTO result = puppyItemService.unequipItem(categoryId, itemId, userId);
+        return new ApiResponse<>(true, "SUCCESS_UNEQUIP_PUPPY_ITEM", "아이템 착용 해제 성공", result);
     }
 
     @Operation(summary = "포인트 조회 API", description = "유저의 현재 포인트를 조회하는 API")
@@ -100,6 +101,19 @@ public class PuppyItemController {
                 true,
                 "SUCCESS_GET_OWNED_ITEMS",
                 "소유한 아이템 목록 조회 성공",
+                result);
+    }
+
+    @Operation(summary = "착용한 아이템 목록 조회 API", description = "강아지가 착용한 아이템 목록을 조회하는 API")
+    @GetMapping("/items/equip")
+    public ApiResponse<List<EquippedItemInfoDTO>> getEquippedItems() {
+        Long userId = userAuthService.getCurrentUserId();
+        List<EquippedItemInfoDTO> result = puppyItemService.getEquippedItems(userId);
+
+        return new ApiResponse<>(
+                true,
+                "SUCCESS_GET_EQUIP_ITEMS",
+                "착용한 아이템 목록 조회 성공",
                 result);
     }
 
