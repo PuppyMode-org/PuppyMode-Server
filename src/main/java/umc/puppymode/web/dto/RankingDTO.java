@@ -14,9 +14,9 @@ import umc.puppymode.domain.Puppy;
 public class RankingDTO {
     private int rank;
     private String username;
-    private String levelName;
+    private String puppyName;
     private int level;
-    private int progressPercentage;
+    private String levelName;
 
     @JsonIgnore
     private Long userId;
@@ -25,18 +25,10 @@ public class RankingDTO {
         return new RankingDTO(
                 rank,
                 puppy.getUser().getUsername(),
-                puppy.getPuppyLevel().getLevelName(),
+                puppy.getPuppyName(),
                 puppy.getPuppyLevel().getPuppyLevel(),
-                calculateProgress(puppy),
+                puppy.getPuppyLevel().getLevelName(),
                 puppy.getUser().getUserId()
         );
-    }
-
-    private static int calculateProgress(Puppy puppy) {
-        int minExp = puppy.getPuppyLevel().getLevelMinExp();
-        int maxExp = puppy.getPuppyLevel().getLevelMaxExp();
-        int currentExp = puppy.getPuppyExp();
-
-        return (int) (((double) (currentExp - minExp) / (maxExp - minExp)) * 100);
     }
 }
