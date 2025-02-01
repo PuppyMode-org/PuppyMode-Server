@@ -43,10 +43,13 @@ public class UserCollectionCommandServiceImpl implements UserCollectionCommandSe
             List<UserCollection> collections = userCollectionMap.get(hangoverItem);
             if (collections != null) {
                 for (UserCollection userCollection : collections) {
-                    if (userCollection.updateCurrentNumAndReturnIsCompleted()) {
-                        // 조건 충족(요구 횟수 만족) 시 보상 아이템 획득
-                        userCollection.setCompleted(true);
-                        getRewardItem(userCollection.getCollection().getPuppyItem(), user.getUserId());
+                    // 이미 완료된 컬렉션이 아닌 경우에만 수행
+                    if (!userCollection.isCompleted()) {
+                        if (userCollection.updateCurrentNumAndReturnIsCompleted()) {
+                            // 조건 충족(요구 횟수 만족) 시 보상 아이템 획득
+                            userCollection.setCompleted(true);
+                            getRewardItem(userCollection.getCollection().getPuppyItem(), user.getUserId());
+                        }
                     }
                 }
             }
