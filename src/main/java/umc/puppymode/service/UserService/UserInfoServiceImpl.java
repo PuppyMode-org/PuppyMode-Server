@@ -25,7 +25,7 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         // 강아지 정보 조회
         Puppy puppy = puppyRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Puppy not found. 강아지를 선택해 주세요."));
+                .orElseThrow(() -> new RuntimeException("강아지를 찾을 수 없습니다. 강아지를 선택해 주세요."));
 
         UserInfoResponseDTO.UserPuppyInfo userPuppyInfo = UserInfoResponseDTO.UserPuppyInfo.builder()
                 .puppyId(puppy.getPuppyId())
