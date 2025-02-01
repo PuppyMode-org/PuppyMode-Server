@@ -31,6 +31,8 @@ public class Puppy extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CustomizingItem puppyItem;
 
+    private String imageUrl;
+
     public void updatePuppyName(String puppyName) {
         this.puppyName = puppyName;
     }

@@ -61,7 +61,7 @@ public class FcmPlaytimeServiceImpl implements FcmPlaytimeService {
                                     .token(token)
                                     .title("오늘도 " + puppy.getPuppyName() + "랑 놀아주세요.")
                                     .body(puppy.getPuppyName() + "가 주인님을 애타게 기다리고 있어요.")
-                                    .image(puppy.getPuppyLevel().getLevelImageUrl())
+                                    .image(puppy.getImageUrl())
                                     .build()
                     );
                 } catch (Exception e) {
