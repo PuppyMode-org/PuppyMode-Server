@@ -9,10 +9,10 @@ import umc.puppymode.domain.PuppyItemCategory;
 import umc.puppymode.domain.EquippedItemImage;
 import umc.puppymode.domain.mapping.PuppyCustomization;
 import umc.puppymode.repository.*;
-import umc.puppymode.web.dto.EquippedItemInfoDTO;
-import umc.puppymode.web.dto.ItemCategoryResponseDTO;
+import umc.puppymode.web.dto.PuppyCustomDTO.EquippedItemInfoDTO;
+import umc.puppymode.web.dto.PuppyCustomDTO.ItemCategoryResponseDTO;
 import umc.puppymode.domain.User;
-import umc.puppymode.web.dto.ItemResponseDTO;
+import umc.puppymode.web.dto.PuppyCustomDTO.ItemResponseDTO;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -166,7 +166,6 @@ public class PuppyItemServiceImpl implements PuppyItemService {
         PuppyCustomization customization = puppyCustomizationRepository.findByPuppyAndPuppyItem(puppy, item)
                 .orElseThrow(() -> new IllegalArgumentException("구매하지 않은 아이템입니다."));
 
-
         // 같은 카테고리에서 현재 착용 중인 아이템 해제
         PuppyCustomization currentEquippedItem = puppyCustomizationRepository.findByPuppyAndPuppyItemCategoryAndIsEquippedTrue(puppy, puppyItemCategory)
                 .orElse(null);
@@ -234,6 +233,43 @@ public class PuppyItemServiceImpl implements PuppyItemService {
         result.put("unequippedItemInfo", new EquippedItemInfoDTO(item.getItemId(), item.getItemName()));
 
         return result;
+    }
+
+    @Override
+    public Integer getPoints(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+
+        return user.getPoints();
+    }
+
+    @Override
+    public List<ItemResponseDTO> getOwnedItems(Long userId) {
+        // 유저의 강아지 찾기
+        Puppy puppy = puppyRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
+
+        // 모든 아이템 조회
+        List<PuppyItem> items = itemRepository.findAll();
+
+        // 유저가 소유한 아이템 리스트
+        List<Long> OwnedItemIds = puppyCustomizationRepository.findByPuppy(puppy).stream()
+                .map(customization -> customization.getPuppyItem().getItemId())
+                .collect(Collectors.toList());
+
+        List<ItemResponseDTO> itemResponseList = items.stream()
+                .filter(item -> OwnedItemIds.contains(item.getItemId())) // 소유한 아이템만 필터링
+                .map(item -> new ItemResponseDTO(
+                        item.getItemId(),
+                        item.getItemName(),
+                        item.getPrice(),
+                        item.getImageUrl(),
+                        OwnedItemIds.contains(item.getItemId()),
+                        item.getMission_item()
+                ))
+                .collect(Collectors.toList());
+
+        return itemResponseList;
     }
 
 }

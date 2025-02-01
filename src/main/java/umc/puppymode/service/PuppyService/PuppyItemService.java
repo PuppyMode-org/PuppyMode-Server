@@ -1,5 +1,8 @@
 package umc.puppymode.service.PuppyService;
 
+import umc.puppymode.web.dto.PuppyCustomDTO.ItemResponseDTO;
+
+import java.util.List;
 import java.util.Map;
 
 public interface PuppyItemService {
@@ -8,4 +11,6 @@ public interface PuppyItemService {
     Map<String, Object> purchaseItem(Long categoryId, Long itemId, Long userId);
     Map<String, Object> equipItem(Long categoryId, Long itemId, Long userId);
     Map<String, Object> unequipItem(Long categoryId, Long itemId, Long userId);
+    Integer getPoints(Long userId);
+    List<ItemResponseDTO> getOwnedItems(Long userId);
 }
