@@ -124,7 +124,7 @@ public class PuppyItemServiceImpl implements PuppyItemService {
 
         // 포인트 차감 및 아이템 구매 처리
         user.setPoints(user.getPoints() - item.getPrice());
-        PuppyCustomization customization = new PuppyCustomization();
+        PuppyCustomization customization = PuppyCustomization.builder().build();
         customization.setPuppy(puppy);
         customization.setPuppyItem(item);
         customization.setPuppyItemCategory(puppyItemCategory);

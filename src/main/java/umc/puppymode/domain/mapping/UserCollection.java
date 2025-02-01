@@ -29,4 +29,9 @@ public class UserCollection extends BaseEntity {
 
     // 달성 여부
     private boolean isCompleted;
+
+    public boolean updateCurrentNumAndReturnIsCompleted() {
+        this.currentNum++;
+        return this.currentNum.equals(collection.getRequiredNum());
+    }
 }
