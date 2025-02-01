@@ -27,8 +27,4 @@ public class UserAuth {
 
     @Column(name = "refresh_token", columnDefinition = "TEXT")
     private String refreshToken;
-
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
 }

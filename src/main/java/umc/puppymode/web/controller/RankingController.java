@@ -1,5 +1,7 @@
 package umc.puppymode.web.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +21,11 @@ public class RankingController {
     private final UserAuthService userAuthService;
 
     @GetMapping("/friends")
+    @Operation(summary = "카카오 친구 랭킹 조회 API", description = "친구인 사용자 랭킹을 조회하는 API입니다.")
     public ResponseEntity<ApiResponse<RankingResponseDTO>> getFriendRankings(
-            @RequestParam List<String> authIds,
-            @RequestParam int page,
-            @RequestParam int size) {
+            @Parameter(description = "Kakao Id list") @RequestParam List<String> authIds,
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam int page,
+            @Parameter(description = "한 페이지당 데이터 수", example = "10") @RequestParam int size) {
 
         Long userId = userAuthService.getCurrentUserId();
 
@@ -32,9 +35,10 @@ public class RankingController {
     }
 
     @GetMapping("/global")
+    @Operation(summary = "전체 랭킹 조회 API", description = "전체 사용자 랭킹을 조회하는 API입니다.")
     public ResponseEntity<ApiResponse<RankingResponseDTO>> getGlobalRankings(
-            @RequestParam int page,
-            @RequestParam int size) {
+            @Parameter(description = "페이지 번호 (0부터 시작)", example = "0") @RequestParam int page,
+            @Parameter(description = "한 페이지당 데이터 수", example = "10") @RequestParam int size) {
 
         Long userId = userAuthService.getCurrentUserId();
 
