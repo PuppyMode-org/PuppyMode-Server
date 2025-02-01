@@ -1,6 +1,8 @@
 package umc.puppymode.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.PuppyItem;
 import umc.puppymode.domain.PuppyItemCategory;
@@ -14,4 +16,7 @@ public interface PuppyCustomizationRepository extends JpaRepository<PuppyCustomi
     Optional<PuppyCustomization> findByPuppyAndPuppyItem(Puppy puppy, PuppyItem item);
     Optional<PuppyCustomization> findByPuppyAndPuppyItemCategoryAndIsEquippedTrue(Puppy puppy, PuppyItemCategory puppyItemCategory);
     List<PuppyCustomization> findByPuppy(Puppy puppy);
+
+    @Query("SELECT p FROM PuppyCustomization p WHERE p.puppy.puppyId = :puppyId")
+    List<PuppyCustomization> findByPuppyId(@Param("puppyId")Long puppyId);
 }

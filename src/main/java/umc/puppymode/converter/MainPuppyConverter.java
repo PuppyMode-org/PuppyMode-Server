@@ -16,14 +16,10 @@ public class MainPuppyConverter {
     }
 
     public static MainPuppyResDTO.UserPuppyViewDTO toUserPuppyViewDTO(Puppy puppy) {
-        // 사용자 지정 강아지 이름이 null일 시 단계명으로 대체 (figma 정책 반영)
-        String puppyName = puppy.getPuppyName();
-        if (puppyName == null) {
-            puppyName = puppy.getPuppyLevel().getLevelName();
-        }
+
         return MainPuppyResDTO.UserPuppyViewDTO.builder()
                 .puppyId(puppy.getPuppyId())
-                .puppyName(puppyName)
+                .puppyName(puppy.getPuppyName())
                 .level(puppy.getPuppyLevel().getPuppyLevel())
                 .levelName(puppy.getPuppyLevel().getLevelName())
                 .imageUrl(puppy.getPuppyLevel().getLevelImageUrl())
@@ -43,9 +39,14 @@ public class MainPuppyConverter {
     }
 
     public static Puppy toPuppy(PuppyLevel puppyLevel, User user) {
+
+        // 초기 강아지 이름을 강아지 레벨 이름으로 대체 (figma 정책 반영)
+        String puppyName = puppyLevel.getLevelName();
+
         return Puppy.builder()
                 .user(user)
                 .puppyLevel(puppyLevel)
+                .puppyName(puppyName)
                 .puppyExp(0)
                 .build();
     }
