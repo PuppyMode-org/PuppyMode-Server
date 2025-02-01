@@ -57,14 +57,11 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
 
     @Override
     // 강아지의 이름을 수정
-    public String updatePuppyName(Long userId, Long puppyId, String newPuppyName) {
+    public String updatePuppyName(Long userId, String newPuppyName) {
 
         userRepository.findById(userId).orElseThrow(() -> new TempHandler(ErrorStatus.USER_NOT_FOUND));
-        Puppy puppy = puppyRepository.findById(puppyId).orElseThrow(() -> new TempHandler(ErrorStatus.PUPPY_NOT_FOUND));
-        // 강아지가 현재 사용자의 강아지가 아닌 경우 에러 발생
-        if (!userId.equals(puppy.getUser().getUserId())) {
-            throw new TempHandler(ErrorStatus.UNAUTHORIZED_PUPPY_ACCESS);
-        }
+        Puppy puppy = puppyRepository.findByUserId(userId).orElseThrow(() -> new TempHandler(ErrorStatus.NO_USERS_PUPPY));
+
         puppy.updatePuppyName(newPuppyName);
 
         return puppy.getPuppyName();
@@ -72,14 +69,11 @@ public class MainPuppyCommandServiceImpl implements MainPuppyCommandService {
 
     @Override
     // 강아지 놀아주기 실행
-    public MainPuppyResDTO.PlayResDTO platWithPuppy(Long userId, Long puppyId) {
+    public MainPuppyResDTO.PlayResDTO platWithPuppy(Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new TempHandler(ErrorStatus.USER_NOT_FOUND));
-        Puppy puppy = puppyRepository.findById(puppyId).orElseThrow(() -> new TempHandler(ErrorStatus.PUPPY_NOT_FOUND));
-        // 강아지가 현재 사용자의 강아지가 아닌 경우 에러 발생
-        if (!userId.equals(puppy.getUser().getUserId())) {
-            throw new TempHandler(ErrorStatus.UNAUTHORIZED_PUPPY_ACCESS);
-        }
+        Puppy puppy = puppyRepository.findByUserId(userId).orElseThrow(() -> new TempHandler(ErrorStatus.NO_USERS_PUPPY));
+
         // 사용자 포인트 10p 증가
         user.updatePoints(10);
         // 현재 레벨의 전체 경험치의 1% 만큼의 경험치 계산
