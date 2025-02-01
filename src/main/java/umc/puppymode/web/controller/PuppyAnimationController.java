@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.domain.enums.AnimationType;
 import umc.puppymode.service.PuppyService.PuppyAnimationService;
-import umc.puppymode.service.UserService.UserAuthService;
+import umc.puppymode.service.AuthService.UserAuthService;
 import umc.puppymode.web.dto.AnimationFramesResponseDTO;
 
 

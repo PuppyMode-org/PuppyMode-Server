@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.DrinkService.DrinkCommandService;
 import umc.puppymode.service.DrinkService.DrinkQueryService;
-import umc.puppymode.service.UserService.UserAuthService;
+import umc.puppymode.service.AuthService.UserAuthService;
 import umc.puppymode.web.dto.DrinkRequestDTO;
 import umc.puppymode.web.dto.DrinkResponseDTO.*;
 

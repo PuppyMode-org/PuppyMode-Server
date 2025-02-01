@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.CollectionService.CollectionQueryService;
-import umc.puppymode.service.UserService.UserAuthService;
+import umc.puppymode.service.AuthService.UserAuthService;
 import umc.puppymode.web.dto.CollectionDTO.CollectionResDTO;
 
 @RestController

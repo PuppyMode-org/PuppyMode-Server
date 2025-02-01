@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
-import umc.puppymode.service.UserService.UserAuthService;
+import umc.puppymode.service.AuthService.UserAuthService;
 import umc.puppymode.service.UserService.UserCommandService;
 import umc.puppymode.service.UserService.UserInfoService;
 import umc.puppymode.service.UserService.UserQueryService;

@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import umc.puppymode.service.PuppyService.PuppyItemService;
 import umc.puppymode.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import umc.puppymode.service.UserService.UserAuthService;
+import umc.puppymode.service.AuthService.UserAuthService;
 
 import java.util.Map;
 

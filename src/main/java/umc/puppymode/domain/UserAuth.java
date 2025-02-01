@@ -2,6 +2,7 @@ package umc.puppymode.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import umc.puppymode.domain.enums.AuthProvider;
 
 @Entity
 @Getter
@@ -19,7 +20,8 @@ public class UserAuth {
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "user_auth_provider_user"))
     private User user;
 
-    private String authProvider;
+    @Enumerated(EnumType.STRING)
+    private AuthProvider authProvider;
 
     private String authId;
 
