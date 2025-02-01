@@ -14,6 +14,9 @@ public interface UserAuthRepository extends JpaRepository<UserAuth, Long> {
 
     Optional<UserAuth> findByUser_EmailAndAuthProvider(String email, AuthProvider authProvider);
 
-    @Query("SELECT u.user FROM UserAuth u WHERE u.authProvider = :provider AND u.authId IN :authIds")
-    List<User> findUsersByAuthProviderAndAuthIdIn(@Param("provider") String provider, @Param("authIds") List<String> authIds);
+    @Query("SELECT u.authId FROM UserAuth u WHERE u.user.userId = :userId")
+    Optional<String> findAuthIdByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT u.user FROM UserAuth u WHERE u.authProvider = :authProvider AND u.authId IN :authIds")
+    List<User> findUsersByAuthProviderAndAuthIdIn(@Param("authProvider") AuthProvider authProvider, @Param("authIds") List<String> authIds);
 }

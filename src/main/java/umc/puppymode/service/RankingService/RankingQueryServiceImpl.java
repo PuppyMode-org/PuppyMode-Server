@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.User;
+import umc.puppymode.domain.enums.AuthProvider;
 import umc.puppymode.repository.PuppyRepository;
 import umc.puppymode.repository.UserAuthRepository;
 import umc.puppymode.web.dto.RankingDTO;
@@ -27,7 +28,9 @@ public class RankingQueryServiceImpl implements RankingQueryService {
      */
     @Override
     public RankingResponseDTO getFriendRankings(List<String> authIds, int page, int size, Long currentUserId) {
-        List<User> kakaoUsers = userAuthProviderRepository.findUsersByAuthProviderAndAuthIdIn("KAKAO", authIds);
+        String currentUserAuthId = userAuthProviderRepository.findAuthIdByUserId(currentUserId).orElse(null);
+        authIds.add(currentUserAuthId);
+        List<User> kakaoUsers = userAuthProviderRepository.findUsersByAuthProviderAndAuthIdIn(AuthProvider.KAKAO, authIds);
         List<Puppy> puppies = puppyRepository.findByUserIn(kakaoUsers);
 
         List<RankingDTO> rankings = calculateRankings(puppies);

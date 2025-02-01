@@ -31,10 +31,13 @@ public class KakaoAuthController {
                     "사용자 정보를 가져온 뒤, 서버에서 JWT를 발급받는 API입니다.  \n" +
                     "로그인 및 회원가입 처리를 포함합니다.  \n" +
                     "`FCMToken`을 함께 전송하여 푸시 알림을 위한 토큰을 저장합니다.")
-    public ResponseEntity<ApiResponse<LoginResponseDTO>> kakaoLogin(@RequestParam("accessToken") String accessToken) {
+    public ResponseEntity<ApiResponse<LoginResponseDTO>> kakaoLogin(
+            @RequestParam("accessToken") String accessToken,
+            @RequestParam(value = "FCMToken", required = false) String fcmToken) {
         try {
             UserAuthInfoDTO userInfo = kakaoAuthService.getUserInfo(accessToken);
             LoginResponseDTO loginResponse = userAuthService.createOrUpdateUser(userInfo, AuthProvider.KAKAO);
+            loginResponse = userAuthService.loginWithFcmToken(loginResponse, fcmToken);
 
             return ResponseEntity.ok(ApiResponse.onSuccess(loginResponse));
         } catch (IllegalArgumentException e) {
