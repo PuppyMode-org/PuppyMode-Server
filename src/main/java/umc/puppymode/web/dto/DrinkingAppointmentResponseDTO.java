@@ -1,5 +1,6 @@
 package umc.puppymode.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import umc.puppymode.domain.enums.AppointmentStatus;
 
@@ -55,6 +56,8 @@ public class DrinkingAppointmentResponseDTO {
     @Getter
     @AllArgsConstructor
     public static class CompletedResultDTO {
+
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul") // 소수점 이하 제거
         private LocalDateTime completedTime;
         private AppointmentStatus appointmentStatus;
     }
@@ -73,6 +76,7 @@ public class DrinkingAppointmentResponseDTO {
             return isDrinking;
         }
 
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul") // 소수점 이하 제거
         private LocalDateTime startTime;
     }
 
