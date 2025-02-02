@@ -12,7 +12,9 @@ import umc.puppymode.repository.*;
 import umc.puppymode.web.dto.DrinkRequestDTO.*;
 import umc.puppymode.web.dto.DrinkResponseDTO.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 @Service
@@ -28,6 +30,7 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
     private final FeedRepository feedRepository;
 
     @Override
+    @Transactional
     public DrinksRecordResponseDTO postDrinksRecord(Long userId, DrinkRecordDTO drinkRecordDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
@@ -36,9 +39,8 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         DrinkHistory drinkHistory = new DrinkHistory();
         drinkHistory.setUser(user);
         drinkHistory.setDrinkDate(drinkRecordDTO.getDrinkDate());
-        // 마신 양 계산해서 합(잔, 병 합치기 필요)
         drinkHistory.setDrinkAmount(drinkRecordDTO.getAlcoholTolerance().stream()
-                .map(AlcoholTolerance::getValue)
+                .map(tolerance -> convertToMl(tolerance.getDrinkItemId(), tolerance.getUnit(), tolerance.getValue()))
                 .reduce(0.0f, Float::sum));
         drinkHistoryRepository.save(drinkHistory);
 
@@ -57,6 +59,37 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
             item.setItem(drinkItem);
             item.setUnit(tolerance.getUnit());
             item.setValue(tolerance.getValue());
+            drinkHistoryItemRepository.save(item);
+        }
+
+        // 안전 주량 및 치사량 계산
+        List<DrinkHistoryItem> historyItems = drinkHistoryItemRepository.findByHistory_User_UserId(userId);
+        Map<Long, Float> safetyLevels = new HashMap<>();
+        Map<Long, Float> maxCapacities = new HashMap<>();
+
+        for (DrinkHistoryItem item : historyItems) {
+            Long drinkItemId = item.getItem().getItemId();
+            float amountMl = convertToMl(drinkItemId, item.getUnit(), item.getValue());
+            // 숙취를 처음 느낀 기록을 기준으로 안전 주량 설정
+            if (!drinkHistory.getHangovers().isEmpty()) {
+                safetyLevels.put(drinkItemId, Math.min(safetyLevels.getOrDefault(drinkItemId, Float.MAX_VALUE), amountMl));
+            }
+            // 가장 많이 마신 기록을 기준으로 치사량 설정
+            maxCapacities.put(drinkItemId, Math.max(maxCapacities.getOrDefault(drinkItemId, 0f), amountMl));
+        }
+
+        // 계산된 안전 주량과 치사량을 DrinkHistoryItem에 설정 후 저장
+        for (DrinkHistoryItem item : historyItems) {
+            Long drinkItemId = item.getItem().getItemId();
+
+            // 안전 주량과 치사량을 해당 항목에 설정
+            if (safetyLevels.containsKey(drinkItemId)) {
+                item.setSafetyValue(safetyLevels.get(drinkItemId));
+            }
+            if (maxCapacities.containsKey(drinkItemId)) {
+                item.setMaxValue(maxCapacities.get(drinkItemId));
+            }
+
             drinkHistoryItemRepository.save(item);
         }
 
@@ -92,6 +125,20 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         feedRepository.save(feed);
 
         return recordResponseDTO;
+    }
+    private float convertToMl(Long drinkItemId, String unit, float value) {
+        if (drinkItemId == 1) { // 소주
+            switch (unit) {
+                case "잔": return value * 50;
+                case "병": return value * 360;
+            }
+        } else if (drinkItemId == 2) { // 맥주
+            switch (unit) {
+                case "잔": return value * 300;
+                case "병": return value * 500;
+            }
+        }
+        return value;
     }
 
     @Override

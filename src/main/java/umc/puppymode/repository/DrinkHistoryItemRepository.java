@@ -15,5 +15,5 @@ public interface DrinkHistoryItemRepository extends JpaRepository<DrinkHistoryIt
     @Query("SELECT new umc.puppymode.web.dto.CalenderDTO.DrinkHistoryItemDTO(hi.item.itemName, hi.unit, hi.value, hi.safetyValue, hi.maxValue) " +
             "FROM DrinkHistoryItem hi WHERE hi.history.drinkHistoryId = :drinkHistoryId")
     List<DrinkHistoryItemDTO> findDrinkItemsByHistoryId(@Param("drinkHistoryId") Long drinkHistoryId);
-
+    List<DrinkHistoryItem> findByHistory_User_UserId(Long userId);
 }
