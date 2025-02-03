@@ -5,7 +5,7 @@ import umc.puppymode.web.dto.LoginResponseDTO;
 import umc.puppymode.web.dto.UserAuthInfoDTO;
 
 public interface UserAuthService {
-    LoginResponseDTO createOrUpdateUser(UserAuthInfoDTO userInfo, AuthProvider authProvider);
+    LoginResponseDTO createOrUpdateUser(UserAuthInfoDTO userInfo, AuthProvider authProvider, String refreshToken);
 
     Long getCurrentUserId();
 

@@ -36,7 +36,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Transactional
     @Override
-    public LoginResponseDTO createOrUpdateUser(UserAuthInfoDTO userInfo, AuthProvider authProvider) {
+    public LoginResponseDTO createOrUpdateUser(UserAuthInfoDTO userInfo, AuthProvider authProvider, String refreshToken) {
         AtomicBoolean isNewUser = new AtomicBoolean(false);
 
         String authId = userInfo.getUserAuthId();

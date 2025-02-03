@@ -37,7 +37,7 @@ public class KakaoAuthController {
             @RequestParam(value = "FCMToken", required = false) String fcmToken) {
         try {
             UserAuthInfoDTO userInfo = kakaoAuthService.getUserInfo(accessToken);
-            LoginResponseDTO loginResponse = userAuthService.createOrUpdateUser(userInfo, AuthProvider.KAKAO);
+            LoginResponseDTO loginResponse = userAuthService.createOrUpdateUser(userInfo, AuthProvider.KAKAO, refreshToken);
             loginResponse = userAuthService.loginWithFcmToken(loginResponse, fcmToken);
 
             return ResponseEntity.ok(ApiResponse.onSuccess(loginResponse));
