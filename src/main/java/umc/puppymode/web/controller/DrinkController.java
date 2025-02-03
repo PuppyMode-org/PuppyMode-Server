@@ -12,6 +12,7 @@ import umc.puppymode.web.dto.DrinkRequestDTO;
 import umc.puppymode.web.dto.DrinkResponseDTO.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,6 +57,13 @@ public class DrinkController {
     public ResponseEntity<ApiResponse<FeedResponseDTO>> postFeed() {
         Long userId = userAuthService.getCurrentUserId();
         FeedResponseDTO  responseDTO = drinkCommandService.postFeed(userId);
+        return ResponseEntity.ok(ApiResponse.onSuccess(responseDTO));
+    }
+
+    @GetMapping("capacity")
+    public ResponseEntity<ApiResponse<DrinkInfoResponseDTO>> getDrinkInfo(@RequestParam Long drinkItemId) {
+        Long userId = userAuthService.getCurrentUserId();
+        DrinkInfoResponseDTO responseDTO = drinkQueryService.getDrinkInfo(userId, drinkItemId);
         return ResponseEntity.ok(ApiResponse.onSuccess(responseDTO));
     }
 }

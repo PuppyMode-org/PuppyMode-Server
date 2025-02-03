@@ -73,4 +73,18 @@ public class DrinkResponseDTO {
         private String puppyLevelName;
         private Integer puppyPercent;
     }
+
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DrinkInfoResponseDTO {
+        private Long drinkItemId;
+        private String drinkItemName;
+        private String imageUrl;
+        private Float alcoholPercentage;
+        private Float safetyValue;
+        private Float maxValue;
+    }
 }

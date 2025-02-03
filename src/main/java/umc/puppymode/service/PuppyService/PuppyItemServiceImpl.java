@@ -166,12 +166,11 @@ public class PuppyItemServiceImpl implements PuppyItemService {
         PuppyCustomization customization = puppyCustomizationRepository.findByPuppyAndPuppyItem(puppy, item)
                 .orElseThrow(() -> new IllegalArgumentException("구매하지 않은 아이템입니다."));
 
-        // 같은 카테고리에서 현재 착용 중인 아이템 해제
-        PuppyCustomization currentEquippedItem = puppyCustomizationRepository.findByPuppyAndPuppyItemCategoryAndIsEquippedTrue(puppy, puppyItemCategory)
-                .orElse(null);
-        if (currentEquippedItem != null) {
-            currentEquippedItem.setIsEquipped(false);
-            puppyCustomizationRepository.save(currentEquippedItem);
+        // 착용 중인 아이템 해제
+        List<PuppyCustomization> equippedItems = puppyCustomizationRepository.findByPuppyAndIsEquippedTrue(puppy);
+        for (PuppyCustomization equippedItem : equippedItems) {
+            equippedItem.setIsEquipped(false);
+            puppyCustomizationRepository.save(equippedItem);
         }
 
         // 아이템 착용 처리
@@ -186,6 +185,10 @@ public class PuppyItemServiceImpl implements PuppyItemService {
                 itemId
         ).map(EquippedItemImage::getImageUrl)
                 .orElseThrow(() -> new IllegalArgumentException("착용 이미지가 존재하지 않습니다."));
+
+        // 착용한 이미지를 강아지의 이미지 필드에 업데이트
+        puppy.setImageUrl(equippedImage);
+        puppyRepository.save(puppy);
 
         return new EquippedItemInfoDTO(item.getItemId(), item.getItemName(), equippedImage);
     }
@@ -224,15 +227,12 @@ public class PuppyItemServiceImpl implements PuppyItemService {
             throw new IllegalArgumentException("이미 착용하지 않은 아이템입니다.");
         }
 
-        // 아이템 착용 이미지
-        String equippedImage = equippedItemImageRepository.findByPuppyTypeAndLevelNameAndItemId(
-                        puppy.getPuppyLevel().getPuppyType(),
-                        puppy.getPuppyLevel().getLevelName(),
-                        itemId
-                ).map(EquippedItemImage::getImageUrl)
-                .orElseThrow(() -> new IllegalArgumentException("착용 이미지가 존재하지 않습니다."));
+        // 아이템 착용 해제 이미지
+        String unEquippedImage = puppy.getPuppyLevel().getLevelImageUrl();
+        puppy.setImageUrl(unEquippedImage);
+        puppyRepository.save(puppy);
 
-        return new EquippedItemInfoDTO(item.getItemId(), item.getItemName(), equippedImage);
+        return new EquippedItemInfoDTO(item.getItemId(), item.getItemName(), unEquippedImage);
     }
 
     @Override

@@ -8,4 +8,5 @@ public interface DrinkQueryService {
    List<HangoverResponseDTO> getAllHangovers();
    List<CategoryResponseDTO> getAllDrinkCategories();
    DrinkItemsByCategoryResponseDTO getAllDrinkItemsByCategory(Long categoryId);
+   DrinkInfoResponseDTO getDrinkInfo(Long userId, Long drinkItemId);
 }

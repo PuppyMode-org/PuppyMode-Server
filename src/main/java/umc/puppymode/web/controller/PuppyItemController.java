@@ -60,7 +60,7 @@ public class PuppyItemController {
         );
     }
 
-    @Operation(summary = "아이템 착용 API", description = "강아지에게 아이템을 착용시키는 API(이미지는 강아지 상태에 따른 아이템 단일 이미지로, 레이어드 할 투명 배경 이미지입니다)")
+    @Operation(summary = "아이템 착용 API", description = "강아지에게 아이템을 착용시키는 API(중복 착용 불가)")
     @PostMapping("/{categoryId}/items/{itemId}/equip")
     public ApiResponse<EquippedItemInfoDTO> equipItem(@PathVariable Long categoryId,
                                                       @PathVariable Long itemId) {
