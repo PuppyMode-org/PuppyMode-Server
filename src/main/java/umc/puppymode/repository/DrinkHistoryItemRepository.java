@@ -16,4 +16,5 @@ public interface DrinkHistoryItemRepository extends JpaRepository<DrinkHistoryIt
             "FROM DrinkHistoryItem hi WHERE hi.history.drinkHistoryId = :drinkHistoryId")
     List<DrinkHistoryItemDTO> findDrinkItemsByHistoryId(@Param("drinkHistoryId") Long drinkHistoryId);
     List<DrinkHistoryItem> findByHistory_User_UserId(Long userId);
+    List<DrinkHistoryItem> findByHistory_User_UserIdAndItem_ItemId(Long userId, Long drinkItemId);
 }

@@ -71,7 +71,7 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
             Long drinkItemId = item.getItem().getItemId();
             float amountMl = convertToMl(drinkItemId, item.getUnit(), item.getValue());
             // 숙취를 처음 느낀 기록을 기준으로 안전 주량 설정
-            if (!drinkHistory.getHangovers().isEmpty()) {
+            if (drinkHistory.getHangovers() != null && !drinkHistory.getHangovers().isEmpty()) {
                 safetyLevels.put(drinkItemId, Math.min(safetyLevels.getOrDefault(drinkItemId, Float.MAX_VALUE), amountMl));
             }
             // 가장 많이 마신 기록을 기준으로 치사량 설정
