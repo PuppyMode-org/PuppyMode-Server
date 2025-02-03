@@ -1,5 +1,6 @@
 package umc.puppymode.web.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,8 @@ public class RankingController {
     private final RankingQueryService rankingQueryService;
     private final UserAuthService userAuthService;
 
-    @GetMapping("/friends")
+    @Hidden
+//    @GetMapping("/friends")
     @Operation(summary = "카카오 친구 랭킹 조회 API", description = "친구인 사용자 랭킹을 조회하는 API입니다.")
     public ResponseEntity<ApiResponse<RankingResponseDTO>> getFriendRankings(
             @Parameter(description = "Kakao 친구 Id 목록 (개별 입력)", example = "authIds=123456&authIds=654321")

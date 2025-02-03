@@ -17,6 +17,7 @@ public class RankingDTO {
     private String puppyName;
     private int level;
     private String levelName;
+    private String imageUrl;
 
     @JsonIgnore
     private Long userId;
@@ -28,6 +29,7 @@ public class RankingDTO {
                 puppy.getPuppyName(),
                 puppy.getPuppyLevel().getPuppyLevel(),
                 puppy.getPuppyLevel().getLevelName(),
+                puppy.getImageUrl(),
                 puppy.getUser().getUserId()
         );
     }
