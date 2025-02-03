@@ -14,7 +14,7 @@ import umc.puppymode.service.DrinkingAppointmentService.DrinkingAppointmentComme
 import umc.puppymode.service.DrinkingAppointmentService.DrinkingAppointmentQueryService;
 import umc.puppymode.service.LocationService.LocationService;
 import umc.puppymode.service.MainPuppyService.MainPuppyQueryService;
-import umc.puppymode.service.UserService.UserAuthService;
+import umc.puppymode.service.AuthService.UserAuthService;
 import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
 import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
 import umc.puppymode.web.dto.MainPuppyDTO.MainPuppyResDTO;

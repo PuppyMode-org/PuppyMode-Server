@@ -1,4 +1,4 @@
-package umc.puppymode.service.UserService;
+package umc.puppymode.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -12,11 +12,14 @@ import umc.puppymode.config.security.JwtTokenProvider;
 import umc.puppymode.config.security.UserAuthentication;
 import umc.puppymode.domain.Token;
 import umc.puppymode.domain.User;
+import umc.puppymode.domain.UserAuth;
+import umc.puppymode.domain.enums.AuthProvider;
 import umc.puppymode.domain.enums.TokenType;
 import umc.puppymode.repository.TokenRepository;
+import umc.puppymode.repository.UserAuthRepository;
 import umc.puppymode.repository.UserRepository;
-import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
+import umc.puppymode.web.dto.UserAuthInfoDTO;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,13 +32,24 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenRepository tokenRepository;
+    private final UserAuthRepository userAuthRepository;
 
     @Transactional
     @Override
-    public LoginResponseDTO createOrUpdateUser(KakaoUserInfoResponseDTO userInfo) {
+    public LoginResponseDTO createOrUpdateUser(UserAuthInfoDTO userInfo, AuthProvider authProvider, String refreshToken) {
         AtomicBoolean isNewUser = new AtomicBoolean(false);
 
-        Optional<User> optionalUser = userRepository.findByEmail(userInfo.getKakaoAccount().getEmail());
+        String authId = userInfo.getUserAuthId();
+        String email = userInfo.getEmail();
+
+        Optional<UserAuth> optionalUserAuth = userAuthRepository.findByUser_EmailAndAuthProvider(email, authProvider);
+
+        if (optionalUserAuth.isPresent()) {
+            User existingUser = optionalUserAuth.get().getUser();
+            return generateLoginResponse(existingUser, false);
+        }
+
+        Optional<User> optionalUser = userRepository.findByEmail(email);
 
         User user = optionalUser.map(existingUser -> {
             if (existingUser.getIsDeleted()) {
@@ -48,8 +62,8 @@ public class UserAuthServiceImpl implements UserAuthService {
             // 새 사용자 생성
             isNewUser.set(true);
             User newUser = User.builder()
-                    .email(userInfo.getKakaoAccount().getEmail())
-                    .username(userInfo.getKakaoAccount().getProfile().getNickName())
+                    .email(email)
+                    .username(userInfo.getUsername())
                     .points(0)
                     .receiveNotifications(false)
                     .isDeleted(false)
@@ -57,17 +71,29 @@ public class UserAuthServiceImpl implements UserAuthService {
             return userRepository.save(newUser);
         });
 
-        // 현재 사용자 인증 객체 생성
-        Authentication authentication = new UserAuthentication(user.getUserId().toString(), null, null);
+        UserAuth userAuth = UserAuth.builder()
+                .user(user)
+                .authProvider(authProvider)
+                .authId(authId)
+                .build();
+        userAuthRepository.save(userAuth);
 
-        // JWT 토큰 생성
+        return generateLoginResponse(user, isNewUser.get());
+    }
+
+    /**
+     * JWT 발급 및 응답 생성
+     */
+    private LoginResponseDTO generateLoginResponse(User user, boolean isNewUser) {
+        // 인증 객체 생성
+        Authentication authentication = new UserAuthentication(user.getUserId().toString(), null, null);
         String token = jwtTokenProvider.generateToken(authentication);
 
         LoginResponseDTO.LoginUserInfo loginUserInfo = LoginResponseDTO.LoginUserInfo.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
                 .email(user.getEmail())
-                .isNewUser(isNewUser.get())
+                .isNewUser(isNewUser)
                 .build();
 
         return LoginResponseDTO.builder()

@@ -2,12 +2,11 @@ package umc.puppymode.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.service.MainPuppyService.MainPuppyCommandService;
 import umc.puppymode.service.MainPuppyService.MainPuppyQueryService;
-import umc.puppymode.service.UserService.UserAuthService;
+import umc.puppymode.service.AuthService.UserAuthService;
 import umc.puppymode.web.dto.MainPuppyDTO.MainPuppyResDTO;
 
 @RestController
