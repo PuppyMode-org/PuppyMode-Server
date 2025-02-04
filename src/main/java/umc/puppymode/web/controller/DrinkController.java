@@ -61,6 +61,10 @@ public class DrinkController {
     }
 
     @GetMapping("capacity")
+    @Operation(summary = "내 주량 정보 조회 API", description = "주종에 따라 유저의 주량 정보를 조회하는 API입니다. \n" +
+            "max_value 및 safety_value는 ml 기준으로 저장되어 있습니다. 각각 병, 잔으로 변환이 필요합니다.\n\n" +
+            "1잔당 소주-50ml, 맥주-300ml \n" +
+            "1병당 소주-360ml, 맥주-500ml")
     public ResponseEntity<ApiResponse<DrinkInfoResponseDTO>> getDrinkInfo(@RequestParam Long drinkItemId) {
         Long userId = userAuthService.getCurrentUserId();
         DrinkInfoResponseDTO responseDTO = drinkQueryService.getDrinkInfo(userId, drinkItemId);
