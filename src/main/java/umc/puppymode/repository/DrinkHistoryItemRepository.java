@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import umc.puppymode.domain.DrinkHistory;
 import umc.puppymode.domain.DrinkHistoryItem;
 import umc.puppymode.web.dto.CalenderDTO.CalenderResponseDTO;
 import umc.puppymode.web.dto.CalenderDTO.DrinkHistoryItemDTO;
@@ -17,4 +18,5 @@ public interface DrinkHistoryItemRepository extends JpaRepository<DrinkHistoryIt
     List<DrinkHistoryItemDTO> findDrinkItemsByHistoryId(@Param("drinkHistoryId") Long drinkHistoryId);
     List<DrinkHistoryItem> findByHistory_User_UserId(Long userId);
     List<DrinkHistoryItem> findByHistory_User_UserIdAndItem_ItemId(Long userId, Long drinkItemId);
+    List<DrinkHistoryItem> findByHistory_DrinkHistoryId(Long drinkHistoryId);
 }
