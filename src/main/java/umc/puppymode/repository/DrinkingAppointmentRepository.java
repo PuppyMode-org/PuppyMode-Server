@@ -11,7 +11,9 @@ import umc.puppymode.domain.User;
 import umc.puppymode.domain.enums.AppointmentStatus;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface DrinkingAppointmentRepository extends JpaRepository<DrinkingAppointment, Long> {
@@ -31,4 +33,9 @@ public interface DrinkingAppointmentRepository extends JpaRepository<DrinkingApp
 
     // 특정 사용자의 모든 약속 조회
     Page<DrinkingAppointment> findByUser_UserId(Long userId, Pageable pageable);
+
+    @Query("SELECT da FROM DrinkingAppointment da " +
+            "WHERE da.user.userId = :userId " +
+            "AND FUNCTION('DATE_FORMAT', da.dateTime, '%Y-%m') = :month")
+    List<DrinkingAppointment> findAppointmentsByUserAndMonth(@Param("userId") Long userId, @Param("month") String month);
 }

@@ -11,12 +11,11 @@ import java.util.List;
 
 @Repository
 public interface DrinkHistoryRepository extends JpaRepository<DrinkHistory, Long> {
-    @Query("SELECT new umc.puppymode.web.dto.CalenderDTO.CalenderListResponseDTO(dh.drinkHistoryId, dh.drinkDate) " +
-            "FROM DrinkHistory dh " +
+    @Query("SELECT dh FROM DrinkHistory dh " +
+            "LEFT JOIN FETCH dh.hangovers " +
             "WHERE dh.user.userId = :userId " +
             "AND FUNCTION('DATE_FORMAT', dh.drinkDate, '%Y-%m') = :month")
-    List<CalenderListResponseDTO> findDrinkDatesByUserAndMonth(@Param("userId") Long userId, @Param("month") String month);
-
+    List<DrinkHistory> findDrinkHistoriesByUserAndMonth(@Param("userId") Long userId, @Param("month") String month);
     @Query("SELECT dh FROM DrinkHistory dh " +
             "LEFT JOIN FETCH dh.hangovers " +
             "LEFT JOIN FETCH dh.feed " +
