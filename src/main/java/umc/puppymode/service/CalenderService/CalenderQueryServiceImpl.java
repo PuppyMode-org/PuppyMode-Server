@@ -3,6 +3,8 @@ package umc.puppymode.service.CalenderService;
 import org.springframework.stereotype.Service;
 import umc.puppymode.domain.DrinkHistory;
 import umc.puppymode.domain.DrinkHistoryItem;
+import umc.puppymode.domain.DrinkingAppointment;
+import umc.puppymode.domain.enums.AppointmentStatus;
 import umc.puppymode.repository.DrinkHistoryItemRepository;
 import umc.puppymode.repository.DrinkHistoryRepository;
 import umc.puppymode.repository.DrinkingAppointmentRepository;
@@ -12,9 +14,11 @@ import umc.puppymode.web.dto.CalenderDTO.CalenderResponseDTO.*;
 import umc.puppymode.web.dto.CalenderDTO.DrinkHistoryItemDTO;
 import umc.puppymode.web.dto.CalenderDTO.FeedDTO;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,7 +42,7 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
     @Override
     public List<CalenderListResponseDTO> getCalender(Long userId, String month) {
         List<DrinkHistory> drinkHistories = drinkHistoryRepository.findDrinkHistoriesByUserAndMonth(userId, month);
-        List<LocalDateTime> appointments = drinkingAppointmentRepository.findAppointmentsByUserAndMonth(userId, month);
+        List<DrinkingAppointment> appointments = drinkingAppointmentRepository.findAppointmentsByUserAndMonth(userId, month);
 
         Map<LocalDate, CalenderListResponseDTO> drinkStatusMap = new HashMap<>();
 
@@ -67,27 +71,51 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
 
             LocalDate date = history.getDrinkDate();
 
+            // 술 약속에 대해 시간 계산 추가
+            Optional<DrinkingAppointment> appointment = appointments.stream()
+                    .filter(app -> app.getDateTime().toLocalDate().equals(date))
+                    .findFirst();
+
+            String appointmentTime = null;
+            Long appointmentId = null;
+            if (appointment.isPresent() && appointment.get().getStatus() == AppointmentStatus.COMPLETED) {
+                appointmentTime = calculateAppointmentTime(appointment.get());
+                appointmentId = appointment.get().getAppointmentId();
+            }
+
             // 음주 기록에 대한 정보 업데이트
             CalenderListResponseDTO responseDTO = CalenderListResponseDTO.builder()
-                    .drinkHistoryId(history.getDrinkHistoryId())
                     .drinkDate(date)
                     .status(status)
+                    .drinkHistoryId(history.getDrinkHistoryId())
                     .historyStatus(historyStatus)
+                    .appointmentId(appointmentId)
+                    .appointmentTime(appointmentTime)
                     .build();
 
             drinkStatusMap.put(date, responseDTO);
         }
 
         // 술 약속만 있는 경우 처리
-        for (LocalDateTime appointment : appointments) {
-            LocalDate date = appointment.toLocalDate();
+        for (DrinkingAppointment appointment : appointments) {
+            LocalDate date = appointment.getDateTime().toLocalDate();
 
             // 술 약속이 있는 경우 상태 업데이트
             drinkStatusMap.putIfAbsent(date, CalenderListResponseDTO.builder()
                     .drinkDate(date)
                     .status("건강 포기한 날")
-                    .historyStatus("술 약속 있음")
                     .build());
+
+            // 술 약속에 대해 시간 계산 추가
+            if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
+                String appointmentTime = calculateAppointmentTime(appointment);
+                Long appointmentId = appointment.getAppointmentId();
+                CalenderListResponseDTO existingDTO = drinkStatusMap.get(date);
+                if (existingDTO != null) {
+                    existingDTO.setAppointmentTime(appointmentTime);
+                    existingDTO.setAppointmentId(appointmentId);
+                }
+            }
         }
 
         // 음주 기록과 술 약속 모두 없는 경우 처리
@@ -102,13 +130,30 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
             }
         }
 
-//        return new ArrayList<>(drinkStatusMap.values());
-
         // 날짜 기준 오름차순 정렬
         return drinkStatusMap.entrySet().stream()
                 .sorted(Map.Entry.<LocalDate, CalenderListResponseDTO>comparingByKey())  // 날짜 오름차순 정렬
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
+    }
+
+    // appointmentTime 계산 로직
+    private String calculateAppointmentTime(DrinkingAppointment appointment) {
+        LocalDateTime startTime = appointment.getDrinkingStartTime();
+        LocalDateTime endTime = appointment.getUpdatedAt();
+
+        if (startTime != null && endTime != null) {
+            Duration duration = Duration.between(startTime, endTime);
+            long hours = duration.toHours();
+            long minutes = duration.toMinutes() % 60;
+
+            // 시작 시간과 종료 시간을 HH:mm 형태로 포맷팅
+            String startFormatted = String.format("%02d:%02d", startTime.getHour(), startTime.getMinute());
+            String endFormatted = String.format("%02d:%02d", endTime.getHour(), endTime.getMinute());
+
+            return String.format("%s ~ %s (%dh %dm)", startFormatted, endFormatted, hours, minutes);
+        }
+        return "술 약속 시간 미정";
     }
 
     @Override
