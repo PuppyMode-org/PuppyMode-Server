@@ -1,18 +1,18 @@
-package umc.puppymode.web.dto.CalenderDTO;
+package umc.puppymode.web.dto.CalendarDTO;
 
 import lombok.*;
 
 import java.util.List;
 
 
-public class CalenderResponseDTO {
+public class CalendarResponseDTO {
 
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class CalenderDetailDTO {
+    public static class CalendarDetailDTO {
         private Long drinkHistoryId;
         private String drinkDate;
         private Float drinkAmount;

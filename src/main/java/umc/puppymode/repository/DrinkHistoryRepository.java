@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import umc.puppymode.domain.DrinkHistory;
-import umc.puppymode.web.dto.CalenderDTO.CalenderListResponseDTO;
+import umc.puppymode.web.dto.CalendarDTO.CalendarListResponseDTO;
 
 import java.util.List;
 
