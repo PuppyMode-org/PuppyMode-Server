@@ -1,4 +1,4 @@
-package umc.puppymode.service.CalenderService;
+package umc.puppymode.service.CalendarService;
 
 import org.springframework.stereotype.Service;
 import umc.puppymode.domain.DrinkHistory;
@@ -9,27 +9,26 @@ import umc.puppymode.repository.DrinkHistoryItemRepository;
 import umc.puppymode.repository.DrinkHistoryRepository;
 import umc.puppymode.repository.DrinkingAppointmentRepository;
 import umc.puppymode.repository.FeedRepository;
-import umc.puppymode.web.dto.CalenderDTO.CalenderListResponseDTO;
-import umc.puppymode.web.dto.CalenderDTO.CalenderResponseDTO.*;
-import umc.puppymode.web.dto.CalenderDTO.DrinkHistoryItemDTO;
-import umc.puppymode.web.dto.CalenderDTO.FeedDTO;
+import umc.puppymode.web.dto.CalendarDTO.CalendarListResponseDTO;
+import umc.puppymode.web.dto.CalendarDTO.CalendarResponseDTO.*;
+import umc.puppymode.web.dto.CalendarDTO.DrinkHistoryItemDTO;
+import umc.puppymode.web.dto.CalendarDTO.FeedDTO;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CalenderQueryServiceImpl implements CalenderQueryService{
+public class CalendarQueryServiceImpl implements CalendarQueryService{
     private final DrinkHistoryRepository drinkHistoryRepository;
     private final DrinkHistoryItemRepository drinkHistoryItemRepository;
     private final FeedRepository feedRepository;
     private final DrinkingAppointmentRepository drinkingAppointmentRepository;
 
-    public CalenderQueryServiceImpl(DrinkHistoryRepository drinkHistoryRepository,
+    public CalendarQueryServiceImpl(DrinkHistoryRepository drinkHistoryRepository,
                                     DrinkHistoryItemRepository drinkHistoryItemRepository,
                                     FeedRepository feedRepository, DrinkingAppointmentRepository drinkingAppointmentRepository) {
         this.drinkHistoryRepository = drinkHistoryRepository;
@@ -40,11 +39,11 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
 
 
     @Override
-    public List<CalenderListResponseDTO> getCalender(Long userId, String month) {
+    public List<CalendarListResponseDTO> getCalendar(Long userId, String month) {
         List<DrinkHistory> drinkHistories = drinkHistoryRepository.findDrinkHistoriesByUserAndMonth(userId, month);
         List<DrinkingAppointment> appointments = drinkingAppointmentRepository.findAppointmentsByUserAndMonth(userId, month);
 
-        Map<LocalDate, CalenderListResponseDTO> drinkStatusMap = new HashMap<>();
+        Map<LocalDate, CalendarListResponseDTO> drinkStatusMap = new HashMap<>();
 
         // 음주 기록이 있는 경우
         for (DrinkHistory history : drinkHistories) {
@@ -84,7 +83,7 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
             }
 
             // 음주 기록에 대한 정보 업데이트
-            CalenderListResponseDTO responseDTO = CalenderListResponseDTO.builder()
+            CalendarListResponseDTO responseDTO = CalendarListResponseDTO.builder()
                     .drinkDate(date)
                     .status(status)
                     .drinkHistoryId(history.getDrinkHistoryId())
@@ -101,7 +100,7 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
             LocalDate date = appointment.getDateTime().toLocalDate();
 
             // 술 약속이 있는 경우 상태 업데이트
-            drinkStatusMap.putIfAbsent(date, CalenderListResponseDTO.builder()
+            drinkStatusMap.putIfAbsent(date, CalendarListResponseDTO.builder()
                     .drinkDate(date)
                     .status("건강 포기한 날")
                     .build());
@@ -110,7 +109,7 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
             if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
                 String appointmentTime = calculateAppointmentTime(appointment);
                 Long appointmentId = appointment.getAppointmentId();
-                CalenderListResponseDTO existingDTO = drinkStatusMap.get(date);
+                CalendarListResponseDTO existingDTO = drinkStatusMap.get(date);
                 if (existingDTO != null) {
                     existingDTO.setAppointmentTime(appointmentTime);
                     existingDTO.setAppointmentId(appointmentId);
@@ -123,7 +122,7 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
             LocalDate date = LocalDate.of(Integer.parseInt(month.split("-")[0]), Integer.parseInt(month.split("-")[1]), day);
 
             if (!drinkStatusMap.containsKey(date)) {
-                drinkStatusMap.put(date, CalenderListResponseDTO.builder()
+                drinkStatusMap.put(date, CalendarListResponseDTO.builder()
                         .drinkDate(date)
                         .status("건강 챙긴 날")
                         .build());
@@ -132,7 +131,7 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
 
         // 날짜 기준 오름차순 정렬
         return drinkStatusMap.entrySet().stream()
-                .sorted(Map.Entry.<LocalDate, CalenderListResponseDTO>comparingByKey())  // 날짜 오름차순 정렬
+                .sorted(Map.Entry.<LocalDate, CalendarListResponseDTO>comparingByKey())  // 날짜 오름차순 정렬
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
     }
@@ -157,7 +156,7 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
     }
 
     @Override
-    public List<CalenderDetailDTO> getCalenderDetail(Long userId, Long drinkHistoryId) {
+    public List<CalendarDetailDTO> getCalendarDetail(Long userId, Long drinkHistoryId) {
         DrinkHistory drinkHistory = drinkHistoryRepository.findDrinkHistoryDetail(userId, drinkHistoryId);
         if (drinkHistory == null) {
             throw new IllegalArgumentException("해당 기록을 찾을 수 없습니다.");
@@ -167,7 +166,7 @@ public class CalenderQueryServiceImpl implements CalenderQueryService{
         FeedDTO feed = feedRepository.findFeedByHistoryId(drinkHistoryId);
 
         return List.of(
-                CalenderDetailDTO.builder()
+                CalendarDetailDTO.builder()
                         .drinkHistoryId(drinkHistory.getDrinkHistoryId())
                         .drinkDate(drinkHistory.getDrinkDate().toString())
                         .drinkAmount(drinkHistory.getDrinkAmount())

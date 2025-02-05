@@ -1,4 +1,4 @@
-package umc.puppymode.web.dto.CalenderDTO;
+package umc.puppymode.web.dto.CalendarDTO;
 
 import lombok.*;
 
