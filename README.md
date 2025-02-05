@@ -25,6 +25,7 @@
 ### 2. 주량 정보 확인 시스템
 - 사용자가 기록한 음주 데이터를 기반으로 주종별 적정 주량을 확인할 수 있습니다.
 <div style="display: flex; justify-content: space-between;">
+  <img src="https://github.com/user-attachments/assets/55a010cb-e83e-4527-a487-8b581dfa40f1" width="150" />
   <img src="https://github.com/user-attachments/assets/a844ecc5-9bc6-4bce-9287-c29f2e86a91d" width="150" />
   <img src="https://github.com/user-attachments/assets/d1b8c773-2192-4b70-ae31-6ad98bd6c898" width="150" />
   <img src="https://github.com/user-attachments/assets/8ceb4347-9fc8-4324-8432-bd24e95a1acb" width="150" />
@@ -34,8 +35,9 @@
 - 사용자가 설정한 술 약속을 통해 음주 기록을 관리하고 추적할 수 있습니다.
 <div style="display: flex; justify-content: space-between;">
   <img src="https://github.com/user-attachments/assets/06c312ae-9974-4086-8c51-bc2e6c14c4f4" width="150" />
-  <img src="https://github.com/user-attachments/assets/313768da-76d7-40ab-98e6-1048938213a3" width="150" />
-  <img src="https://github.com/user-attachments/assets/da17e265-70ff-4653-b1fa-ff0059f7367c" width="150" />
+  <img src="https://github.com/user-attachments/assets/5c44c083-6e21-4529-878d-65d08cfb7077" width="150" />
+  <img src="https://github.com/user-attachments/assets/ad2e60b6-c8a9-43fc-a453-1b8a90f97703" width="150" />
+  <img src="https://github.com/user-attachments/assets/607c3d3d-986b-4a29-837f-7c8bbb57ce9c" width="150" />
 </div>
 
 <br>
