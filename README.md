@@ -1,4 +1,4 @@
-# ![강아지 모드](https://github.com/user-attachments/assets/5def9f3c-2c33-4930-a7f9-eae60d071879)
+# ![강아지 모드](https://github.com/user-attachments/assets/dde53587-3d57-48aa-a6d4-91eb3d1610ce)
 > 강아지를 키워보세요.   
 > 강아지는 여러분의 음주를 함께하며 성장해 나갈 거예요.  
 > 강아지와 함께한 시간들이 쌓이면 여러분의 주량까지 알려준답니다.  
