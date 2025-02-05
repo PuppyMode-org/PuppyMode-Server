@@ -52,6 +52,6 @@
 ## Contributors
 
 | [이서진](https://github.com/SeoJin-L-ee) | [이진경](https://github.com/alschlee) | [이하늘](https://github.com/twosky0202) | [윤윤지](https://github.com/Yunji-Yun) | [윤혜정](https://github.com/hjyoon99) | [한지수](https://github.com/eldeoddt) |
-|:-------------------------------------------------:|:-----------------------------------------------:|:-------------------------------------------------:|:-------------------------------------------------:|:-------------------------------------------------:|:-------------------------------------------------:|
-| ![이서진](https://avatars.githubusercontent.com/SeoJin-L-ee) | ![이진경](https://avatars.githubusercontent.com/alschlee) | ![이하늘](https://avatars.githubusercontent.com/twosky0202) | ![윤윤지](https://avatars.githubusercontent.com/Yunji-Yun) | ![윤혜정](https://avatars.githubusercontent.com/hjyoon99) | ![한지수](https://avatars.githubusercontent.com/eldeoddt) |
+| --- | --- | --- | --- | --- | --- |
+| <center> <img width="120px" src="https://avatars.githubusercontent.com/SeoJin-L-ee" /></center> | <center> <img width="120px" src="https://avatars.githubusercontent.com/alschlee" /></center> | <center> <img width="120px" src="https://avatars.githubusercontent.com/twosky0202" /></center> | <center> <img width="120px" src="https://avatars.githubusercontent.com/Yunji-Yun" /></center> | <center> <img width="120px" src="https://avatars.githubusercontent.com/hjyoon99" /></center> | <center> <img width="120px" src="https://avatars.githubusercontent.com/eldeoddt" /></center> |
 | **CI/CD**<br>- 강아지 정보<br>- 컬렉션 | `Part Lead`<br>**Project Structure**<br>- FCM 알림<br>- 설정 | **API Docs**<br>- 음주 기록<br>- 캘린더 | **DB**<br>- 강아지 커스텀<br>- 애니메이션 | **DB**<br>- 음주 상태<br>- 술 약속 | **API Docs**<br>- 소셜 로그인<br>- 유저<br>- 랭킹 |
