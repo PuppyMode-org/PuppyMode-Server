@@ -9,8 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import umc.puppymode.domain.enums.AuthProvider;
+import umc.puppymode.web.dto.KakaoFriendsResponseDTO;
 import umc.puppymode.web.dto.KakaoUserInfoResponseDTO;
 import umc.puppymode.web.dto.UserAuthInfoDTO;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -52,6 +56,39 @@ public class KakaoAuthService {
                 .username(userInfo.getKakaoAccount().getProfile().getNickName())
                 .authProvider(AuthProvider.KAKAO)
                 .build();
+    }
+
+    /**
+     * 카카오 친구 목록을 가져옵니다.
+     *
+     * @param accessToken
+     * @return 친구들의 authId 목록
+     */
+    public List<String> getFriendsList(String accessToken) {
+
+        KakaoFriendsResponseDTO friendsResponse = WebClient.create(KAUTH_USER_URL_HOST)
+                .get()
+                .uri("/v1/api/talk/friends")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
+                .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse ->
+                        Mono.error(new RuntimeException("카카오 친구 목록을 가져오는 요청이 잘못되었습니다.")))
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse ->
+                        Mono.error(new RuntimeException("카카오 서버 오류")))
+                .bodyToMono(KakaoFriendsResponseDTO.class)
+                .block();
+
+        log.info("[ Kakao Service ] 친구 목록 응답: {}", friendsResponse); //Todo: comment
+
+        if (friendsResponse == null || friendsResponse.getElements() == null) {
+            throw new IllegalArgumentException("카카오 친구 목록을 가져올 수 없습니다.");
+        }
+
+        return friendsResponse.getElements().stream()
+                .map(KakaoFriendsResponseDTO.Friend::getId)
+                .map(String::valueOf)
+                .collect(Collectors.toList());
     }
 
     /**

@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             final String token = getJwtFromRequest(request);
-            log.info("Extracted JWT: {}", token);
+//            log.info("Extracted JWT: {}", token);
             if (jwtTokenProvider.validateToken(token) == VALID_JWT) {
                 Long userId = jwtTokenProvider.getUserFromJwt(token);
                 // authentication 객체 생성 -> principal에 유저정보를 담는다.
@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception exception) {
-            log.error("JWT processing error: {}", exception.getMessage());
+//            log.error("JWT processing error: {}", exception.getMessage());
             try {
                 throw new Exception();
             } catch (Exception e) {
@@ -50,11 +50,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        log.info("Authorization Header: {}", bearerToken);
+//        log.info("Authorization Header: {}", bearerToken);
 
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             String token = bearerToken.substring("Bearer ".length());
-            log.info("Extracted JWT from request: {}", token);
+//            log.info("Extracted JWT from request: {}", token);
             return token;
         }
 
