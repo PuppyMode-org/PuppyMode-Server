@@ -55,7 +55,7 @@ public class UserAuthServiceImpl implements UserAuthService {
             user = userAuth.getUser();
 
             // Refresh Token 갱신 필요 확인
-            if (refreshToken != null && !refreshToken.equals(userAuth.getRefreshToken())) {
+            if (refreshToken != null && (userAuth.getRefreshToken() == null || !refreshToken.equals(userAuth.getRefreshToken()))) {
                 log.info("Refresh Token 갱신됨.");
                 userAuth.setRefreshToken(refreshToken);
                 userAuthRepository.save(userAuth);
