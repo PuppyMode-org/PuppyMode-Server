@@ -1,6 +1,7 @@
 package umc.puppymode.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import umc.puppymode.web.dto.UserAuthInfoDTO;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -44,14 +46,27 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         Optional<UserAuth> optionalUserAuth = userAuthRepository.findByUser_EmailAndAuthProvider(email, authProvider);
 
+        UserAuth userAuth;
+        User user;
+
         if (optionalUserAuth.isPresent()) {
-            User existingUser = optionalUserAuth.get().getUser();
-            return generateLoginResponse(existingUser, false);
+            // 기존 회원일 경우
+            userAuth = optionalUserAuth.get();
+            user = userAuth.getUser();
+
+            // Refresh Token 갱신 필요 확인
+            if (refreshToken != null && !refreshToken.equals(userAuth.getRefreshToken())) {
+                log.info("Refresh Token 갱신됨.");
+                userAuth.setRefreshToken(refreshToken);
+                userAuthRepository.save(userAuth);
+            }
+
+            return generateLoginResponse(user, false);
         }
 
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
-        User user = optionalUser.map(existingUser -> {
+        user = optionalUser.map(existingUser -> {
             if (existingUser.getIsDeleted()) {
                 // 탈퇴한 사용자 복구
                 existingUser.setIsDeleted(false);
@@ -71,7 +86,7 @@ public class UserAuthServiceImpl implements UserAuthService {
             return userRepository.save(newUser);
         });
 
-        UserAuth userAuth = UserAuth.builder()
+        userAuth = UserAuth.builder()
                 .user(user)
                 .authProvider(authProvider)
                 .authId(authId)
