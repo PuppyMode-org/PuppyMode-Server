@@ -107,7 +107,6 @@ public class UserAuthServiceImpl implements UserAuthService {
         LoginResponseDTO.LoginUserInfo loginUserInfo = LoginResponseDTO.LoginUserInfo.builder()
                 .userId(user.getUserId())
                 .username(user.getUsername())
-                .email(user.getEmail())
                 .isNewUser(isNewUser)
                 .build();
 
