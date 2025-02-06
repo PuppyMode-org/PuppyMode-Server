@@ -30,7 +30,7 @@ public class RankingQueryServiceImpl implements RankingQueryService {
      */
     @Override
     public RankingResponseDTO getFriendRankings(String accessToken, int page, int size, Long currentUserId) {
-        List<String> authIds = kakaoAuthService.getFriendsList(accessToken);
+        List<String> authIds = kakaoAuthService.getFriendsList(accessToken, currentUserId);
         String currentUserAuthId = userAuthProviderRepository.findAuthIdByUserId(currentUserId).orElse(null);
         authIds.add(currentUserAuthId);
         List<User> kakaoUsers = userAuthProviderRepository.findUsersByAuthProviderAndAuthIdIn(AuthProvider.KAKAO, authIds);
