@@ -74,8 +74,6 @@ public class RankingQueryServiceImpl implements RankingQueryService {
      */
     private List<RankingDTO> calculateRankings(List<Puppy> puppies) {
         AtomicInteger rankCounter = new AtomicInteger(1);
-        AtomicReference<Integer> previousExp = new AtomicReference<>(null);
-        AtomicReference<Integer> previousRank = new AtomicReference<>(0);
 
         return puppies.stream()
                 .sorted(Comparator
@@ -83,15 +81,7 @@ public class RankingQueryServiceImpl implements RankingQueryService {
                         .thenComparing(Puppy::getUpdatedAt)
                         .thenComparing(puppy -> puppy.getUser().getUserId())
                 )
-                .map(puppy -> {
-                    if (previousExp.get() != null && puppy.getPuppyExp().equals(previousExp.get())) {
-                        return RankingDTO.from(puppy, previousRank.get());
-                    } else {
-                        previousExp.set(puppy.getPuppyExp());
-                        previousRank.set(rankCounter.getAndIncrement());
-                        return RankingDTO.from(puppy, previousRank.get());
-                    }
-                })
+                .map(puppy -> RankingDTO.from(puppy, rankCounter.getAndIncrement()))
                 .collect(Collectors.toList());
     }
 
