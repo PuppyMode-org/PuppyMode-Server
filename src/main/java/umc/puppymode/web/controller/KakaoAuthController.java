@@ -33,7 +33,7 @@ public class KakaoAuthController {
                     "`FCMToken`을 함께 전송하여 푸시 알림을 위한 토큰을 저장합니다.")
     public ResponseEntity<ApiResponse<LoginResponseDTO>> kakaoLogin(
             @RequestParam("accessToken") String accessToken,
-            @RequestParam(value = "refreshToken", required = false) String refreshToken,
+            @RequestParam(value = "refreshToken") String refreshToken,
             @RequestParam(value = "FCMToken", required = false) String fcmToken) {
         try {
             UserAuthInfoDTO userInfo = kakaoAuthService.getUserInfo(accessToken);

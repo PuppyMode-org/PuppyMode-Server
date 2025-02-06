@@ -7,6 +7,7 @@ import umc.puppymode.domain.User;
 import umc.puppymode.domain.enums.AuthProvider;
 import umc.puppymode.repository.PuppyRepository;
 import umc.puppymode.repository.UserAuthRepository;
+import umc.puppymode.service.AuthService.KakaoAuthService;
 import umc.puppymode.web.dto.RankingDTO;
 import umc.puppymode.web.dto.RankingResponseDTO;
 
@@ -22,12 +23,14 @@ public class RankingQueryServiceImpl implements RankingQueryService {
 
     private final UserAuthRepository userAuthProviderRepository;
     private final PuppyRepository puppyRepository;
+    private final KakaoAuthService kakaoAuthService;
 
     /**
      * 친구 목록(authIds)중, 가입된 회원들의 강아지 정보를 가져와 랭킹을 조회합니다.
      */
     @Override
-    public RankingResponseDTO getFriendRankings(List<String> authIds, int page, int size, Long currentUserId) {
+    public RankingResponseDTO getFriendRankings(String accessToken, int page, int size, Long currentUserId) {
+        List<String> authIds = kakaoAuthService.getFriendsList(accessToken, currentUserId);
         String currentUserAuthId = userAuthProviderRepository.findAuthIdByUserId(currentUserId).orElse(null);
         authIds.add(currentUserAuthId);
         List<User> kakaoUsers = userAuthProviderRepository.findUsersByAuthProviderAndAuthIdIn(AuthProvider.KAKAO, authIds);

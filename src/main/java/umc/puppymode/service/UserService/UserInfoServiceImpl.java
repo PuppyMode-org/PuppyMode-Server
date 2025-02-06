@@ -33,9 +33,7 @@ public class UserInfoServiceImpl implements UserInfoService {
                 .build();
 
         return UserInfoResponseDTO.builder()
-                .userId(user.getUserId())
                 .username(user.getUsername())
-                .email(user.getEmail())
                 .puppy(userPuppyInfo)
                 .build();
     }

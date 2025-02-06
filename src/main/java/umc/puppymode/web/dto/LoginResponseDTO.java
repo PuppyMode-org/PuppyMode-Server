@@ -1,5 +1,6 @@
 package umc.puppymode.web.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,8 +19,9 @@ public class LoginResponseDTO {
     @AllArgsConstructor
     @Builder
     public static class LoginUserInfo {
+        @JsonIgnore
         private Long userId;
-        private String email;
+
         private String username;
         private Boolean isNewUser;
     }
