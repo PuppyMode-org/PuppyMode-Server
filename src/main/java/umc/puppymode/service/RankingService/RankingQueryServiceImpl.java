@@ -14,7 +14,6 @@ import umc.puppymode.web.dto.RankingResponseDTO;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -66,28 +65,22 @@ public class RankingQueryServiceImpl implements RankingQueryService {
     }
 
     /**
-     * puppy list를 puppyExp 기준으로 정렬하고, 랭킹을 계산합니다.
-     * 동일 경험치인 경우 공동 순위 처리합니다.
+     * puppy list를 puppyExp 기준으로 정렬하고,
+     * 동일 경험치인 경우 updated_at 기준으로 정렬하여 랭킹을 계산합니다.
      *
      * @param puppies 랭킹 계산할 강아지 리스트
      * @return 경험치 기준으로 정렬된 강아지 랭킹 리스트
      */
     private List<RankingDTO> calculateRankings(List<Puppy> puppies) {
         AtomicInteger rankCounter = new AtomicInteger(1);
-        AtomicReference<Integer> previousExp = new AtomicReference<>(null);
-        AtomicReference<Integer> previousRank = new AtomicReference<>(0);
 
         return puppies.stream()
-                .sorted(Comparator.comparingInt(Puppy::getPuppyExp).reversed())
-                .map(puppy -> {
-                    if (previousExp.get() != null && puppy.getPuppyExp().equals(previousExp.get())) {
-                        return RankingDTO.from(puppy, previousRank.get());
-                    } else {
-                        previousExp.set(puppy.getPuppyExp());
-                        previousRank.set(rankCounter.getAndIncrement());
-                        return RankingDTO.from(puppy, previousRank.get());
-                    }
-                })
+                .sorted(Comparator
+                        .comparingInt(Puppy::getPuppyExp).reversed()
+                        .thenComparing(Puppy::getUpdatedAt)
+                        .thenComparing(puppy -> puppy.getUser().getUserId())
+                )
+                .map(puppy -> RankingDTO.from(puppy, rankCounter.getAndIncrement()))
                 .collect(Collectors.toList());
     }
 
