@@ -47,6 +47,17 @@ public enum ErrorStatus implements BaseErrorCode {
     UNAUTHORIZED_PUPPY_ACCESS(HttpStatus.UNAUTHORIZED, "PUPPY401", "강아지에 대한 접근 권한이 없습니다."),
     PUPPY_ALREADY_EXISTS(HttpStatus.CONFLICT, "PUPPY409", "최대 강아지 보유량을 초과하였습니다. (최대: 1)"),
 
+    // 강아지 아이템 관련 예외 처리
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM4041", "해당 아이템이 존재하지 않습니다."),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM4042", "해당 카테고리가 존재하지 않습니다."),
+    ITEM_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM4043", "아이템이 해당 카테고리에 속하지 않습니다."),
+    UNPURCHASE_ITEM(HttpStatus.NOT_FOUND, "ITEM4044", "구매하지 않은 아이템입니다."),
+    EQUIPPED_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "ITEM4045", "착용 이미지가 존재하지 않습니다."),
+    NO_PURCHASE_ITEM(HttpStatus.CONFLICT, "ITEM4091", "도전 과제로 얻는 아이템은 구매할 수 없습니다."),
+    ITEM_ALREADY_PURCHASE(HttpStatus.CONFLICT, "ITEM4092", "이미 구매한 아이템입니다."),
+    POINT_NOT_ENOUGH(HttpStatus.CONFLICT, "ITEM4093", "잔여 포인트가 부족합니다."),
+    ITEM_ALREADY_UNEQUIPPED(HttpStatus.CONFLICT, "ITEM4094", "이미 착용하지 않은 아이템입니다."),
+
     // 이미지 관련 예외 처리
     EMPTY_FILE_LIST(HttpStatus.BAD_REQUEST, "IMAGE4001", "요청 파일 목록이 비어있습니다."),
     INVALID_FILE_UPLOAD(HttpStatus.BAD_REQUEST, "IMAGE4002", "파일이 비어있거나 유효하지 않습니다."),
@@ -78,6 +89,7 @@ public enum ErrorStatus implements BaseErrorCode {
                 .code(code)
                 .isSuccess(false)
                 .httpStatus(httpStatus)
+                .result(null)
                 .build()
                 ;
     }
