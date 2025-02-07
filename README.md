@@ -1,4 +1,4 @@
-# ![강아지 모드](https://github.com/user-attachments/assets/dde53587-3d57-48aa-a6d4-91eb3d1610ce)
+# ![강아지 모드](https://github.com/user-attachments/assets/9a7b657d-50e0-4acf-b498-4e905c06a7a1)
 > 강아지를 키워보세요.   
 > 강아지는 여러분의 음주를 함께하며 성장해 나갈 거예요.  
 > 강아지와 함께한 시간들이 쌓이면 여러분의 주량까지 알려준답니다.  
@@ -10,34 +10,34 @@
 ### 1. 강아지 성장 시스템
 - 음주 기록을 통해 강아지가 최대 3단계까지 성장합니다.
 <div style="display: flex; justify-content: space-between;">
-  <img src="https://github.com/user-attachments/assets/dcfc4de6-b287-4526-9454-c9a10680bc64" width="150" />
-  <img src="https://github.com/user-attachments/assets/cde6be10-579f-413b-8feb-c4a0bf43e0f9" width="150" />
-  <img src="https://github.com/user-attachments/assets/0c114782-4d70-4e54-bcb3-8d0d3b0456c7" width="150" />
+  <img src="https://github.com/user-attachments/assets/ea733b1f-65ec-4da5-a122-79803c22be3e" width="150" />
+  <img src="https://github.com/user-attachments/assets/7e01a53d-90c8-4da8-a82c-7382132d1851" width="150" />
+  <img src="https://github.com/user-attachments/assets/b798249c-6996-41c5-bd02-635fdbb615cd" width="150" />
 </div>
 
 - 성장 과정에서 얻은 포인트로 강아지를 커스터마이징할 수 있습니다.
 <div style="display: flex; justify-content: space-between;">
-  <img src="https://github.com/user-attachments/assets/68ac1fd5-0317-4865-b793-64321ae03520" width="150" />
-  <img src="https://github.com/user-attachments/assets/108e5744-b934-4066-946b-75603ea1f13d" width="150" />
-  <img src="https://github.com/user-attachments/assets/9b100276-9625-434c-aa38-77bccf00e14a" width="150" />
+  <img src="https://github.com/user-attachments/assets/03419b52-6cab-4862-a072-c15f31385f8c" width="150" />
+  <img src="https://github.com/user-attachments/assets/55325339-9d5a-445f-aebe-3e4eb7beaceb" width="150" />
+  <img src="https://github.com/user-attachments/assets/4ba0be2c-6f96-454c-89b7-06db82bf62a7" width="150" />
 </div>
 
 ### 2. 주량 정보 확인 시스템
 - 사용자가 기록한 음주 데이터를 기반으로 주종별 적정 주량을 확인할 수 있습니다.
 <div style="display: flex; justify-content: space-between;">
-  <img src="https://github.com/user-attachments/assets/55a010cb-e83e-4527-a487-8b581dfa40f1" width="150" />
-  <img src="https://github.com/user-attachments/assets/a844ecc5-9bc6-4bce-9287-c29f2e86a91d" width="150" />
-  <img src="https://github.com/user-attachments/assets/d1b8c773-2192-4b70-ae31-6ad98bd6c898" width="150" />
-  <img src="https://github.com/user-attachments/assets/8ceb4347-9fc8-4324-8432-bd24e95a1acb" width="150" />
+  <img src="https://github.com/user-attachments/assets/47f0e179-40bf-4d1b-8f09-7fb53ded64f9" width="150" />
+  <img src="https://github.com/user-attachments/assets/88cc843b-498b-4d8d-a273-f48a068010e9" width="150" />
+  <img src="https://github.com/user-attachments/assets/dc07f7ee-e82b-49e4-904b-2ad2f0a34054" width="150" />
+  <img src="https://github.com/user-attachments/assets/00fbe04b-10d7-4098-ac55-bc93fbfa32ce" width="150" />
 </div>
 
 ### 3. 술 약속 시스템
 - 사용자가 설정한 술 약속을 통해 음주 기록을 관리하고 추적할 수 있습니다.
 <div style="display: flex; justify-content: space-between;">
-  <img src="https://github.com/user-attachments/assets/06c312ae-9974-4086-8c51-bc2e6c14c4f4" width="150" />
-  <img src="https://github.com/user-attachments/assets/5c44c083-6e21-4529-878d-65d08cfb7077" width="150" />
-  <img src="https://github.com/user-attachments/assets/ad2e60b6-c8a9-43fc-a453-1b8a90f97703" width="150" />
-  <img src="https://github.com/user-attachments/assets/607c3d3d-986b-4a29-837f-7c8bbb57ce9c" width="150" />
+  <img src="https://github.com/user-attachments/assets/5b2474d8-cb79-460d-bf11-fff9af4a5d9c" width="150" />
+  <img src="https://github.com/user-attachments/assets/3065a912-fd74-40ba-97af-6c2d38bf5286" width="150" />
+  <img src="https://github.com/user-attachments/assets/d7b30ad5-e116-4d65-ab1c-60220a3f803e" width="150" />
+  <img src="https://github.com/user-attachments/assets/78cae9dc-b366-4ae9-8296-756c7ebff75e" width="150" />
 </div>
 
 <br>
