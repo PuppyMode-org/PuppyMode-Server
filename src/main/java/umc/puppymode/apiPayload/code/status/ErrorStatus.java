@@ -89,7 +89,6 @@ public enum ErrorStatus implements BaseErrorCode {
                 .code(code)
                 .isSuccess(false)
                 .httpStatus(httpStatus)
-                .result(null)
                 .build()
                 ;
     }
