@@ -25,7 +25,7 @@ public class PuppyAnimationController {
     public ApiResponse<AnimationFramesResponseDTO> getAnimationFrames(
             @RequestParam AnimationType animationType) {
         Long userId = userAuthService.getCurrentUserId();
-        AnimationFramesResponseDTO animationFramesResponseDTO = puppyAnimationService.getAnimaitonFrames(animationType, userId);
+        AnimationFramesResponseDTO animationFramesResponseDTO = puppyAnimationService.getAnimationFrames(animationType, userId);
         return ApiResponse.onSuccess(animationFramesResponseDTO);
     }
 }

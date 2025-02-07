@@ -7,8 +7,11 @@ import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.PuppyAnimation;
 import umc.puppymode.domain.PuppyAnimationImage;
+import umc.puppymode.domain.PuppyItem;
 import umc.puppymode.domain.enums.AnimationType;
+import umc.puppymode.domain.mapping.PuppyCustomization;
 import umc.puppymode.repository.PuppyAnimationRepository;
+import umc.puppymode.repository.PuppyCustomizationRepository;
 import umc.puppymode.repository.PuppyRepository;
 import umc.puppymode.web.dto.AnimationFramesResponseDTO;
 
@@ -22,21 +25,33 @@ public class PuppyAnimationServiceImpl implements PuppyAnimationService{
 
     private final PuppyAnimationRepository puppyAnimationRepository;
     private final PuppyRepository puppyRepository;
+    private final PuppyCustomizationRepository puppyCustomizationRepository;
 
     @Override
-    public AnimationFramesResponseDTO getAnimaitonFrames(AnimationType animationType, Long userId) {
+    public AnimationFramesResponseDTO getAnimationFrames(AnimationType animationType, Long userId) {
 
-        // 유저의 강아지 찾기
         // 유저의 강아지 찾기
         Puppy puppy = puppyRepository.findByUserId(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.NO_USERS_PUPPY));
 
+        // 현재 착용 중인 아이템 찾기
+        List<PuppyCustomization> equippedItems = puppyCustomizationRepository.findByPuppyAndIsEquippedTrue(puppy);
+        PuppyItem equippedItem = equippedItems.isEmpty() ? null : equippedItems.get(0).getPuppyItem();
+
         // 해당하는 애니메이션 찾기
-        PuppyAnimation puppyAnimation = puppyAnimationRepository.findByAnimationTypeAndPuppyTypeAndLevelName(
-                        animationType,
-                        puppy.getPuppyLevel().getPuppyType(),
-                        puppy.getPuppyLevel().getLevelName()
-                ).orElseThrow(() -> new GeneralException(ErrorStatus.ANIMATION_NOT_FOUND));
+        PuppyAnimation puppyAnimation;
+        if (animationType == AnimationType.DRINKING) {  // 음주 중 애니메이션의 경우, 아이템 고려 X
+            puppyAnimation = puppyAnimationRepository.findByAnimationTypeAndPuppyTypeAndLevelName(
+                    animationType, puppy.getPuppyLevel().getPuppyType(), puppy.getPuppyLevel().getLevelName()
+            ).orElseThrow(() -> new GeneralException(ErrorStatus.ANIMATION_NOT_FOUND));
+        }
+        else {
+            puppyAnimation = puppyAnimationRepository.findByAnimationTypeAndPuppyTypeAndLevelNameAndItem(
+                            animationType, puppy.getPuppyLevel().getPuppyType(), puppy.getPuppyLevel().getLevelName(), equippedItem)
+                    .or(() -> puppyAnimationRepository.findByAnimationTypeAndPuppyTypeAndLevelName(
+                            animationType, puppy.getPuppyLevel().getPuppyType(), puppy.getPuppyLevel().getLevelName()))
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.ANIMATION_NOT_FOUND));
+        }
 
         // 애니메이션 프레임 가져오기
         List<PuppyAnimationImage> animationImages = puppyAnimation.getAnimationImages();

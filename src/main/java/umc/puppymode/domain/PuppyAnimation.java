@@ -28,6 +28,10 @@ public class PuppyAnimation {
 
     private String levelName; // 강아지 레벨 이름
 
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private PuppyItem item; // 착용 아이템
+
     @OneToMany(mappedBy = "animation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PuppyAnimationImage> animationImages; // 애니메이션 이미지 리스트
 }
