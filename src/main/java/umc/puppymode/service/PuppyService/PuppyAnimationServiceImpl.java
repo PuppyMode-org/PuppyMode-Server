@@ -2,6 +2,8 @@ package umc.puppymode.service.PuppyService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import umc.puppymode.apiPayload.code.status.ErrorStatus;
+import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.domain.Puppy;
 import umc.puppymode.domain.PuppyAnimation;
 import umc.puppymode.domain.PuppyAnimationImage;
@@ -25,15 +27,16 @@ public class PuppyAnimationServiceImpl implements PuppyAnimationService{
     public AnimationFramesResponseDTO getAnimaitonFrames(AnimationType animationType, Long userId) {
 
         // 유저의 강아지 찾기
+        // 유저의 강아지 찾기
         Puppy puppy = puppyRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("강아지가 존재하지 않습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NO_USERS_PUPPY));
 
         // 해당하는 애니메이션 찾기
         PuppyAnimation puppyAnimation = puppyAnimationRepository.findByAnimationTypeAndPuppyTypeAndLevelName(
                         animationType,
                         puppy.getPuppyLevel().getPuppyType(),
                         puppy.getPuppyLevel().getLevelName()
-                ).orElseThrow(() -> new IllegalArgumentException("해당하는 애니메이션을 찾을 수 없습니다."));
+                ).orElseThrow(() -> new GeneralException(ErrorStatus.ANIMATION_NOT_FOUND));
 
         // 애니메이션 프레임 가져오기
         List<PuppyAnimationImage> animationImages = puppyAnimation.getAnimationImages();

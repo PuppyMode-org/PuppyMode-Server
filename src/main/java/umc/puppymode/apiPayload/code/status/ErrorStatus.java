@@ -58,6 +58,9 @@ public enum ErrorStatus implements BaseErrorCode {
     POINT_NOT_ENOUGH(HttpStatus.CONFLICT, "ITEM4093", "잔여 포인트가 부족합니다."),
     ITEM_ALREADY_UNEQUIPPED(HttpStatus.CONFLICT, "ITEM4094", "이미 착용하지 않은 아이템입니다."),
 
+    // 애니메이션 관련 예외 처리
+    ANIMATION_NOT_FOUND(HttpStatus.NOT_FOUND, "ANIMATION404", "해당하는 애니메이션을 찾을 수 없습니다."),
+
     // 이미지 관련 예외 처리
     EMPTY_FILE_LIST(HttpStatus.BAD_REQUEST, "IMAGE4001", "요청 파일 목록이 비어있습니다."),
     INVALID_FILE_UPLOAD(HttpStatus.BAD_REQUEST, "IMAGE4002", "파일이 비어있거나 유효하지 않습니다."),
