@@ -14,6 +14,7 @@ import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -110,5 +111,11 @@ public class DrinkingAppointmentQueryServiceImpl implements DrinkingAppointmentQ
 
         // 최소 1시간 이상 경과 시 반환, 1시간 미만이면 1시간으로 처리
         return Math.max(1, (int) drinkingHours);
+    }
+
+    @Override
+    public Optional<DrinkingAppointmentResponseDTO.AppointmentSimpleDTO> getNearestScheduledAppointmentForToday(Long userId) {
+        return drinkingAppointmentRepository.findNearestScheduledAppointmentForToday(userId)
+                .map(DrinkingAppointmentConverter::toSimpleDTO);
     }
 }
