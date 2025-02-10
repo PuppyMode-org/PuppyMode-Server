@@ -19,6 +19,8 @@ import umc.puppymode.web.dto.DrinkingAppointmentRequestDTO;
 import umc.puppymode.web.dto.DrinkingAppointmentResponseDTO;
 import umc.puppymode.web.dto.MainPuppyDTO.MainPuppyResDTO;
 
+import java.util.Optional;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -167,6 +169,21 @@ public class DrinkingAppointmentController {
 
         return ApiResponse.onSuccess(response, "APPOINTMENT_UPDATE_SUCCESS", "술 약속 수정 성공");
 
+    }
+
+    @GetMapping("/nearest-scheduled")
+    @Operation(summary = "오늘 날짜의 가장 가까운 SCHEDULED 상태 약속 조회",
+            description = "오늘 날짜의 가장 가까운 SCHEDULED 상태의 약속 정보를 반환합니다.")
+    public ApiResponse<?> getNearestScheduledAppointmentForToday() {
+        Long userId = userAuthService.getCurrentUserId();
+
+        Optional<DrinkingAppointmentResponseDTO.AppointmentSimpleDTO> response =
+                drinkingAppointmentQueryService.getNearestScheduledAppointmentForToday(userId);
+
+        return response.map(appointment ->
+                        ApiResponse.onSuccess(appointment, "APPOINTMENT_NEAREST_SCHEDULED_FOUND", "오늘 날짜의 가장 가까운 예약된 술 약속을 조회했습니다."))
+                .orElseGet(() ->
+                        ApiResponse.onFailure("NO_SCHEDULED_APPOINTMENT_TODAY", "오늘 날짜의 예약된 술 약속이 없습니다.", null));
     }
 
 }
