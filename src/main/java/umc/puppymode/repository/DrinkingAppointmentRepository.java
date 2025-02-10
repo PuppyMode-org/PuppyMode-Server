@@ -11,7 +11,6 @@ import umc.puppymode.domain.User;
 import umc.puppymode.domain.enums.AppointmentStatus;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,4 +37,8 @@ public interface DrinkingAppointmentRepository extends JpaRepository<DrinkingApp
             "WHERE da.user.userId = :userId " +
             "AND FUNCTION('DATE_FORMAT', da.dateTime, '%Y-%m') = :month")
     List<DrinkingAppointment> findAppointmentsByUserAndMonth(@Param("userId") Long userId, @Param("month") String month);
+
+    @Query("SELECT a FROM DrinkingAppointment a WHERE a.status = 'SCHEDULED' AND a.user.userId = :userId " +
+            "AND DATE(a.dateTime) = CURRENT_DATE ORDER BY a.dateTime ASC LIMIT 1")
+    Optional<DrinkingAppointment> findNearestScheduledAppointmentForToday(@Param("userId") Long userId);
 }
