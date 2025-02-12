@@ -49,6 +49,13 @@
 
 <br>
 
+## ERD
+<div align="left">
+  <img src="https://github.com/user-attachments/assets/8b978d6f-8cfe-412a-ae48-3efd22d5e8ae" width="700" />
+</div>
+
+<br>
+
 ## Contributors
 
 | [이서진](https://github.com/SeoJin-L-ee) | [이진경](https://github.com/alschlee) | [이하늘](https://github.com/twosky0202) | [윤윤지](https://github.com/Yunji-Yun) | [윤혜정](https://github.com/hjyoon99) | [한지수](https://github.com/eldeoddt) |
