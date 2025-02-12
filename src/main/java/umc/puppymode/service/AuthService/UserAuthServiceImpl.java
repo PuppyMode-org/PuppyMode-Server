@@ -111,7 +111,8 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .build();
 
         return LoginResponseDTO.builder()
-                .jwt(token)
+                .accessToken(token)
+                .refreshToken(null) //TODO: refresh 구현
                 .userInfo(loginUserInfo)
                 .build();
     }
