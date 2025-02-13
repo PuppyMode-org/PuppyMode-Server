@@ -46,7 +46,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     }
 
     /**
-     * Apple login을 처리합니다.
+     * Apple Login 을 처리합니다.
      *
      * @param authorizationCode
      * @param identityToken
@@ -55,6 +55,12 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
      */
     @Override
     public LoginResponseDTO loginWithApple(String authorizationCode, String identityToken, String username, String fcmToken) {
+
+        boolean isValid = verifyIdentityToken(identityToken);
+        if (!isValid) {
+            throw new IllegalArgumentException("Invalid identity token");
+        }
+
         UserAuthInfoDTO userInfo = appleAuthQueryService.getUserInfo(identityToken);
 
         if (username != null && !username.isEmpty()) {
@@ -80,7 +86,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     }
 
     /**
-     * Identity Token을 검증합니다.
+     * Identity Token 을 검증합니다.
      * @param identityToken
      * @return boolean
      */
@@ -120,7 +126,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
 
             // sub(사용자 고유 ID) 반환
             String appleUserId = body.getSubject();
-            log.info("Apple User ID: {}", appleUserId);
+//            log.info("Apple User ID: {}", appleUserId);
 
             return true;
 
@@ -143,7 +149,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     }
 
     /**
-     * Authorization Code를 사용하여 Access Token, Refresh Token을 요청합니다.
+     * Authorization Code 를 사용하여 Access Token, Refresh Token 을 요청합니다.
      * @param authorizationCode
      * @return AppleTokenResponseDTO
      */
@@ -180,7 +186,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     }
 
     /**
-     * Client Secret을 생성합니다.
+     * Client Secret 을 생성합니다.
      */
     public String generateClientSecret() {
         try {

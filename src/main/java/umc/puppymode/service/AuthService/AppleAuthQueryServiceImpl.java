@@ -20,7 +20,7 @@ public class AppleAuthQueryServiceImpl implements AppleAuthQueryService {
     private final AppleKeyService appleKeyService;
 
     /**
-     * Identity Token 검증 및 사용자 정보 추출
+     * Identity Token 에서 사용자 정보 추출
      *
      * @param identityToken
      * @return UserAuthInfoDTO
@@ -39,7 +39,7 @@ public class AppleAuthQueryServiceImpl implements AppleAuthQueryService {
             String email = payload.get("email", String.class);
             Boolean emailVerified = Boolean.parseBoolean(payload.get("email_verified", String.class));
 
-            log.info("Apple Identity Token 검증 완료: sub={}, email={}, emailVerified={}", userAuthId, email, emailVerified);
+            log.info("Apple Identity Token 정보 추출 완료");
 
             return UserAuthInfoDTO.builder()
                     .userAuthId(userAuthId)
