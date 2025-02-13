@@ -8,7 +8,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import umc.puppymode.config.AppleAuthConfig;
 import umc.puppymode.domain.enums.AuthProvider;
 import umc.puppymode.web.dto.AppleTokenResponseDTO;
@@ -26,7 +26,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
     private final AppleKeyService appleKeyService;
     private final AppleAuthConfig appleAuthConfig;
     private final AppleAuthQueryService appleAuthQueryService;
@@ -46,7 +46,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     }
 
     /**
-     * Apple login을 진행합니다.
+     * Apple login을 처리합니다.
      *
      * @param authorizationCode
      * @param identityToken
@@ -129,7 +129,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     }
 
     /**
-     * JWT 헤더에서 kid 값을 추출합니다.
+     * Id Token JWT 헤더에서 kid 값을 추출합니다.
      */
     private String extractKidFromToken(String identityToken) {
         return Jwts.parserBuilder()
@@ -155,10 +155,15 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
                 "redirect_uri", "https://puppy-mode.site/auth/apple/login"
         );
 
-        JsonNode response = restTemplate.postForObject(APPLE_TOKEN_URL, requestParams, JsonNode.class);
+        JsonNode response = webClient.post()
+                .uri(APPLE_TOKEN_URL)
+                .bodyValue(requestParams)
+                .retrieve()
+                .bodyToMono(JsonNode.class)
+                .block();
 
         if (Objects.isNull(response) || !response.has("access_token")) {
-            log.error("Apple OAuth 토큰 요청 실패: 응답 없음");
+            log.error("Apple Access Token 요청 실패: 응답 없음");
             throw new RuntimeException("Failed to retrieve Apple tokens");
         }
 
@@ -178,7 +183,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
             long now = System.currentTimeMillis();
             long exp = now + (15777000 * 1000L); // 약 6개월 후 만료
 
-            PrivateKey privateKey = appleKeyService.loadPrivateKey();
+            PrivateKey privateKey = appleKeyService.getPrivateKey();
 
             return Jwts.builder()
                     .setHeaderParam("alg", "ES256")

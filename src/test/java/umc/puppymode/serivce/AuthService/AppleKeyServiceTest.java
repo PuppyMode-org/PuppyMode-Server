@@ -17,14 +17,14 @@ public class AppleKeyServiceTest {
         WebClient webClientMock = mock(WebClient.class);
         AppleAuthConfig configMock = mock(AppleAuthConfig.class);
 
-        when(configMock.getPrivateKeyPath()).thenReturn("/etc/secrets/AuthKey.p8"); // 가짜 경로 설정
+        when(configMock.getPrivateKeyPath()).thenReturn("/Users/jisu/Documents/umc/7th_puppy_mode/AuthKey.p8"); // 가짜 경로 설정
 
         keyService = new AppleKeyServiceImpl(webClientMock, configMock);
     }
 
     @Test
     public void testLoadPrivateKey() {
-        assertNotNull(keyService.loadPrivateKey(), "🔹 Private Key가 null이면 안 됩니다.");
-        System.out.println("✅ Private Key 로드 테스트 성공!");
+        assertNotNull(keyService.loadPrivateKey(), "Private Key가 null이면 안 됩니다.");
+        System.out.println("Private Key 로드 테스트 성공!");
     }
 }
