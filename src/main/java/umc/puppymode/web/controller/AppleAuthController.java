@@ -34,9 +34,10 @@ public class AppleAuthController {
     public ResponseEntity<ApiResponse<LoginResponseDTO>> appleLogin(
             @RequestParam("AuthorizationCode") String authorizationCode,
             @RequestParam(value = "IdentityToken") String identityToken,
+            @RequestParam(value = "UserName", required = false) String username,
             @RequestParam(value = "FCMToken", required = false) String fcmToken) {
         try {
-            LoginResponseDTO loginResponse = appleAuthCommandService.loginWithApple(authorizationCode, identityToken, fcmToken);
+            LoginResponseDTO loginResponse = appleAuthCommandService.loginWithApple(authorizationCode, identityToken, username, fcmToken);
             return ResponseEntity.ok(ApiResponse.onSuccess(loginResponse));
         } catch (IllegalArgumentException e) {
             log.error("애플 로그인 유효성 오류: {}", e.getMessage());

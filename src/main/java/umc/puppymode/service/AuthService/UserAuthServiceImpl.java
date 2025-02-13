@@ -43,27 +43,34 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         String authId = userInfo.getUserAuthId();
         String email = userInfo.getEmail();
+        String newUsername = userInfo.getUsername();
 
         Optional<UserAuth> optionalUserAuth = userAuthRepository.findByUser_EmailAndAuthProvider(email, authProvider);
 
         UserAuth userAuth;
         User user;
 
+        // 기존 회원일 경우
         if (optionalUserAuth.isPresent()) {
-            // 기존 회원일 경우
             userAuth = optionalUserAuth.get();
             user = userAuth.getUser();
 
-            // Refresh Token 갱신 필요 확인
             if (refreshToken != null && (userAuth.getRefreshToken() == null || !refreshToken.equals(userAuth.getRefreshToken()))) {
-                log.info("Refresh Token 갱신됨.");
+                log.info("Auth Refresh Token 갱신됨.");
                 userAuth.setRefreshToken(refreshToken);
                 userAuthRepository.save(userAuth);
+            }
+
+            if (newUsername != null && !newUsername.equals(user.getUsername())) {
+                log.info("username 변경됨.");
+                user.setUsername(newUsername);
+                userRepository.save(user);
             }
 
             return generateLoginResponse(user, false);
         }
 
+        // 신규 회원일 경우
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         user = optionalUser.map(existingUser -> {
@@ -90,6 +97,7 @@ public class UserAuthServiceImpl implements UserAuthService {
                 .user(user)
                 .authProvider(authProvider)
                 .authId(authId)
+                .refreshToken(refreshToken)
                 .build();
         userAuthRepository.save(userAuth);
 

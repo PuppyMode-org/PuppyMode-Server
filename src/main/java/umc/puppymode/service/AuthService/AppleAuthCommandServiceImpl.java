@@ -54,8 +54,18 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
      * @return 로그인 응답
      */
     @Override
-    public LoginResponseDTO loginWithApple(String authorizationCode, String identityToken, String fcmToken) {
+    public LoginResponseDTO loginWithApple(String authorizationCode, String identityToken, String username, String fcmToken) {
         UserAuthInfoDTO userInfo = appleAuthQueryService.getUserInfo(identityToken);
+
+        if (username != null && !username.isEmpty()) {
+            userInfo = UserAuthInfoDTO.builder()
+                    .userAuthId(userInfo.getUserAuthId())
+                    .userId(userInfo.getUserId())
+                    .email(userInfo.getEmail())
+                    .authProvider(userInfo.getAuthProvider())
+                    .username(username)
+                    .build();
+        }
 
         AppleTokenResponseDTO appleTokens = getAppleTokens(authorizationCode);
         String refreshToken = appleTokens.getRefreshToken();
