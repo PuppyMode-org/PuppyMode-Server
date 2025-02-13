@@ -43,7 +43,7 @@ public class AppleAuthController {
         } catch (Exception e) {
             log.error("애플 로그인 오류 발생: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(ApiResponse.onFailure("AUTH_ERROR", "카카오 로그인 오류가 발생했습니다.", null));
+                    .body(ApiResponse.onFailure("AUTH_ERROR", "애플 로그인 오류가 발생했습니다.", null));
         }
     }
 }
