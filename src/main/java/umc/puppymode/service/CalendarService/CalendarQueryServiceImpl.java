@@ -13,6 +13,7 @@ import umc.puppymode.web.dto.CalendarDTO.CalendarListResponseDTO;
 import umc.puppymode.web.dto.CalendarDTO.CalendarResponseDTO.*;
 import umc.puppymode.web.dto.CalendarDTO.DrinkHistoryItemDTO;
 import umc.puppymode.web.dto.CalendarDTO.FeedDTO;
+import umc.puppymode.web.dto.DrinkResponseDTO;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -44,15 +45,27 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
         List<DrinkingAppointment> appointments = drinkingAppointmentRepository.findAppointmentsByUserAndMonth(userId, month);
 
         Map<LocalDate, CalendarListResponseDTO> drinkStatusMap = new HashMap<>();
+        LocalDate today = LocalDate.now();
+        YearMonth targetMonth = YearMonth.parse(month);
+        boolean isCurrentMonth = targetMonth.equals(YearMonth.from(today));
+        int lastDay = isCurrentMonth ? today.getDayOfMonth() : targetMonth.lengthOfMonth();
 
-        // 음주 기록이 있는 경우
         for (DrinkHistory history : drinkHistories) {
-            List<DrinkHistoryItem> drinkHistoryItems = drinkHistoryItemRepository.findByHistory_DrinkHistoryId(history.getDrinkHistoryId());
+            LocalDate date = history.getDrinkDate();
+            if (date.isAfter(today) && isCurrentMonth) continue;
+
+            List<DrinkHistoryItem> drinkHistoryItems =
+                    Optional.ofNullable(drinkHistoryItemRepository.findByHistory_DrinkHistoryId(history.getDrinkHistoryId()))
+                            .orElse(Collections.emptyList());
 
             float totalDrinkAmount = history.getDrinkAmount();
-            float safetyValue = drinkHistoryItems.stream().map(DrinkHistoryItem::getSafetyValue).reduce(0f, Float::sum);
-            float maxValue = drinkHistoryItems.stream().map(DrinkHistoryItem::getMaxValue).reduce(0f, Float::sum);
-            boolean hasHangover = !history.getHangovers().isEmpty();
+            float safetyValue = drinkHistoryItems.stream()
+                    .map(item -> Optional.ofNullable(item.getSafetyValue()).orElse(0f))
+                    .reduce(0f, Float::sum);
+            float maxValue = drinkHistoryItems.stream()
+                    .map(item -> Optional.ofNullable(item.getMaxValue()).orElse(0f))
+                    .reduce(0f, Float::sum);
+            boolean hasHangover = Optional.ofNullable(history.getHangovers()).map(list -> !list.isEmpty()).orElse(false);
 
             String status;
             String historyStatus;
@@ -68,9 +81,6 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
                 historyStatus = hasHangover ? "주량 조절 실패" : "주량 조절 필요";
             }
 
-            LocalDate date = history.getDrinkDate();
-
-            // 술 약속에 대해 시간 계산 추가
             Optional<DrinkingAppointment> appointment = appointments.stream()
                     .filter(app -> app.getDateTime().toLocalDate().equals(date))
                     .findFirst();
@@ -82,30 +92,25 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
                 appointmentId = appointment.get().getAppointmentId();
             }
 
-            // 음주 기록에 대한 정보 업데이트
-            CalendarListResponseDTO responseDTO = CalendarListResponseDTO.builder()
+            drinkStatusMap.put(date, CalendarListResponseDTO.builder()
                     .drinkDate(date)
                     .status(status)
                     .drinkHistoryId(history.getDrinkHistoryId())
                     .historyStatus(historyStatus)
                     .appointmentId(appointmentId)
                     .appointmentTime(appointmentTime)
-                    .build();
-
-            drinkStatusMap.put(date, responseDTO);
+                    .build());
         }
 
-        // 술 약속만 있는 경우 처리
         for (DrinkingAppointment appointment : appointments) {
             LocalDate date = appointment.getDateTime().toLocalDate();
+            if (date.isAfter(today) && isCurrentMonth) continue;
 
-            // 술 약속이 있는 경우 상태 업데이트
             drinkStatusMap.putIfAbsent(date, CalendarListResponseDTO.builder()
                     .drinkDate(date)
                     .status("건강 포기한 날")
                     .build());
 
-            // 술 약속에 대해 시간 계산 추가
             if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
                 String appointmentTime = calculateAppointmentTime(appointment);
                 Long appointmentId = appointment.getAppointmentId();
@@ -117,10 +122,8 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
             }
         }
 
-        // 음주 기록과 술 약속 모두 없는 경우 처리
-        for (int day = 1; day <= YearMonth.parse(month).lengthOfMonth(); day++) {
-            LocalDate date = LocalDate.of(Integer.parseInt(month.split("-")[0]), Integer.parseInt(month.split("-")[1]), day);
-
+        for (int day = 1; day <= lastDay; day++) {
+            LocalDate date = LocalDate.of(targetMonth.getYear(), targetMonth.getMonth(), day);
             if (!drinkStatusMap.containsKey(date)) {
                 drinkStatusMap.put(date, CalendarListResponseDTO.builder()
                         .drinkDate(date)
@@ -129,12 +132,12 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
             }
         }
 
-        // 날짜 기준 오름차순 정렬
         return drinkStatusMap.entrySet().stream()
-                .sorted(Map.Entry.<LocalDate, CalendarListResponseDTO>comparingByKey())  // 날짜 오름차순 정렬
+                .sorted(Map.Entry.comparingByKey())
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
     }
+
 
     // appointmentTime 계산 로직
     private String calculateAppointmentTime(DrinkingAppointment appointment) {
