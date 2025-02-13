@@ -30,10 +30,12 @@ public class AppleKeyServiceImpl implements AppleKeyService {
     private final AppleAuthConfig appleAuthConfig;
     private static final String APPLE_KEYS_URL = "https://appleid.apple.com/auth/keys";
     private final Map<String, PublicKey> publicKeyCache = new HashMap<>();
+    private PrivateKey privateKey;
 
     @PostConstruct
     public void init() {
         refreshKeys();
+        this.privateKey = loadPrivateKey();
     }
 
     /**
@@ -90,11 +92,14 @@ public class AppleKeyServiceImpl implements AppleKeyService {
     public PrivateKey loadPrivateKey() {
         try {
             String privateKeyPath = appleAuthConfig.getPrivateKeyPath();
+            log.info("Private Key 파일 경로: {}", privateKeyPath);
             byte[] keyBytes = Files.readAllBytes(Paths.get(privateKeyPath));
             String privateKeyPEM = new String(keyBytes)
                     .replace("-----BEGIN PRIVATE KEY-----", "")
                     .replace("-----END PRIVATE KEY-----", "")
                     .replaceAll("\\s", "");
+
+            log.info("Private Key (Base64): {}", privateKeyPEM);
 
             byte[] decoded = Base64.getDecoder().decode(privateKeyPEM);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
@@ -102,7 +107,14 @@ public class AppleKeyServiceImpl implements AppleKeyService {
             return keyFactory.generatePrivate(keySpec);
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load Apple Private Key", e);
+            throw new RuntimeException("Apple Private Key 로드 실패", e);
         }
+    }
+
+    /**
+     * Private Key를 반환합니다.
+     */
+    public PrivateKey getPrivateKey() {
+        return this.privateKey;
     }
 }

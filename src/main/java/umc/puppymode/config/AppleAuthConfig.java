@@ -28,30 +28,4 @@ public class AppleAuthConfig {
 
     @Value("${auth.apple.private-key-path}")
     private String privateKeyPath;
-
-    private PrivateKey privateKey;
-
-    public AppleAuthConfig(@Value("${auth.apple.private-key-path}") String privateKeyPath) {
-        this.privateKeyPath = privateKeyPath;
-        this.privateKey = loadPrivateKey();
-    }
-
-    private PrivateKey loadPrivateKey() {
-        try {
-            byte[] keyBytes = Files.readAllBytes(Paths.get(privateKeyPath));
-            String privateKeyPEM = new String(keyBytes)
-                    .replace("-----BEGIN PRIVATE KEY-----", "")
-                    .replace("-----END PRIVATE KEY-----", "")
-                    .replaceAll("\\s", "");
-
-            byte[] decoded = Base64.getDecoder().decode(privateKeyPEM);
-            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
-            KeyFactory keyFactory = KeyFactory.getInstance("EC");
-            return keyFactory.generatePrivate(keySpec);
-
-        } catch (Exception e) {
-            log.error("Apple Private Key 로드 실패", e);
-            throw new RuntimeException("Failed to load Apple Private Key", e);
-        }
-    }
 }
