@@ -81,6 +81,8 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
 
     /**
      * Identity Token을 검증합니다.
+     * @param identityToken
+     * @return boolean
      */
     public boolean verifyIdentityToken(String identityToken) {
         try {
@@ -142,6 +144,8 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
 
     /**
      * Authorization Code를 사용하여 Access Token, Refresh Token을 요청합니다.
+     * @param authorizationCode
+     * @return AppleTokenResponseDTO
      */
     @Override
     public AppleTokenResponseDTO getAppleTokens(String authorizationCode) {
