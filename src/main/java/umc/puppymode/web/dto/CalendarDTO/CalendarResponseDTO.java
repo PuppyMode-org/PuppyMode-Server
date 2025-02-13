@@ -1,6 +1,8 @@
 package umc.puppymode.web.dto.CalendarDTO;
 
 import lombok.*;
+import umc.puppymode.domain.HangoverItem;
+import umc.puppymode.web.dto.DrinkResponseDTO;
 
 import java.util.List;
 
@@ -19,6 +21,7 @@ public class CalendarResponseDTO {
 
         private List<DrinkHistoryItemDTO> drinkItems;
         private FeedDTO feed;
+        private List<DrinkResponseDTO.HangoverResponseDTO> hangoverItems;
     }
 
 }

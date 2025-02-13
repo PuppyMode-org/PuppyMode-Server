@@ -164,6 +164,14 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
 
         List<DrinkHistoryItemDTO> drinkItems = drinkHistoryItemRepository.findDrinkItemsByHistoryId(drinkHistoryId);
         FeedDTO feed = feedRepository.findFeedByHistoryId(drinkHistoryId);
+        List<DrinkResponseDTO.HangoverResponseDTO> hangoverItems = drinkHistory.getHangovers().stream()
+                .map(hangover -> new DrinkResponseDTO.HangoverResponseDTO(
+                        hangover.getHangoverId(),
+                        hangover.getImageUrl(),
+                        hangover.getHangoverName()
+                ))
+                .collect(Collectors.toList());
+
 
         return List.of(
                 CalendarDetailDTO.builder()
@@ -172,6 +180,7 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
                         .drinkAmount(drinkHistory.getDrinkAmount())
                         .drinkItems(drinkItems)
                         .feed(feed)
+                        .hangoverItems(hangoverItems)
                         .build()
         );
     }
