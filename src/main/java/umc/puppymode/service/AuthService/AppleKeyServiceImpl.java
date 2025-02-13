@@ -1,9 +1,6 @@
 package umc.puppymode.service.AuthService;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,7 +37,7 @@ public class AppleKeyServiceImpl implements AppleKeyService {
     }
 
     /**
-     * 공개 키 조회
+     * 공개 키를 조회합니다.
      * Identity Token 검증용
      */
     @Override
@@ -88,7 +85,7 @@ public class AppleKeyServiceImpl implements AppleKeyService {
     }
 
     /**
-     * Private Key 로딩
+     * Private Key를 로드합니다.
      */
     public PrivateKey loadPrivateKey() {
         try {
@@ -101,7 +98,7 @@ public class AppleKeyServiceImpl implements AppleKeyService {
 
             byte[] decoded = Base64.getDecoder().decode(privateKeyPEM);
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
-            KeyFactory keyFactory = KeyFactory.getInstance("EC"); // Apple은 EC 키 사용
+            KeyFactory keyFactory = KeyFactory.getInstance("EC");
             return keyFactory.generatePrivate(keySpec);
 
         } catch (Exception e) {

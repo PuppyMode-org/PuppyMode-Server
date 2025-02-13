@@ -141,7 +141,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     }
 
     /**
-     * Authorization Code를 사용하여 Access Token, Refresh Token 요청
+     * Authorization Code를 사용하여 Access Token, Refresh Token을 요청합니다.
      */
     @Override
     public AppleTokenResponseDTO getAppleTokens(String authorizationCode) {
@@ -171,7 +171,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     }
 
     /**
-     * Client Secret 생성
+     * Client Secret을 생성합니다.
      */
     public String generateClientSecret() {
         try {

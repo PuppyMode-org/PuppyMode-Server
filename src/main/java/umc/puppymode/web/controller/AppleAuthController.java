@@ -7,13 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import umc.puppymode.apiPayload.ApiResponse;
-import umc.puppymode.domain.enums.AuthProvider;
 import umc.puppymode.service.AuthService.AppleAuthCommandService;
 import umc.puppymode.service.AuthService.AppleAuthQueryService;
 import umc.puppymode.service.AuthService.UserAuthService;
-import umc.puppymode.web.dto.AppleTokenResponseDTO;
 import umc.puppymode.web.dto.LoginResponseDTO;
-import umc.puppymode.web.dto.UserAuthInfoDTO;
 
 @Slf4j
 @RestController
