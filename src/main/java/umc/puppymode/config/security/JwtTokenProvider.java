@@ -22,7 +22,7 @@ public class JwtTokenProvider {
     private static final String USER_ID = "userId";
     private static final Long TOKEN_EXPIRATION_TIME = 24 * 60 * 60 * 1000L;
 
-    @Value("${jwt.secret}")
+    @Value("${auth.jwt.secret}")
     private String JWT_SECRET;
 
     @PostConstruct

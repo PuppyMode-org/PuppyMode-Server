@@ -31,7 +31,7 @@ public class KakaoAuthService {
     private final WebClient webClient = WebClient.create(KAUTH_USER_URL_HOST);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${kakao.client_id}")
+    @Value("${auth.kakao.client_id}")
     private String kakaoClientId;
 
     /**
