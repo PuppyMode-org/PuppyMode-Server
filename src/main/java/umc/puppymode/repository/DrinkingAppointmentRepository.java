@@ -38,7 +38,16 @@ public interface DrinkingAppointmentRepository extends JpaRepository<DrinkingApp
             "AND FUNCTION('DATE_FORMAT', da.dateTime, '%Y-%m') = :month")
     List<DrinkingAppointment> findAppointmentsByUserAndMonth(@Param("userId") Long userId, @Param("month") String month);
 
-    @Query("SELECT a FROM DrinkingAppointment a WHERE a.status = 'SCHEDULED' AND a.user.userId = :userId " +
-            "AND DATE(a.dateTime) = CURRENT_DATE ORDER BY a.dateTime ASC LIMIT 1")
+    //MySQL만 지원
+    @Query(value = "SELECT * FROM drinking_appointment " +
+            "WHERE status = 'SCHEDULED' " +
+            "AND user_id = :userId " +
+            "AND date_time BETWEEN DATE(DATE_ADD(NOW(), INTERVAL 9 HOUR)) " +
+            "AND DATE_ADD(DATE(DATE_ADD(NOW(), INTERVAL 9 HOUR)), INTERVAL 1 DAY) - INTERVAL 1 SECOND " +
+            "ORDER BY date_time ASC " +
+            "LIMIT 1",
+            nativeQuery = true)
     Optional<DrinkingAppointment> findNearestScheduledAppointmentForToday(@Param("userId") Long userId);
+
+
 }
