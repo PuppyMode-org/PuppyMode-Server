@@ -40,7 +40,6 @@ public class AppleLoginRequestDTO {
     @NoArgsConstructor
     public static class UserInfo {
         private Name name;
-        private String email;
 
         @Data
         @AllArgsConstructor
