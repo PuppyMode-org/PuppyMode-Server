@@ -2,7 +2,6 @@ package umc.puppymode.service.AuthService;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +15,6 @@ import umc.puppymode.web.dto.LoginResponseDTO;
 import umc.puppymode.web.dto.UserAuthInfoDTO;
 
 import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
@@ -32,7 +29,6 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     private final AppleAuthQueryService appleAuthQueryService;
     private final UserAuthService userAuthService;
 
-    private static final String APPLE_ISSUER = "https://appleid.apple.com";
     private static final String APPLE_TOKEN_URL = "https://appleid.apple.com/auth/token";
     private String clientId;
     private String keyId;
@@ -56,12 +52,16 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
     @Override
     public LoginResponseDTO loginWithApple(String authorizationCode, String identityToken, String username, String fcmToken) {
 
-        boolean isValid = verifyIdentityToken(identityToken);
-        if (!isValid) {
+        Claims claims = appleAuthQueryService.verifyIdentityToken(identityToken);
+        if (claims == null) {
             throw new IllegalArgumentException("Invalid identity token");
         }
 
-        UserAuthInfoDTO userInfo = appleAuthQueryService.getUserInfo(identityToken);
+        UserAuthInfoDTO userInfo = UserAuthInfoDTO.builder()
+                .userAuthId(claims.getSubject())
+                .email(claims.get("email", String.class))
+                .authProvider(AuthProvider.APPLE)
+                .build();
 
         if (username != null && !username.isEmpty()) {
             userInfo = UserAuthInfoDTO.builder()
@@ -83,69 +83,6 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
         }
 
         return loginResponse;
-    }
-
-    /**
-     * Identity Token 을 검증합니다.
-     * @param identityToken
-     * @return boolean
-     */
-    public boolean verifyIdentityToken(String identityToken) {
-        try {
-            // Identity Token JWT 헤더에서 kid 값 추출
-            String kid = extractKidFromToken(identityToken);
-
-            // 공개 키 조회
-            PublicKey publicKey = appleKeyService.getApplePublicKey(kid);
-            if (publicKey == null) {
-                throw new IllegalArgumentException("No matching public key found for kid: " + kid);
-            }
-
-            // Id Token JWT 검증 수행
-            Jws<Claims> claims = Jwts.parserBuilder()
-                    .setSigningKey(publicKey)
-                    .build()
-                    .parseClaimsJws(identityToken);
-
-            Claims body = claims.getBody();
-
-            // iss(발급자) 검증
-            if (!APPLE_ISSUER.equals(body.getIssuer())) {
-                throw new IllegalArgumentException("Invalid issuer: " + body.getIssuer());
-            }
-
-            // aud(Audience) 검증
-            if (!clientId.equals(body.getAudience())) {
-                throw new IllegalArgumentException("Invalid audience: " + body.getAudience());
-            }
-
-            // exp(만료 시간) 검증
-            if (body.getExpiration().before(new Date())) {
-                throw new IllegalArgumentException("Token has expired");
-            }
-
-            // sub(사용자 고유 ID) 반환
-            String appleUserId = body.getSubject();
-//            log.info("Apple User ID: {}", appleUserId);
-
-            return true;
-
-        } catch (Exception e) {
-            log.error("Identity Token 검증 실패: {}", e.getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Id Token JWT 헤더에서 kid 값을 추출합니다.
-     */
-    private String extractKidFromToken(String identityToken) {
-        return Jwts.parserBuilder()
-                .build()
-                .parseClaimsJws(identityToken)
-                .getHeader()
-                .get("kid")
-                .toString();
     }
 
     /**
