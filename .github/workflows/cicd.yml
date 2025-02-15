@@ -43,8 +43,8 @@ jobs:
       # Apple Private Key 파일 생성
       - name: Make Apple Private Key file
         run: |
-          mkdir -p /etc/secrets
-          echo "${{ secrets.APPLE_PRIVATE_KEY_BASE64 }}" | base64 -d > /etc/secrets/AuthKey.p8
+          mkdir -p ~/.secrets
+          echo "${{ secrets.APPLE_PRIVATE_KEY_BASE64 }}" | base64 -d > ~/.secrets/AuthKey.p8
         shell: bash
 
       # yml 파일 생성
