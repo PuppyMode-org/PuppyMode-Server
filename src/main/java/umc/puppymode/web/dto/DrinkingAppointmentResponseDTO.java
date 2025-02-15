@@ -50,6 +50,7 @@ public class DrinkingAppointmentResponseDTO {
         private AppointmentStatus appointmentStatus;
         private String puppyName;
         private int drinkingHours;
+        private List<String> drinkingImageUrls;
 
     }
 
