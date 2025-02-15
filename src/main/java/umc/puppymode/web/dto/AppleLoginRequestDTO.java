@@ -23,13 +23,20 @@ public class AppleLoginRequestDTO {
         String firstName = user.getName().getFirstName();
         String lastName = user.getName().getLastName();
 
-        if (firstName == null && lastName == null) {
+        if (firstName != null) {
+            firstName = firstName.trim();
+        }
+        if (lastName != null) {
+            lastName = lastName.trim();
+        }
+
+        if ((firstName == null || firstName.isEmpty()) && (lastName == null || lastName.isEmpty())) {
             return null;
         }
-        if (firstName == null) {
+        if (firstName == null || firstName.isEmpty()) {
             return lastName;
         }
-        if (lastName == null) {
+        if (lastName == null || lastName.isEmpty()) {
             return firstName;
         }
         return firstName + " " + lastName;
