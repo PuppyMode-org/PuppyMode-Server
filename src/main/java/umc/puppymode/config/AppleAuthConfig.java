@@ -25,7 +25,4 @@ public class AppleAuthConfig {
 
     @Value("${auth.apple.key-id}")
     private String keyId;
-
-    @Value("${auth.apple.private-key-path}")
-    private String privateKeyPath;
 }
