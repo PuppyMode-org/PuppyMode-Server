@@ -91,17 +91,18 @@ public class AppleKeyServiceImpl implements AppleKeyService {
      */
     public PrivateKey loadPrivateKey() {
         try {
-            String privateKeyPath = appleAuthConfig.getPrivateKeyPath();
-//            log.info("Private Key 파일 경로: {}", privateKeyPath);
-            byte[] keyBytes = Files.readAllBytes(Paths.get(privateKeyPath));
+            String privateKeyPath = appleAuthConfig.getPrivateKey();
+
+            // Base64 디코딩
+            byte[] keyBytes = Base64.getDecoder().decode(privateKeyPath);
+
             String privateKeyPEM = new String(keyBytes)
                     .replace("-----BEGIN PRIVATE KEY-----", "")
                     .replace("-----END PRIVATE KEY-----", "")
                     .replaceAll("\\s", "");
 
-//            log.info("Private Key (Base64): {}", privateKeyPEM);
-
             byte[] decoded = Base64.getDecoder().decode(privateKeyPEM);
+
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             return keyFactory.generatePrivate(keySpec);
