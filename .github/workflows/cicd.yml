@@ -40,17 +40,12 @@ jobs:
           mkdir -p ./src/main/resources/firebase
           echo "${{ secrets.FIREBASE_ADMIN_SDK_BASE64 }}" | base64 -d > ./src/main/resources/firebase/puppymode-53d9a-firebase-adminsdk-myzbc-7e65f856a6.json
 
-      # Apple Private Key 파일 환경변수 load
-      - name: Set Apple Private Key as Environment Variable
-        run: echo "APPLE_PRIVATE_KEY=${{ secrets.APPLE_PRIVATE_KEY_BASE64 }}" >> $GITHUB_ENV
-        shell: bash
-
-
       # yml 파일 생성
       - name: Make application.yml
         run: |
           mkdir -p ./src/main/resources
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+          echo "auth.apple.private-key=${{ secrets.APPLE_PRIVATE_KEY_BASE64 }}" >> ./src/main/resources/application.yml
         shell: bash
 
       # Spring Boot 어플리케이션 Build
