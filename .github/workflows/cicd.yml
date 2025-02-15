@@ -45,7 +45,7 @@ jobs:
         run: |
           mkdir -p ./src/main/resources
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
-          echo "auth.apple.private-key=${{ secrets.APPLE_PRIVATE_KEY_BASE64 }}" >> ./src/main/resources/application.yml
+          echo "auth.apple.private-key: ${{ secrets.APPLE_PRIVATE_KEY_BASE64 }}" >> ./src/main/resources/application.yml
         shell: bash
 
       # Spring Boot 어플리케이션 Build
