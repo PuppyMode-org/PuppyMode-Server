@@ -13,7 +13,7 @@ import umc.puppymode.web.dto.CalendarDTO.CalendarListResponseDTO;
 import umc.puppymode.web.dto.CalendarDTO.CalendarResponseDTO.*;
 import umc.puppymode.web.dto.CalendarDTO.DrinkHistoryItemDTO;
 import umc.puppymode.web.dto.CalendarDTO.FeedDTO;
-import umc.puppymode.web.dto.DrinkResponseDTO;
+import umc.puppymode.web.dto.DrinkResponseDTO.*;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -167,11 +167,11 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
 
         List<DrinkHistoryItemDTO> drinkItems = drinkHistoryItemRepository.findDrinkItemsByHistoryId(drinkHistoryId);
         FeedDTO feed = feedRepository.findFeedByHistoryId(drinkHistoryId);
-        List<DrinkResponseDTO.HangoverResponseDTO> hangoverItems = drinkHistory.getHangovers().stream()
-                .map(hangover -> new DrinkResponseDTO.HangoverResponseDTO(
+        List<HangoverResponseDTO> hangoverItems = drinkHistory.getHangovers().stream()
+                .map(hangover -> new HangoverResponseDTO(
                         hangover.getHangoverId(),
-                        hangover.getImageUrl(),
-                        hangover.getHangoverName()
+                        hangover.getHangoverName(),
+                        hangover.getImageUrl()
                 ))
                 .collect(Collectors.toList());
 
