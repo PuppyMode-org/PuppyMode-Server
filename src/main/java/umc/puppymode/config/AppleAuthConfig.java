@@ -25,4 +25,7 @@ public class AppleAuthConfig {
 
     @Value("${auth.apple.key-id}")
     private String keyId;
+
+    @Value("${auth.apple.private-key}")
+    private String privateKey;
 }
