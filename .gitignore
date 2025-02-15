@@ -43,3 +43,12 @@ out/
 /src/main/generated/
 
 /src/main/resources/firebase/*
+
+### Ignore environment files ###
+.env
+*.env
+
+### Ignore private key files ###
+*.p8
+/etc/secrets/*.p8
+/src/main/resources/*.p8

@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return token;
         }
 
-        log.warn("Authorization header is missing or invalid");
+//        log.warn("Authorization header is missing or invalid");
         return null;
     }
 }
