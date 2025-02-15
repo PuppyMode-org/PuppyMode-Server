@@ -42,7 +42,13 @@ jobs:
 
       # Apple Private Key 파일 환경변수 load
       - name: Set Apple Private Key as Environment Variable
-        run: echo "APPLE_PRIVATE_KEY=$(echo '${{ secrets.APPLE_PRIVATE_KEY_BASE64 }}' | base64 -d)" >> $GITHUB_ENV
+        run: |
+          {
+            echo 'APPLE_PRIVATE_KEY<<EOF'
+            echo "${{ secrets.APPLE_PRIVATE_KEY_BASE64 }}" | base64 -d
+            echo ''
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
         shell: bash
 
       # yml 파일 생성
