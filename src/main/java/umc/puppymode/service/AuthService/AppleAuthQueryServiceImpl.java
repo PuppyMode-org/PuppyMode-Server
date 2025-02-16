@@ -5,11 +5,8 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 import umc.puppymode.config.AppleAuthConfig;
-import umc.puppymode.domain.enums.AuthProvider;
-import umc.puppymode.web.dto.UserAuthInfoDTO;
 
 import java.security.PublicKey;
 import java.util.Date;
@@ -63,42 +60,11 @@ public class AppleAuthQueryServiceImpl implements AppleAuthQueryService {
                 throw new IllegalArgumentException("Token has expired");
             }
 
-            // sub(사용자 고유 ID) 반환
-            String appleUserId = body.getSubject();
-
             return body;
 
         } catch (Exception e) {
             log.error("Identity Token 검증 실패: {}", e.getMessage());
             throw new IllegalArgumentException("Invalid Identity Token");
-        }
-    }
-
-    /**
-     * Identity Token 에서 사용자 정보 추출
-     *
-     * @param identityToken
-     * @return UserAuthInfoDTO
-     */
-    @Override
-    public UserAuthInfoDTO getUserInfo(String identityToken) {
-        try {
-            Claims claims = verifyIdentityToken(identityToken);
-
-            String appleAuthId = claims.get("sub", String.class);
-            String email = claims.get("email", String.class);
-            Boolean emailVerified = Boolean.parseBoolean(claims.get("email_verified", String.class));
-
-            log.info("Apple Identity Token 정보 추출 완료");
-
-            return UserAuthInfoDTO.builder()
-                    .userAuthId(appleAuthId)
-                    .email(email)
-                    .authProvider(AuthProvider.APPLE)
-                    .build();
-        } catch (JwtException e) {
-            log.error("Invalid Apple Identity Token", e);
-            throw new IllegalArgumentException("Invalid Apple Identity Token");
         }
     }
 
