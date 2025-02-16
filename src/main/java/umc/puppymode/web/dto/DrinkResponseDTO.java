@@ -56,9 +56,11 @@ public class DrinkResponseDTO {
         private String message;
         private String feedImageUrl;
         private String feedType;
+        private String puppyName;
+        private Integer puppyExp;
         private Integer puppyLevel;
         private String puppyLevelName;
-        private Integer puppyPercent;
+        private Float puppyPercent;
     }
 
     @Builder
@@ -71,7 +73,7 @@ public class DrinkResponseDTO {
         private Integer puppyExp;
         private Integer puppyLevel;
         private String puppyLevelName;
-        private Integer puppyPercent;
+        private Float puppyPercent;
     }
 
     @Builder
