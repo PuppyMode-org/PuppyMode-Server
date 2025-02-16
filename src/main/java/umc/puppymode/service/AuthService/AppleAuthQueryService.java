@@ -1,7 +1,7 @@
 package umc.puppymode.service.AuthService;
 
-import umc.puppymode.web.dto.UserAuthInfoDTO;
+import io.jsonwebtoken.Claims;
 
 public interface AppleAuthQueryService {
-    UserAuthInfoDTO getUserInfo(String identityToken);
+    Claims verifyIdentityToken(String identityToken);
 }
