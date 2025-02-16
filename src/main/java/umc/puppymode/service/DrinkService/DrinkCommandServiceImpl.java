@@ -106,10 +106,16 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         }
 
         Puppy puppy = puppyRepository.findByUserId(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.NO_USERS_PUPPY));;
+                .orElseThrow(() -> new GeneralException(ErrorStatus.NO_USERS_PUPPY));
+        recordResponseDTO.setPuppyName(puppy.getPuppyName());
+        recordResponseDTO.setPuppyExp(puppy.getPuppyExp());
         recordResponseDTO.setPuppyLevel(puppy.getPuppyLevel().getPuppyLevel());
         recordResponseDTO.setPuppyLevelName(puppy.getPuppyLevel().getLevelName());
-        recordResponseDTO.setPuppyPercent(puppy.getPuppyExp());
+
+        Float puppyPercent = (float) (((double) (puppy.getPuppyExp() - puppy.getPuppyLevel().getLevelMinExp()) /
+                (puppy.getPuppyLevel().getLevelMaxExp() - puppy.getPuppyLevel().getLevelMinExp())) * 100);
+
+        recordResponseDTO.setPuppyPercent(puppyPercent);
 
         // 획득 먹이 10개 중 랜덤
         Random RANDOM = new Random();
@@ -158,8 +164,8 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         puppy.updatePuppyExp(fivePercentExp);
 
         // 현재 경험치 비율 계산 (0~100%)
-        int puppyPercent = (int) (((double) (puppy.getPuppyExp() - puppy.getPuppyLevel().getLevelMinExp()) /
-                (puppy.getPuppyLevel().getLevelMaxExp() - puppy.getPuppyLevel().getLevelMinExp())) * 100);
+        Float puppyPercent = (float) (((double) (puppy.getPuppyExp() - puppy.getPuppyLevel().getLevelMinExp()) /
+                        (puppy.getPuppyLevel().getLevelMaxExp() - puppy.getPuppyLevel().getLevelMinExp())) * 100);
 
         // DTO 생성 및 반환
         return FeedResponseDTO.builder()
