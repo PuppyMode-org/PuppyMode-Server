@@ -100,9 +100,9 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         if (drinkRecordDTO.getHangoverOptions().toArray().length == 0) {
             recordResponseDTO.setMessage("주량을 잘 조절해서 마셨네요!");
         } else if (drinkRecordDTO.getHangoverOptions().toArray().length <= 2) {
-            recordResponseDTO.setMessage("다음에는 꼭 주량을 지키도록 노력해 주세요!");
+            recordResponseDTO.setMessage("주량을 지키도록 노력해 주세요!");
         } else {
-            recordResponseDTO.setMessage("건강을 생각해서 다음에는 꼭 주량을 지켜주세요!");
+            recordResponseDTO.setMessage("다음에는 꼭 주량을 지켜주세요!");
         }
 
         Puppy puppy = puppyRepository.findByUserId(userId)
