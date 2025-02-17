@@ -87,7 +87,7 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
 
             String appointmentTime = null;
             Long appointmentId = null;
-            if (appointment.isPresent() && appointment.get().getStatus() == AppointmentStatus.COMPLETED) {
+            if (appointment.isPresent()) {
                 appointmentTime = calculateAppointmentTime(appointment.get());
                 appointmentId = appointment.get().getAppointmentId();
             }
@@ -111,14 +111,13 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
                     .status("건강 포기한 날")
                     .build());
 
-            if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
-                String appointmentTime = calculateAppointmentTime(appointment);
-                Long appointmentId = appointment.getAppointmentId();
-                CalendarListResponseDTO existingDTO = drinkStatusMap.get(date);
-                if (existingDTO != null) {
-                    existingDTO.setAppointmentTime(appointmentTime);
-                    existingDTO.setAppointmentId(appointmentId);
-                }
+            String appointmentTime = calculateAppointmentTime(appointment);
+            Long appointmentId = appointment.getAppointmentId();
+
+            CalendarListResponseDTO existingDTO = drinkStatusMap.get(date);
+            if (existingDTO != null) {
+                existingDTO.setAppointmentTime(appointmentTime);
+                existingDTO.setAppointmentId(appointmentId);
             }
         }
 
@@ -144,18 +143,19 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
         LocalDateTime startTime = appointment.getDrinkingStartTime();
         LocalDateTime endTime = appointment.getUpdatedAt();
 
-        if (startTime != null && endTime != null) {
-            Duration duration = Duration.between(startTime, endTime);
-            long hours = duration.toHours();
-            long minutes = duration.toMinutes() % 60;
+            if (appointment.getStatus() == AppointmentStatus.COMPLETED && endTime != null) {
+                String startFormatted = String.format("%02d:%02d", startTime.getHour(), startTime.getMinute());
+                Duration duration = Duration.between(startTime, endTime);
+                long hours = duration.toHours();
+                long minutes = duration.toMinutes() % 60;
+                String endFormatted = String.format("%02d:%02d", endTime.getHour(), endTime.getMinute());
 
-            // 시작 시간과 종료 시간을 HH:mm 형태로 포맷팅
-            String startFormatted = String.format("%02d:%02d", startTime.getHour(), startTime.getMinute());
-            String endFormatted = String.format("%02d:%02d", endTime.getHour(), endTime.getMinute());
-
-            return String.format("%s ~ %s (%dh %dm)", startFormatted, endFormatted, hours, minutes);
-        }
-        return "술 약속 시간 미정";
+                return String.format("%s ~ %s (%dh %dm)", startFormatted, endFormatted, hours, minutes);
+            } else {
+                // 완료되지 않은 약속의 경우 시작 시간만 표시
+                String startFormatted = String.format("%02d:%02d", appointment.getDateTime().getHour(), appointment.getDateTime().getMinute());
+                return startFormatted + " ~";
+            }
     }
 
     @Override
