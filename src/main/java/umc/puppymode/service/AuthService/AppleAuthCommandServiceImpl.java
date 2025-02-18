@@ -87,6 +87,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
 
     /**
      * Authorization Code 를 사용하여 Access Token, Refresh Token 을 요청합니다.
+     *
      * @param authorizationCode
      * @return AppleTokenResponseDTO
      */

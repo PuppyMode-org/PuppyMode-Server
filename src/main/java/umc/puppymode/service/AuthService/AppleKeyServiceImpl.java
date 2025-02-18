@@ -9,8 +9,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import umc.puppymode.config.AppleAuthConfig;
 
 import javax.annotation.PostConstruct;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -29,13 +27,18 @@ public class AppleKeyServiceImpl implements AppleKeyService {
     private final WebClient webClient;
     private final AppleAuthConfig appleAuthConfig;
     private static final String APPLE_KEYS_URL = "https://appleid.apple.com/auth/keys";
-    private final Map<String, PublicKey> publicKeyCache = new HashMap<>();
+    public final Map<String, PublicKey> publicKeyCache = new HashMap<>();
     private PrivateKey privateKey;
 
     @PostConstruct
     public void init() {
         refreshKeys();
         this.privateKey = loadPrivateKey();
+    }
+
+    public AppleKeyServiceImpl() {
+        this.webClient = null;
+        this.appleAuthConfig = null;
     }
 
     /**
@@ -79,6 +82,7 @@ public class AppleKeyServiceImpl implements AppleKeyService {
             publicKeyCache.clear();
             publicKeyCache.putAll(newKeyCache);
             log.info("애플 공개 키 갱신 완료. 저장된 키 개수: {}", publicKeyCache.size());
+//            log.info("Apple 공개 키 캐싱: {}", publicKeyCache.keySet());
 
         } catch (Exception e) {
             log.error("애플 공개 키 갱신 실패: {}", e.getMessage(), e);
@@ -93,6 +97,11 @@ public class AppleKeyServiceImpl implements AppleKeyService {
         try {
             String privateKeyPath = appleAuthConfig.getPrivateKey();
 
+//            log.info("Apple Private Key 로드 시작...");
+            if (privateKeyPath == null || privateKeyPath.isEmpty()) {
+                throw new RuntimeException("Apple Private Key 값이 설정되지 않았습니다.");
+            }
+
             // Base64 디코딩
             byte[] keyBytes = Base64.getDecoder().decode(privateKeyPath);
 
@@ -105,6 +114,8 @@ public class AppleKeyServiceImpl implements AppleKeyService {
 
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decoded);
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
+
+//            log.info("Apple Private Key 로드 성공");
             return keyFactory.generatePrivate(keySpec);
 
         } catch (Exception e) {
