@@ -25,6 +25,7 @@ public class DrinkingAppointmentConverter {
                 .appointmentId(entity.getAppointmentId())
                 .dateTime(entity.getDateTime())
                 .address(entity.getAddress())
+                .locationName(entity.getLocationName())
                 .status(entity.getStatus().toString())
                 .build();
     }
@@ -35,6 +36,7 @@ public class DrinkingAppointmentConverter {
                 .appointmentId(entity.getAppointmentId())
                 .dateTime(entity.getDateTime())
                 .address(entity.getAddress())
+                .locationName(entity.getLocationName())
                 .status(entity.getStatus().name().toLowerCase()) //일단 API 명세에는 소문자로 되어있어서 소문자 처리.
                 .build();
     }
