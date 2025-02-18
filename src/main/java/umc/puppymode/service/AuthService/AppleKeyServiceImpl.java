@@ -36,11 +36,6 @@ public class AppleKeyServiceImpl implements AppleKeyService {
         this.privateKey = loadPrivateKey();
     }
 
-    public AppleKeyServiceImpl() {
-        this.webClient = null;
-        this.appleAuthConfig = null;
-    }
-
     /**
      * 공개 키를 조회합니다.
      * Identity Token 검증용
