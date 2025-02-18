@@ -17,6 +17,7 @@ public class DrinkingAppointmentResponseDTO {
         private Long appointmentId; // 약속 ID
         private LocalDateTime dateTime; // 약속 날짜 및 시간
         private String address; // 약속 장소
+        private String locationName;
         private String status;
     }
 
@@ -26,6 +27,7 @@ public class DrinkingAppointmentResponseDTO {
         private Long appointmentId;
         private LocalDateTime dateTime;
         private String address;
+        private String locationName;
         private String status;
     }
 
