@@ -18,6 +18,8 @@ public class CalendarResponseDTO {
         private Long drinkHistoryId;
         private String drinkDate;
         private Float drinkAmount;
+        private Float totalSafetyValue;
+        private Float totalMaxValue;
 
         private List<DrinkHistoryItemDTO> drinkItems;
         private FeedDTO feed;

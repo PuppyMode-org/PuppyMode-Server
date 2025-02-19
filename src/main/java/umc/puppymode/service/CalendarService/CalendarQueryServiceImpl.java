@@ -175,12 +175,21 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
                 ))
                 .collect(Collectors.toList());
 
+        float totalSafetyValue = 0f;
+        float totalMaxValue = 0f;
+
+        for (DrinkHistoryItemDTO item : drinkItems) {
+            totalSafetyValue += item.getSafetyValue();
+            totalMaxValue += item.getMaxValue();
+        }
 
         return List.of(
                 CalendarDetailDTO.builder()
                         .drinkHistoryId(drinkHistory.getDrinkHistoryId())
                         .drinkDate(drinkHistory.getDrinkDate().toString())
                         .drinkAmount(drinkHistory.getDrinkAmount())
+                        .totalSafetyValue(totalSafetyValue)
+                        .totalMaxValue(totalMaxValue)
                         .drinkItems(drinkItems)
                         .feed(feed)
                         .hangoverItems(hangoverItems)
