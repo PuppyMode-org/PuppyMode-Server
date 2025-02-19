@@ -60,15 +60,15 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
             item.setValue(tolerance.getValue());
             historyItemsList.add(item);
         }
-
         drinkHistoryItemRepository.saveAll(historyItemsList);
+
 
         // 안전 주량 및 치사량 계산
         List<DrinkHistoryItem> historyItems = drinkHistoryItemRepository.findByHistory_User_UserId(userId);
         Map<Long, Float> safetyLevels = new HashMap<>();
         Map<Long, Float> maxCapacities = new HashMap<>();
 
-        for (DrinkHistoryItem item : historyItemsList) {
+        for (DrinkHistoryItem item : historyItems) {
             Long drinkItemId = item.getItem().getItemId();
             float alcoholAmount = convertToAlcoholAmount(drinkItemId, item.getUnit(), item.getValue());
             // 숙취를 처음 느낀 기록을 기준으로 안전 주량 설정
@@ -80,7 +80,7 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         }
 
         // 계산된 안전 주량과 치사량을 DrinkHistoryItem에 설정 후 저장
-        for (DrinkHistoryItem item : historyItemsList) {
+        for (DrinkHistoryItem item : historyItems) {
             Long drinkItemId = item.getItem().getItemId();
 
             // 안전 주량과 치사량을 해당 항목에 설정
@@ -90,9 +90,8 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
             if (maxCapacities.containsKey(drinkItemId)) {
                 item.setMaxValue(maxCapacities.get(drinkItemId));
             }
-
-            drinkHistoryItemRepository.saveAll(historyItemsList);
         }
+        drinkHistoryItemRepository.saveAll(historyItems);
 
         DrinksRecordResponseDTO recordResponseDTO = new DrinksRecordResponseDTO();
         // 숙취 개수에 따라 message 다르게
