@@ -91,7 +91,7 @@ public class LocationServiceImpl implements LocationService {
                     userLatitude, userLongitude, targetLatitude, targetLongitude
             );
 
-            return distance <= 1.01; // 1km 이내 허용
+            return distance <= 5.01; // 1km 이내 허용
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.DISTANCE_CALCULATION_FAILED);
         }
