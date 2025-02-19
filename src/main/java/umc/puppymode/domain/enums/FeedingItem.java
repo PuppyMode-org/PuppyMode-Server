@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum FeedingItem {
-    CHICKEN("닭 고기", "https://d1le4wcgenmery.cloudfront.net/8827837e-0403-4d5f-a38e-cf2b9ac9e6b3chicken.png"),
-    BEEF("소 고기", "https://d1le4wcgenmery.cloudfront.net/b8747c5e-ce61-4439-a4d8-f5065bf98abdbeef.png"),
+    CHICKEN("닭고기", "https://d1le4wcgenmery.cloudfront.net/8827837e-0403-4d5f-a38e-cf2b9ac9e6b3chicken.png"),
+    BEEF("소고기", "https://d1le4wcgenmery.cloudfront.net/b8747c5e-ce61-4439-a4d8-f5065bf98abdbeef.png"),
     SALMON("연어", "https://d1le4wcgenmery.cloudfront.net/a124080f-68fe-4e3b-bdad-5008c6b1a979salmon.png"),
     SWEET_POTATO("고구마", "https://d1le4wcgenmery.cloudfront.net/0a4f606f-c3ee-4add-8ee2-cb3a717be156sweet_potato.png"),
     CARROT("당근", "https://d1le4wcgenmery.cloudfront.net/1276f7de-201c-4cca-899e-a37b2907e359carrot.png"),
