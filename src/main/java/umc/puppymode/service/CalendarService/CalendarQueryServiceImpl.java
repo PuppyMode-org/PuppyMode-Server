@@ -47,6 +47,7 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
         Map<LocalDate, CalendarListResponseDTO> drinkStatusMap = new HashMap<>();
         YearMonth targetMonth = YearMonth.parse(month);
         int lastDay = targetMonth.lengthOfMonth();
+        LocalDate today = LocalDate.now();
 
         for (DrinkHistory history : drinkHistories) {
             LocalDate date = history.getDrinkDate();
@@ -101,10 +102,17 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
 
         for (DrinkingAppointment appointment : appointments) {
             LocalDate date = appointment.getDateTime().toLocalDate();
+            String status;
+
+            if (date.isAfter(today)) {
+                status = "건강 챙기고 싶은 날";
+            } else {
+                status = "건강 포기한 날";
+            }
 
             drinkStatusMap.putIfAbsent(date, CalendarListResponseDTO.builder()
                     .drinkDate(date)
-                    .status("건강 포기한 날")
+                    .status(status)
                     .build());
 
             String appointmentTime = calculateAppointmentTime(appointment);
@@ -120,9 +128,16 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
         for (int day = 1; day <= lastDay; day++) {
             LocalDate date = LocalDate.of(targetMonth.getYear(), targetMonth.getMonth(), day);
             if (!drinkStatusMap.containsKey(date)) {
+                String status;
+                if (date.isAfter(today)) {
+                    status = "건강 챙기는 날";  // 오늘 이후이면서 약속이 없는 날
+                } else {
+                    status = "건강 챙긴 날";    // 오늘 이전이면서 기록이 없는 날
+                }
+
                 drinkStatusMap.put(date, CalendarListResponseDTO.builder()
                         .drinkDate(date)
-                        .status("건강 챙긴 날")
+                        .status(status)
                         .build());
             }
         }
