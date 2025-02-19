@@ -45,14 +45,11 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
         List<DrinkingAppointment> appointments = drinkingAppointmentRepository.findAppointmentsByUserAndMonth(userId, month);
 
         Map<LocalDate, CalendarListResponseDTO> drinkStatusMap = new HashMap<>();
-        LocalDate today = LocalDate.now();
         YearMonth targetMonth = YearMonth.parse(month);
-        boolean isCurrentMonth = targetMonth.equals(YearMonth.from(today));
-        int lastDay = isCurrentMonth ? today.getDayOfMonth() : targetMonth.lengthOfMonth();
+        int lastDay = targetMonth.lengthOfMonth();
 
         for (DrinkHistory history : drinkHistories) {
             LocalDate date = history.getDrinkDate();
-            if (date.isAfter(today) && isCurrentMonth) continue;
 
             List<DrinkHistoryItem> drinkHistoryItems =
                     Optional.ofNullable(drinkHistoryItemRepository.findByHistory_DrinkHistoryId(history.getDrinkHistoryId()))
@@ -104,7 +101,6 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
 
         for (DrinkingAppointment appointment : appointments) {
             LocalDate date = appointment.getDateTime().toLocalDate();
-            if (date.isAfter(today) && isCurrentMonth) continue;
 
             drinkStatusMap.putIfAbsent(date, CalendarListResponseDTO.builder()
                     .drinkDate(date)
@@ -143,19 +139,19 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
         LocalDateTime startTime = appointment.getDrinkingStartTime();
         LocalDateTime endTime = appointment.getUpdatedAt();
 
-            if (appointment.getStatus() == AppointmentStatus.COMPLETED && endTime != null) {
-                String startFormatted = String.format("%02d:%02d", startTime.getHour(), startTime.getMinute());
-                Duration duration = Duration.between(startTime, endTime);
-                long hours = duration.toHours();
-                long minutes = duration.toMinutes() % 60;
-                String endFormatted = String.format("%02d:%02d", endTime.getHour(), endTime.getMinute());
+        if (appointment.getStatus() == AppointmentStatus.COMPLETED && endTime != null) {
+            String startFormatted = String.format("%02d:%02d", startTime.getHour(), startTime.getMinute());
+            Duration duration = Duration.between(startTime, endTime);
+            long hours = duration.toHours();
+            long minutes = duration.toMinutes() % 60;
+            String endFormatted = String.format("%02d:%02d", endTime.getHour(), endTime.getMinute());
 
-                return String.format("%s ~ %s (%dh %dm)", startFormatted, endFormatted, hours, minutes);
-            } else {
-                // 완료되지 않은 약속의 경우 시작 시간만 표시
-                String startFormatted = String.format("%02d:%02d", appointment.getDateTime().getHour(), appointment.getDateTime().getMinute());
-                return startFormatted + " ~";
-            }
+            return String.format("%s ~ %s (%dh %dm)", startFormatted, endFormatted, hours, minutes);
+        } else {
+            // 완료되지 않은 약속의 경우 시작 시간만 표시
+            String startFormatted = String.format("%02d:%02d", appointment.getDateTime().getHour(), appointment.getDateTime().getMinute());
+            return startFormatted + " ~";
+        }
     }
 
     @Override
