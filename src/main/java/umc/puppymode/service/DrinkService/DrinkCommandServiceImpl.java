@@ -13,14 +13,10 @@ import umc.puppymode.service.UserCollectionService.UserCollectionCommandService;
 import umc.puppymode.web.dto.DrinkRequestDTO.*;
 import umc.puppymode.web.dto.DrinkResponseDTO.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class DrinkCommandServiceImpl implements DrinkCommandService {
     private final UserRepository userRepository;
     private final DrinkItemRepository drinkItemRepository;
@@ -42,7 +38,7 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         drinkHistory.setUser(user);
         drinkHistory.setDrinkDate(drinkRecordDTO.getDrinkDate());
         drinkHistory.setDrinkAmount(drinkRecordDTO.getAlcoholTolerance().stream()
-                .map(tolerance -> convertToMl(tolerance.getDrinkItemId(), tolerance.getUnit(), tolerance.getValue()))
+                .map(tolerance -> convertToAlcoholAmount(tolerance.getDrinkItemId(), tolerance.getUnit(), tolerance.getValue()))
                 .reduce(0.0f, Float::sum));
         drinkHistoryRepository.save(drinkHistory);
 
@@ -52,36 +48,39 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
             drinkHistory.setHangovers(hangoverItems);
         }
 
-        // 주종 별 기록 추가
+        List<DrinkHistoryItem> historyItemsList = new ArrayList<>();
         for (AlcoholTolerance tolerance : drinkRecordDTO.getAlcoholTolerance()) {
             DrinkHistoryItem item = new DrinkHistoryItem();
             DrinkItem drinkItem = drinkItemRepository.findById(tolerance.getDrinkItemId())
-                    .orElseThrow(() -> new GeneralException(ErrorStatus.DRINK_ITEM_NOT_FOUND));;
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.DRINK_ITEM_NOT_FOUND));
+
             item.setHistory(drinkHistory);
             item.setItem(drinkItem);
             item.setUnit(tolerance.getUnit());
             item.setValue(tolerance.getValue());
-            drinkHistoryItemRepository.save(item);
+            historyItemsList.add(item);
         }
+
+        drinkHistoryItemRepository.saveAll(historyItemsList);
 
         // 안전 주량 및 치사량 계산
         List<DrinkHistoryItem> historyItems = drinkHistoryItemRepository.findByHistory_User_UserId(userId);
         Map<Long, Float> safetyLevels = new HashMap<>();
         Map<Long, Float> maxCapacities = new HashMap<>();
 
-        for (DrinkHistoryItem item : historyItems) {
+        for (DrinkHistoryItem item : historyItemsList) {
             Long drinkItemId = item.getItem().getItemId();
-            float amountMl = convertToMl(drinkItemId, item.getUnit(), item.getValue());
+            float alcoholAmount = convertToAlcoholAmount(drinkItemId, item.getUnit(), item.getValue());
             // 숙취를 처음 느낀 기록을 기준으로 안전 주량 설정
             if (drinkHistory.getHangovers() != null && !drinkHistory.getHangovers().isEmpty()) {
-                safetyLevels.put(drinkItemId, Math.min(safetyLevels.getOrDefault(drinkItemId, Float.MAX_VALUE), amountMl));
+                safetyLevels.put(drinkItemId, Math.min(safetyLevels.getOrDefault(drinkItemId, Float.MAX_VALUE), alcoholAmount));
             }
             // 가장 많이 마신 기록을 기준으로 치사량 설정
-            maxCapacities.put(drinkItemId, Math.max(maxCapacities.getOrDefault(drinkItemId, 0f), amountMl));
+            maxCapacities.put(drinkItemId, Math.max(maxCapacities.getOrDefault(drinkItemId, 0f), alcoholAmount));
         }
 
         // 계산된 안전 주량과 치사량을 DrinkHistoryItem에 설정 후 저장
-        for (DrinkHistoryItem item : historyItems) {
+        for (DrinkHistoryItem item : historyItemsList) {
             Long drinkItemId = item.getItem().getItemId();
 
             // 안전 주량과 치사량을 해당 항목에 설정
@@ -92,7 +91,7 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
                 item.setMaxValue(maxCapacities.get(drinkItemId));
             }
 
-            drinkHistoryItemRepository.save(item);
+            drinkHistoryItemRepository.saveAll(historyItemsList);
         }
 
         DrinksRecordResponseDTO recordResponseDTO = new DrinksRecordResponseDTO();
@@ -139,13 +138,13 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
 
         return recordResponseDTO;
     }
-    private float convertToMl(Long drinkItemId, String unit, float value) {
-        if (drinkItemId == 1) { // 소주
+    private float convertToMl(Long drinkCategoryId, String unit, float value) {
+        if (drinkCategoryId == 1) { // 소주
             switch (unit) {
                 case "잔": return value * 50;
                 case "병": return value * 360;
             }
-        } else if (drinkItemId == 2) { // 맥주
+        } else if (drinkCategoryId == 2) { // 맥주
             switch (unit) {
                 case "잔": return value * 300;
                 case "병": return value * 500;
@@ -154,6 +153,17 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         return value;
     }
 
+    private float convertToAlcoholAmount(Long drinkItemId, String unit, float value) {
+        DrinkItem drinkItem = drinkItemRepository.findById(drinkItemId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.DRINK_ITEM_NOT_FOUND));
+
+        Long drinkCategoryId = drinkItem.getCategory().getCategoryId();
+        float volume = convertToMl(drinkCategoryId, unit, value);
+        float alcoholPercentage = drinkItem.getAlcoholPercentage();
+        float alcoholAmount = (volume * alcoholPercentage) / 100;
+
+        return alcoholAmount;
+    }
     @Override
     public FeedResponseDTO postFeed(Long userId) {
         Puppy puppy = puppyRepository.findByUserId(userId)
