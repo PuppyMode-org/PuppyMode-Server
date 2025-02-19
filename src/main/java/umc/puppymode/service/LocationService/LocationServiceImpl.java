@@ -2,7 +2,6 @@ package umc.puppymode.service.LocationService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UrlPathHelper;
 import umc.puppymode.apiPayload.ApiResponse;
 import umc.puppymode.apiPayload.code.status.ErrorStatus;
 import umc.puppymode.apiPayload.exception.GeneralException;
@@ -25,7 +24,6 @@ public class LocationServiceImpl implements LocationService {
     private final DrinkingAppointmentRepository drinkingAppointmentRepository;
     private final DistanceCalculator distanceCalculator;
     private final DrinkingAppointmentQueryService drinkingAppointmentQueryService;
-    private final UrlPathHelper mvcUrlPathHelper;
 
     @Override
     public ApiResponse<DrinkingAppointmentResponseDTO.StartAppointmentResultDTO> startAppointment(Long appointmentId, DrinkingAppointmentRequestDTO.StartAppointmentRequestDTO request, Long userId) {
@@ -91,7 +89,7 @@ public class LocationServiceImpl implements LocationService {
                     userLatitude, userLongitude, targetLatitude, targetLongitude
             );
 
-            return distance <= 5.01; // 1km 이내 허용
+            return distance <= 5.01; // 5km 이내 허용
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.DISTANCE_CALCULATION_FAILED);
         }

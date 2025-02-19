@@ -34,7 +34,6 @@ public class DrinkingAppointmentQueryServiceImpl implements DrinkingAppointmentQ
             throw new IllegalStateException("해당 약속을 조회할 권한이 없습니다.");
         }
 
-        // 엔티티 → DTO 변환
         return DrinkingAppointmentConverter.toDTO(appointment);
     }
 
@@ -50,7 +49,6 @@ public class DrinkingAppointmentQueryServiceImpl implements DrinkingAppointmentQ
             appointments = drinkingAppointmentRepository.findByUser_UserId(userId, pageable);
         }
 
-        // DTO 변환
         List<DrinkingAppointmentResponseDTO.AppointmentSimpleDTO> appointmentDTOs = appointments.stream()
                 .map(DrinkingAppointmentConverter::toSimpleDTO)
                 .toList();

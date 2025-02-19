@@ -39,9 +39,9 @@ public class DrinkingAppointmentCommendServiceImpl implements DrinkingAppointmen
         DrinkingAppointment entity = DrinkingAppointmentConverter.toEntity(request);
         // User 설정
         entity.setUser(user);
-        // 데이터 저장
+
         DrinkingAppointment savedEntity = repository.save(entity);
-        // Entity → DTO 변환
+
         return DrinkingAppointmentConverter.toDTO(savedEntity);
     }
 
@@ -117,17 +117,14 @@ public class DrinkingAppointmentCommendServiceImpl implements DrinkingAppointmen
             }
         }
 
-        // 요청 데이터 수정
         Optional.ofNullable(request.getDateTime()).ifPresent(appointment::setDateTime);
         Optional.ofNullable(request.getLatitude()).ifPresent(appointment::setLatitude);
         Optional.ofNullable(request.getLongitude()).ifPresent(appointment::setLongitude);
         Optional.ofNullable(request.getAddress()).ifPresent(appointment::setAddress);
         Optional.ofNullable(request.getLocationName()).ifPresent(appointment::setLocationName);
 
-        // 수정된 엔티티 저장
         DrinkingAppointment updatedEntity = repository.save(appointment);
 
-        // Entity → DTO 변환
         return DrinkingAppointmentConverter.toUpdateAppointmentDTO(updatedEntity);
     }
 

@@ -11,7 +11,6 @@ public class DrinkingAppointmentRequestDTO {
 
     @Getter
     public static class AppointmentDTO {
-        //날짜가 오늘로 고정인지, 아니면 변동 가능한 지에 따라 추후 수정가능성 있습니다.
         @NotNull(message = "날짜 및 시간은 필수입니다.")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime dateTime;
@@ -50,7 +49,6 @@ public class DrinkingAppointmentRequestDTO {
 
     @Getter
     public static class UpdateAppointmentDTO {
-        //날짜가 오늘로 고정인지, 아니면 변동 가능한 지에 따라 추후 수정가능성 있습니다.
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
         private LocalDateTime dateTime;
 
