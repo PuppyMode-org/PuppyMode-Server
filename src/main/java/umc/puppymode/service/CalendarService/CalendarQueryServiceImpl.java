@@ -104,7 +104,7 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
             LocalDate date = appointment.getDateTime().toLocalDate();
             String status;
 
-            if (date.isAfter(today)) {
+            if (!date.isBefore(today)) {
                 status = "건강 챙기고 싶은 날";
             } else {
                 status = "건강 포기한 날";
@@ -129,8 +129,8 @@ public class CalendarQueryServiceImpl implements CalendarQueryService{
             LocalDate date = LocalDate.of(targetMonth.getYear(), targetMonth.getMonth(), day);
             if (!drinkStatusMap.containsKey(date)) {
                 String status;
-                if (date.isAfter(today)) {
-                    status = "건강 챙기는 날";  // 오늘 이후이면서 약속이 없는 날
+                if (!date.isBefore(today)) {
+                    status = "건강 챙기는 날";  // 오늘 포함 이후이면서 약속이 없는 날
                 } else {
                     status = "건강 챙긴 날";    // 오늘 이전이면서 기록이 없는 날
                 }
