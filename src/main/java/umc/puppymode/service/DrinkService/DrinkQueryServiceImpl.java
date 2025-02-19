@@ -3,6 +3,8 @@ package umc.puppymode.service.DrinkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import umc.puppymode.apiPayload.code.status.ErrorStatus;
+import umc.puppymode.apiPayload.exception.GeneralException;
 import umc.puppymode.domain.DrinkCategory;
 import umc.puppymode.domain.DrinkHistoryItem;
 import umc.puppymode.domain.DrinkItem;
@@ -88,21 +90,72 @@ public class DrinkQueryServiceImpl implements DrinkQueryService {
 
             // 사용자가 해당 drinkItem에 대해 작성한 기록이 있을 경우에만 반환
             if (!historyItems.isEmpty()) {
-                // 가장 최근 기록을 가져오기 (혹은 원하는 기록 기준으로 선택)
                 DrinkHistoryItem historyItem = historyItems.get(0);
+                // 평균 주량 계산
+                float average = (float) historyItems.stream()
+                        .mapToDouble(item -> convertToAlcoholAmount(item.getItem().getItemId(), item.getUnit(), item.getValue()))
+                        .average()
+                        .orElse(0.0);
 
+                float safetyValueBottle = 0;
+                float safetyValueGlass = 0;
+                float maxValueBottle = 0;
+                float maxValueGlass = 0;
+
+                // 소주나 맥주에 따라 병과 잔의 값을 다르게 설정
+                if (drinkItem.getCategory().getCategoryId() == 1) { // 소주
+                    safetyValueBottle = historyItem.getSafetyValue() / (360 * historyItem.getItem().getAlcoholPercentage() / 100);
+                    safetyValueGlass = historyItem.getSafetyValue() / (50 * historyItem.getItem().getAlcoholPercentage() / 100);
+
+                    maxValueBottle = historyItem.getMaxValue() / (360 * historyItem.getItem().getAlcoholPercentage() / 100);
+                    maxValueGlass = historyItem.getMaxValue() / (50 * historyItem.getItem().getAlcoholPercentage() / 100);
+                } else if (drinkItem.getCategory().getCategoryId() == 2) { // 맥주
+                    safetyValueBottle = historyItem.getSafetyValue() / (500 * historyItem.getItem().getAlcoholPercentage() / 100);
+                    safetyValueGlass = historyItem.getSafetyValue() / (300 * historyItem.getItem().getAlcoholPercentage() / 100);
+
+                    maxValueBottle = historyItem.getMaxValue() / (500 * historyItem.getItem().getAlcoholPercentage() / 100);
+                    maxValueGlass = historyItem.getMaxValue() / (300 * historyItem.getItem().getAlcoholPercentage() / 100);
+                }
                 return DrinkInfoResponseDTO.builder()
                         .drinkItemId(drinkItem.getItemId())
                         .drinkItemName(drinkItem.getItemName())
                         .imageUrl(drinkItem.getImageUrl())
                         .alcoholPercentage(drinkItem.getAlcoholPercentage())
-                        .safetyValue(historyItem.getSafetyValue())  // historyItem에서 safetyValue 가져오기
-                        .maxValue(historyItem.getMaxValue())    // historyItem에서 maxValue 가져오기
+                        .safetyValue(historyItem.getSafetyValue())
+                        .maxValue(historyItem.getMaxValue())
+                        .safetyValueBottle(safetyValueBottle)  // 안전 주량 병
+                        .safetyValueGlass(safetyValueGlass)    // 안전 주량 잔
+                        .maxValueBottle(maxValueBottle)        // 치사량 병
+                        .maxValueGlass(maxValueGlass)          // 치사량 잔
+                        .average(average)                      // 평균 주량
                         .build();
             }
         }
-
-        // 사용자가 작성한 기록이 없으면 null 반환
         return null;
+    }
+
+    private float convertToAlcoholAmount(Long drinkItemId, String unit, float value) {
+        DrinkItem drinkItem = drinkItemRepository.findById(drinkItemId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.DRINK_ITEM_NOT_FOUND));
+        float volume = convertToMl(drinkItem.getCategory().getCategoryId(), unit, value);
+        float alcoholPercentage = drinkItem.getAlcoholPercentage();
+        return (volume * alcoholPercentage) / 100;
+    }
+    private float convertToMl(Long drinkCategoryId, String unit, float value) {
+        // 소주
+        if (drinkCategoryId == 1) {
+            switch (unit) {
+                case "잔": return value * 50;
+                case "병": return value * 360;
+            }
+        }
+        // 맥주
+        else if (drinkCategoryId == 2) {
+            switch (unit) {
+                case "잔": return value * 300;
+                case "병": return value * 500;
+            }
+        }
+        return value;
     }
 }
