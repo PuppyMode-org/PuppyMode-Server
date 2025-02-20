@@ -28,7 +28,7 @@ public class AppleAuthController {
      * iOS 클라이언트용 애플 로그인 엔드포인트입니다.
      * JSON 요청을 받습니다.
      */
-//    @PostMapping("/login")
+    @PostMapping("/login")
     @Operation(summary = "애플 로그인 API",
             description = "애플 서버로부터 발급받은 `Authorization Token`과 `Identity Token`을 사용하여,  \n" +
                     "서버에서 JWT를 발급받는 API입니다.  \n" +
@@ -60,8 +60,7 @@ public class AppleAuthController {
      * 웹 테스트 용 애플 로그인 엔드포인트입니다.
      * form_post 요청을 받습니다.
      */
-//    @PostMapping("/web/callback")
-    @PostMapping("/login")
+    @PostMapping("/web/callback")
     @Operation(summary = "웹 테스트용 애플 로그인 API",
             description = "웹 방식으로 애플 로그인을 테스트합니다.")
     public ResponseEntity<ApiResponse<LoginResponseDTO>> appleWebLogin(

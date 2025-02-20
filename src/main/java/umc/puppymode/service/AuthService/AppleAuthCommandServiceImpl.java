@@ -116,8 +116,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
             throw new RuntimeException("Client Secret 생성 실패" + e.getMessage(), e);
         }
 
-//        String clientId = appleAuthConfig.getClientId(); TODO: appleAuthConfig.getClientId() 로 변경
-        String clientId = "PuppyMode.umc.com";
+        String clientId = appleAuthConfig.getClientId();
         String redirectUri = appleAuthConfig.getRedirectUri();
 
 //        log.info("Apple Access Token 요청: client_id={}, code={}, grant_type={}, redirect_uri={}",
@@ -182,8 +181,7 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
                 throw new IllegalStateException("Private Key가 null 입니다. 초기화 순서를 확인하세요.");
             }
 
-//            String clientId = appleAuthConfig.getClientId(); TODO: appleAuthConfig.getClientId() 로 변경
-            String clientId = "PuppyMode.umc.com";
+            String clientId = appleAuthConfig.getClientId();
             String keyId = appleAuthConfig.getKeyId();
             String teamId = appleAuthConfig.getTeamId();
 
