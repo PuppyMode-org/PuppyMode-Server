@@ -60,8 +60,8 @@ public class AppleAuthQueryServiceImpl implements AppleAuthQueryService {
                 throw new IllegalArgumentException("Invalid issuer: " + body.getIssuer());
             }
 
-            // aud(Audience) 검증 TODO: appleAuthConfig.getClientId() 로 변경
-            if (!"PuppyMode.umc.com".equals(body.getAudience())) {
+            // aud(Audience) 검증
+            if (!appleAuthConfig.getClientId().equals(body.getAudience())) {
                 throw new IllegalArgumentException("Invalid audience: " + body.getAudience());
             }
 

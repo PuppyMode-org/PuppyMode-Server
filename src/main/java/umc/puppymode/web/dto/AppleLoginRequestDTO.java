@@ -1,5 +1,6 @@
 package umc.puppymode.web.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class AppleLoginRequestDTO {
     /**
      * username을 자동으로 생성합니다.
      */
+    @Schema(hidden = true)
     public String getUsername() {
         if (user == null || user.getName() == null) {
             return null;
