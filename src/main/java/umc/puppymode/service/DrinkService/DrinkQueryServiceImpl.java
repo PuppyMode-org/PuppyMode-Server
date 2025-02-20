@@ -14,9 +14,7 @@ import umc.puppymode.repository.DrinkItemRepository;
 import umc.puppymode.repository.HangoverRepository;
 import umc.puppymode.web.dto.DrinkResponseDTO.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,63 +77,63 @@ public class DrinkQueryServiceImpl implements DrinkQueryService {
         DrinkItem drinkItem = drinkItemRepository.findById(drinkItemId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.DRINK_ITEM_NOT_FOUND));
 
-        List<DrinkHistoryItem> historyItems = drinkHistoryItemRepository.findByHistory_User_UserIdAndItem_ItemId(userId, drinkItemId);
+        List<DrinkHistoryItem> allHistoryItems = drinkHistoryItemRepository.findByHistory_User_UserId(userId);
 
-        if (!historyItems.isEmpty()) {
-            DrinkHistoryItem historyItem = historyItems.get(0);
-            // 평균 주량 계산
-            float average = (float) historyItems.stream()
-                    .mapToDouble(item -> convertToAlcoholAmount(item.getItem().getItemId(), item.getUnit(), item.getValue()))
-                    .average()
-                    .orElse(0.0);
+        Map<Long, DrinkHistoryItem> historyItemLists = allHistoryItems.stream()
+                .collect(Collectors.toMap(
+                        item -> item.getItem().getItemId(),
+                        item -> item,
+                        (existing, newer) -> existing.getCreatedAt().isAfter(newer.getCreatedAt()) ? existing : newer
+                ));
 
-            float safetyValueBottle = 0;
-            float safetyValueGlass = 0;
-            float maxValueBottle = 0;
-            float maxValueGlass = 0;
+        List<DrinkHistoryItem> historyItemList = new ArrayList<>(historyItemLists.values());
 
-            // 소주나 맥주에 따라 병과 잔의 값을 다르게 설정
-            if (drinkItem.getCategory().getCategoryId() == 1) { // 소주
-                safetyValueBottle = historyItem.getSafetyValue() / (360 * historyItem.getItem().getAlcoholPercentage() / 100);
-                safetyValueGlass = historyItem.getSafetyValue() / (50 * historyItem.getItem().getAlcoholPercentage() / 100);
+        float totalSafetyValue = (float) historyItemList.stream().mapToDouble(DrinkHistoryItem::getSafetyValue).sum();
+        float totalMaxValue = (float) historyItemList.stream().mapToDouble(DrinkHistoryItem::getMaxValue).sum();
 
-                maxValueBottle = historyItem.getMaxValue() / (360 * historyItem.getItem().getAlcoholPercentage() / 100);
-                maxValueGlass = historyItem.getMaxValue() / (50 * historyItem.getItem().getAlcoholPercentage() / 100);
-            } else if (drinkItem.getCategory().getCategoryId() == 2) { // 맥주
-                safetyValueBottle = historyItem.getSafetyValue() / (500 * historyItem.getItem().getAlcoholPercentage() / 100);
-                safetyValueGlass = historyItem.getSafetyValue() / (300 * historyItem.getItem().getAlcoholPercentage() / 100);
+        System.out.println("totalSafetyValue: " + totalSafetyValue);
+        System.out.println("totalMaxValue: " + totalMaxValue);
 
-                maxValueBottle = historyItem.getMaxValue() / (500 * historyItem.getItem().getAlcoholPercentage() / 100);
-                maxValueGlass = historyItem.getMaxValue() / (300 * historyItem.getItem().getAlcoholPercentage() / 100);
-            }
-            return DrinkInfoResponseDTO.builder()
-                    .drinkItemId(drinkItem.getItemId())
-                    .drinkItemName(drinkItem.getItemName())
-                    .imageUrl(drinkItem.getImageUrl())
-                    .alcoholPercentage(drinkItem.getAlcoholPercentage())
-                    .safetyValue(historyItem.getSafetyValue())
-                    .maxValue(historyItem.getMaxValue())
-                    .safetyValueBottle(safetyValueBottle)  // 안전 주량 병
-                    .safetyValueGlass(safetyValueGlass)    // 안전 주량 잔
-                    .maxValueBottle(maxValueBottle)        // 치사량 병
-                    .maxValueGlass(maxValueGlass)          // 치사량 잔
-                    .average(average)                      // 평균 주량
-                    .build();
+        // 평균 주량 계산
+        float average = roundToOneDecimal((float) historyItemList.stream()
+                .mapToDouble(item -> convertToAlcoholAmount(item.getItem().getItemId(), item.getUnit(), item.getValue()))
+                .average()
+                .orElse(0.0));
+
+        float safetyValueBottle = 0;
+        int safetyValueGlass = 0;
+        float maxValueBottle = 0;
+        int maxValueGlass = 0;
+
+        // 소주나 맥주에 따라 병과 잔의 값을 다르게 설정
+        if (drinkItem.getCategory().getCategoryId() == 1) { // 소주
+            safetyValueBottle = roundToOneDecimal(totalSafetyValue / (360 * drinkItem.getAlcoholPercentage() / 100));
+            safetyValueGlass = Math.round(totalSafetyValue / (50 * drinkItem.getAlcoholPercentage() / 100));
+
+            maxValueBottle = roundToOneDecimal(totalMaxValue / (360 * drinkItem.getAlcoholPercentage() / 100));
+            maxValueGlass = Math.round(totalMaxValue / (50 * drinkItem.getAlcoholPercentage() / 100));
+
+        } else if (drinkItem.getCategory().getCategoryId() == 2) { // 맥주
+            safetyValueBottle = roundToOneDecimal(totalSafetyValue / (500 * drinkItem.getAlcoholPercentage() / 100));
+            safetyValueGlass = Math.round(totalSafetyValue / (300 * drinkItem.getAlcoholPercentage() / 100));
+
+            maxValueBottle = roundToOneDecimal(totalMaxValue / (500 * drinkItem.getAlcoholPercentage() / 100));
+            maxValueGlass = Math.round(totalMaxValue / (300 * drinkItem.getAlcoholPercentage() / 100));
         }
+
         return DrinkInfoResponseDTO.builder()
                 .drinkItemId(drinkItem.getItemId())
                 .drinkItemName(drinkItem.getItemName())
                 .imageUrl(drinkItem.getImageUrl())
                 .alcoholPercentage(drinkItem.getAlcoholPercentage())
-                .safetyValue(0f)
-                .maxValue(0f)
-                .safetyValueBottle(0f)
-                .safetyValueGlass(0f)
-                .maxValueBottle(0f)
-                .maxValueGlass(0f)
-                .average(0f)
+                .safetyValue(totalSafetyValue)
+                .maxValue(totalMaxValue)
+                .safetyValueBottle(safetyValueBottle)  // 안전 주량 병
+                .safetyValueGlass(safetyValueGlass)    // 안전 주량 잔
+                .maxValueBottle(maxValueBottle)        // 치사량 병
+                .maxValueGlass(maxValueGlass)          // 치사량 잔
+                .average(average)                      // 평균 주량
                 .build();
-
     }
 
     private float convertToAlcoholAmount(Long drinkItemId, String unit, float value) {
@@ -166,5 +164,9 @@ public class DrinkQueryServiceImpl implements DrinkQueryService {
             }
         }
         return value;
+    }
+
+    private float roundToOneDecimal(float value) {
+        return Math.round(value * 10) / 10.0f;
     }
 }

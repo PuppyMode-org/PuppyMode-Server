@@ -89,9 +89,9 @@ public class DrinkResponseDTO {
         private Float safetyValue;
         private Float maxValue;
         private Float safetyValueBottle; // 안전 주량 병
-        private Float safetyValueGlass; // 안전 주량 잔
+        private Integer safetyValueGlass; // 안전 주량 잔
         private Float maxValueBottle; // 치사량 병
-        private Float maxValueGlass; // 치사량 잔
+        private Integer maxValueGlass; // 치사량 잔
         private Float average; // 평균 주량
     }
 }
