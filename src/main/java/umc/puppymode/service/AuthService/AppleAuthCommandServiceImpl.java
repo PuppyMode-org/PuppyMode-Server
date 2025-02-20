@@ -59,16 +59,26 @@ public class AppleAuthCommandServiceImpl implements AppleAuthCommandService {
      * @return 로그인 응답
      */
     @Override
-    public LoginResponseDTO loginWithApple(String authorizationCode, String identityToken, String username, String fcmToken) {
+    public LoginResponseDTO loginWithApple(String authorizationCode, String identityToken,
+                                           String username, String fcmToken) {
+        return loginWithApple(authorizationCode, identityToken, username, null, fcmToken);
+    }
+
+    @Override
+    public LoginResponseDTO loginWithApple(String authorizationCode, String identityToken, String username, String email, String fcmToken) {
 
         Claims claims = appleAuthQueryService.verifyIdentityToken(identityToken);
         if (claims == null) {
             throw new IllegalArgumentException("Invalid identity token");
         }
 
+        if (email == null) {
+            email = claims.get("email", String.class);
+        }
+
         UserAuthInfoDTO userInfo = UserAuthInfoDTO.builder()
                 .userAuthId(claims.getSubject())
-                .email(claims.get("email", String.class))
+                .email(email)
                 .authProvider(AuthProvider.APPLE)
                 .build();
 

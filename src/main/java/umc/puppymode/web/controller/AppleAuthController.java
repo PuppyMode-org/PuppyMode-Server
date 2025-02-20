@@ -79,10 +79,12 @@ public class AppleAuthController {
             String userJson = formParams.get("user");
             String fcmToken = formParams.getOrDefault("fcm_token", null);
 
-            String username = extractUsername(userJson);
+            String[] userInfo = extractUserInfo(userJson);
+            String username = userInfo[0];
+            String email = userInfo[1];
 
             return ResponseEntity.ok(ApiResponse.onSuccess(
-                    processAppleLogin(authorizationCode, identityToken, username, fcmToken)
+                    processAppleLogin(authorizationCode, identityToken, username, email, fcmToken)
             ));
         } catch (IllegalArgumentException e) {
             log.warn("애플 로그인 유효성 오류: {}", e.getMessage());
@@ -96,41 +98,50 @@ public class AppleAuthController {
     }
 
     /**
-     * 애플 로그인 처리 공통 로직입니다.
+     * 애플 로그인 처리 공통 로직입니다. (앱 전용, email 없음)
      */
-    private LoginResponseDTO processAppleLogin(String authorizationCode, String identityToken, String username, String fcmToken) {
+    private LoginResponseDTO processAppleLogin(String authorizationCode, String identityToken,
+                                               String username, String fcmToken) {
         return appleAuthCommandService.loginWithApple(authorizationCode, identityToken, username, fcmToken);
+    }
+
+    /**
+     * 애플 로그인 처리 공통 로직입니다. (웹 전용, email 포함)
+     */
+    private LoginResponseDTO processAppleLogin(String authorizationCode, String identityToken,
+                                               String username, String email, String fcmToken) {
+        return appleAuthCommandService.loginWithApple(authorizationCode, identityToken, username, email, fcmToken);
     }
 
     /**
      * JSON에서 username(firstName + lastName)을 추출합니다.
      *
      * @param userJson
-     * @return username
+     * @return String[] (username, email)
      */
-    private String extractUsername(String userJson) {
+    private String[] extractUserInfo(String userJson) {
         if (userJson == null || userJson.isEmpty()) {
-            return null;
+            return new String[]{null, null};
         }
 
         try {
             JsonNode userNode = objectMapper.readTree(userJson);
             JsonNode nameNode = userNode.get("name");
-            if (nameNode == null) {
-                return null;
+            JsonNode emailNode = userNode.get("email");
+
+            String firstName = nameNode != null && nameNode.has("firstName") ? nameNode.get("firstName").asText() : "";
+            String lastName = nameNode != null && nameNode.has("lastName") ? nameNode.get("lastName").asText() : "";
+            String email = emailNode != null ? emailNode.asText() : null;
+
+            String username = (firstName + " " + lastName).trim();
+            if (username.isEmpty()) {
+                username = null;
             }
 
-            String firstName = nameNode.has("firstName") ? nameNode.get("firstName").asText() : "";
-            String lastName = nameNode.has("lastName") ? nameNode.get("lastName").asText() : "";
-
-            if (firstName.isEmpty() && lastName.isEmpty()) {
-                return null;
-            }
-
-            return (firstName + " " + lastName).trim();
+            return new String[]{username, email};
         } catch (Exception e) {
-            log.error("애플 로그인 사용자 이름 파싱 실패", e);
-            return null;
+            log.error("애플 로그인 사용자 정보 파싱 실패", e);
+            return new String[]{null, null};
         }
     }
 }
