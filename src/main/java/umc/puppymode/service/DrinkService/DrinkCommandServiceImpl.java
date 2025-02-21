@@ -74,6 +74,8 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
             // 숙취를 처음 느낀 기록을 기준으로 안전 주량 설정
             if (drinkHistory.getHangovers() != null && !drinkHistory.getHangovers().isEmpty()) {
                 safetyLevels.put(drinkItemId, Math.min(safetyLevels.getOrDefault(drinkItemId, Float.MAX_VALUE), alcoholAmount));
+            } else {
+                safetyLevels.put(drinkItemId, Math.max(safetyLevels.getOrDefault(drinkItemId, 0f), alcoholAmount));
             }
             // 가장 많이 마신 기록을 기준으로 치사량 설정
             maxCapacities.put(drinkItemId, Math.max(maxCapacities.getOrDefault(drinkItemId, 0f), alcoholAmount));
