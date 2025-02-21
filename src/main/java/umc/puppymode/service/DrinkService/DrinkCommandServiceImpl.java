@@ -178,6 +178,8 @@ public class DrinkCommandServiceImpl implements DrinkCommandService {
         Float puppyPercent = (float) (((double) (puppy.getPuppyExp() - puppy.getPuppyLevel().getLevelMinExp()) /
                         (puppy.getPuppyLevel().getLevelMaxExp() - puppy.getPuppyLevel().getLevelMinExp())) * 100);
 
+        puppyRepository.save(puppy);
+
         // DTO 생성 및 반환
         return FeedResponseDTO.builder()
                 .puppyName(puppy.getPuppyName())
